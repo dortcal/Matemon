@@ -272,6 +272,16 @@ kbd{display:inline-block;min-width:1.6em;padding:.1em .45em;border:.12rem solid 
 .hitplate{animation:shk2 .45s}.hitplate .hp i{box-shadow:0 0 .8rem #fff}
 .hp i{transition:width .6s cubic-bezier(.2,.8,.2,1)}
 .fplate .hp{height:1.05rem}
+
+.power{display:flex;align-items:center;gap:.5rem;background:var(--panel);border:.16rem solid var(--ink);border-radius:1rem;padding:.2rem .7rem;color:#fff;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;box-shadow:0 .2rem 0 var(--ink)}
+.power .segs{display:flex;gap:.18rem}.power .segs i{width:.9rem;height:.9rem;border-radius:.3rem;background:#12063a;border:.12rem solid var(--ink);transform:skewX(-14deg)}
+.power .segs i.on{background:linear-gradient(180deg,#a8f3ff,#2d9bff);box-shadow:0 0 .5rem #2de2ff}
+.power.ready{background:linear-gradient(180deg,#2de2ff,#2d9bff);color:var(--ink);cursor:pointer;animation:pls2 .5s infinite alternate}
+.power.ready .segs i.on{background:#fff}
+.power:not(.usable){cursor:default}.power.ready:not(.usable){animation:none;opacity:.8}
+.power kbd{font-size:.7rem}
+.ans.gone{opacity:.12;filter:grayscale(1);transform:scale(.92);pointer-events:none}
+@media (max-aspect-ratio:1/1){.power{order:5;padding:.15rem .5rem}.power .pl{display:none}.power.ready .pl{display:inline}}
 </style>
 </head>
 <body>
@@ -1414,6 +1424,7 @@ const modalOpen = () => !!document.getElementById('modal');
 function helpModal() {
   modal(`<h3>Cómo se juega</h3><p>Tu criatura se enfrenta a otras. <b>Resuelve bien el reto</b> para atacar. Si fallas, pierdes un corazón. ¡Vence a los jefes y consigue la mejor calificación!</p>
   <div class="ctl"><span><kbd>↑</kbd><kbd>←</kbd><kbd>→</kbd><kbd>↓</kbd></span><span>Elegir respuesta (la flecha de cada botón)</span><span><kbd>Espacio</kbd></span><span>Aceptar y continuar (clic en Makey Makey)</span><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> · <kbd>1</kbd>–<kbd>4</kbd></span><span>Alternativas de teclado</span><span><kbd>Esc</kbd> · <kbd>M</kbd></span><span>Pausa · Silenciar</span></div>
+  <p><b>Poder:</b> cada acierto carga la barra PODER. Cuando está llena, pulsa <kbd>Espacio</kbd> (o el botón) en una pregunta para eliminar dos respuestas incorrectas. Solo se puede usar una vez por carga.</p>
   <p><b>Makey Makey:</b> conecta ↑ ← → ↓ y ESPACIO a cuatro objetos conductores (plastilina, fruta, papel de aluminio…) y la tierra a tu mano. También sirve tocar la pantalla.</p>
   <button class="btn" data-first data-nav data-act="closemodal">¡Entendido!</button>`);
 }
@@ -1423,7 +1434,7 @@ function teacherModal() {
   <tr><td>Cría Chispa<br>1.º–2.º</td><td>Sumas y restas (hasta 100), huecos y problemas · secuencias de figuras y de 1 en 1, 2, 5, 10 · mayor/menor y signos &lt; &gt; = (hasta 999) · figuras planas y cuerpos geométricos · contar cuadraditos de superficie. <b>Sin tablas, divisiones ni fracciones.</b></td></tr>
   <tr><td>Domador Rayo<br>3.º–4.º</td><td>Sumas y restas hasta 9.999 y problemas · tablas del 2 al 10 · divisiones exactas y con resto · secuencias · fracciones sencillas (leer, fracción de una cantidad, comparar) · comparar números y operaciones · polígonos, cuerpos, ángulos rectos, paralelas · áreas en cuadrícula y perímetro.</td></tr>
   <tr><td>Maestro Volcán<br>5.º–6.º</td><td>Cálculo hasta 999.999 y decimales · multiplicar por 2 cifras, ×10/100/1000 · divisiones con resto y prueba · series geométricas · fracciones (equivalentes, suma, simplificar, decimal, %) · decimales · ángulos, triángulos, círculo · áreas de rectángulo, triángulo, paralelogramo y figuras compuestas.</td></tr></table>
-  <p><b>Tiempo:</b> en 1.º–2.º y 3.º–4.º cada pregunta tiene un máximo de 1 minuto y en 5.º–6.º de 2 minutos (barra visible); si se agota cuenta como fallo y se muestra la pista. Estos dos primeros ciclos también tienen más corazones y una subida de dificultad más suave.</p><p>Las preguntas se generan al vuelo (decenas de miles de combinaciones) y no se repiten dentro de una sesión. Ante un fallo se muestra una pista con el cálculo resuelto. No se recogen datos personales: solo se guardan en este navegador las puntuaciones y las criaturas domadas.</p>
+  <p><b>Tiempo:</b> en 1.º–2.º y 3.º–4.º cada pregunta tiene un máximo de 1 minuto y en 5.º–6.º de 2 minutos (barra visible); si se agota cuenta como fallo y se muestra la pista. Estos dos primeros ciclos también tienen más corazones y una subida de dificultad más suave.</p><p><b>Poder:</b> la barra PODER se carga con los aciertos (4 en 1.º–4.º, 5 en 5.º–6.º) y permite eliminar dos respuestas incorrectas en una pregunta, una vez por carga.</p><p>Las preguntas se generan al vuelo (decenas de miles de combinaciones) y no se repiten dentro de una sesión. Ante un fallo se muestra una pista con el cálculo resuelto. No se recogen datos personales: solo se guardan en este navegador las puntuaciones y las criaturas domadas.</p>
   <button class="btn" data-first data-nav data-act="closemodal">Cerrar</button>`);
 }
 
@@ -1504,6 +1515,7 @@ function act(a, v, el) {
     case 'menu': tok++; S = null; modeScreen(); musicFor('menu'); break;
     case 'home': tok++; S = null; titleScreen(); break;
     case 'full': toggleFull(); break;
+    case 'power': usePower(); break;
     case 'ans': if (el) answer(+el.dataset.i); break;
     case 'cont': if (S && S.resume) S.resume(); break;
   }
@@ -1530,7 +1542,7 @@ function buildPlan(mode, cat, cycle) {
 function startRun(mode, cat) {
   tok++; closeModal();
   const maxL = P.cycle === 1 ? 7 : P.cycle === 2 ? 6 : 5, plan = buildPlan(mode, cat, P.cycle);
-  S = { mode, cat, cycle: P.cycle, me: mkCr(P.cr), lives: maxL, maxLives: maxL, score: 0, streak: 0, best: 0, correct: 0, wrong: 0, answered: 0, stage: 1, plan, pi: -1, tamed: [], dyn: 0, bonus: { enc: 0, boss: 0 }, locked: true, paused: false, totalNeed: plan.reduce((s, e) => s + e.need, 0), limit: P.cycle <= 2 ? 60 : 120, evo2: mode === 'story' ? 9 : 5, evo3: mode === 'story' ? 24 : 11, lastCat: '', stats: {} };
+  S = { mode, cat, cycle: P.cycle, me: mkCr(P.cr), lives: maxL, maxLives: maxL, score: 0, streak: 0, best: 0, correct: 0, wrong: 0, answered: 0, stage: 1, plan, pi: -1, tamed: [], dyn: 0, bonus: { enc: 0, boss: 0 }, locked: true, paused: false, totalNeed: plan.reduce((s, e) => s + e.need, 0), limit: P.cycle <= 2 ? 60 : 120, pow: 0, powNeed: P.cycle === 3 ? 5 : 4, removed: new Set(), evo2: mode === 'story' ? 9 : 5, evo3: mode === 'story' ? 24 : 11, lastCat: '', stats: {} };
   curTrack = ''; UI.audioOn && musicFor('battle');
   renderBattle();
   run().catch(e => { if (e !== CANCEL) { console.error(e); } });
@@ -1538,12 +1550,12 @@ function startRun(mode, cat) {
 function renderBattle() {
   UI.screen = 'battle'; UI.back = null; UI.busy = false;
   app.innerHTML = `<div class="screen battle" data-screen="battle" style="padding:0;gap:0;justify-content:flex-start;align-items:stretch;overflow:hidden;animation:none">
-  <div class="hud"><div class="hl"><div class="hearts" id="hearts" role="img"></div><span class="hpill" id="encInfo"></span></div><div class="hr"><span class="hpill streak" id="streak"></span><span class="score" id="score">0</span></div></div>
+  <div class="hud"><div class="hl"><div class="hearts" id="hearts" role="img"></div><span class="hpill" id="encInfo"></span></div><button class="power" id="power" data-act="power" aria-label="Poder: eliminar dos respuestas"><span class="segs" id="segs"></span><span class="pl" id="plabel">PODER</span></button><div class="hr"><span class="hpill streak" id="streak"></span><span class="score" id="score">0</span></div></div>
   <div class="arena" id="arena"><div class="plate fplate" id="fplate"></div><div class="sprite foe" id="foe"><div class="shadow"></div><div class="inner bob"></div></div>
   <div class="plate mplate" id="mplate"></div><div class="sprite me" id="me"><div class="shadow"></div><div class="inner bob"></div></div></div>
   <div class="qpanel" id="qpanel"></div><div class="banner" id="banner"></div></div>`;
   const tc = document.getElementById('topctl'); tc.dataset.mode = 'battle';
-  setHearts(); setMe(); setHud();
+  setHearts(); setMe(); setHud(); setPower();
 }
 const $ = id => document.getElementById(id);
 function setHearts(lost) {
@@ -1556,6 +1568,22 @@ function setHud() {
   $('score').textContent = S.score.toLocaleString('es-ES');
   const m = mult();
   $('streak').textContent = S.streak >= 2 ? `RACHA ×${m}` : ''; $('streak').style.display = S.streak >= 2 ? '' : 'none'; $('streak').classList.toggle('hot', m >= 3);
+}
+function setPower() {
+  const p = $('power'); if (!p) return; const need = S.powNeed, full = S.pow >= need;
+  $('segs').innerHTML = Array.from({ length: need }, (_, i) => `<i class="${i < S.pow ? 'on' : ''}"></i>`).join('');
+  const usable = full && S.q && !S.locked && S.q.answers.length >= 3 && !S.removed.size;
+  p.classList.toggle('ready', full); p.classList.toggle('usable', !!usable);
+  $('plabel').innerHTML = full ? '¡Quitar 2! <kbd>Espacio</kbd>' : 'PODER';
+  p.setAttribute('aria-label', full ? 'Poder listo: pulsa para eliminar dos respuestas' : `Poder: ${S.pow} de ${need}`);
+}
+function usePower() {
+  try { document.activeElement && document.activeElement.blur(); } catch (e) {}
+  if (!S || S.paused || S.locked || !S.q || S.pow < S.powNeed || S.removed.size || S.q.answers.length < 3) return;
+  const wrong = S.q.answers.map((_, i) => i).filter(i => i !== S.q.correct), n = Math.min(2, S.q.answers.length - 2);
+  R.shuffle(wrong).slice(0, n).forEach(i => S.removed.add(i));
+  document.querySelectorAll('.ans').forEach(b => { if (S.removed.has(+b.dataset.i)) { b.classList.add('gone'); b.disabled = true; const r = b.getBoundingClientRect(); FX.burst(r.left + r.width / 2, r.top + r.height / 2, ['#fff', '#2de2ff', '#b6ff3b'], 22, 7); } });
+  S.pow = 0; sfx('evolve'); floatText('¡Dos fuera!', $('qcard'), '#2de2ff'); live('Se han eliminado dos respuestas'); setPower();
 }
 const mult = () => 1 + Math.min(4, Math.floor(S.streak / 3));
 function setMe(mood) {
@@ -1647,27 +1675,28 @@ function renderQuestion(q) {
   const info = Q.info(q.cat, S.cycle), dirs = dirsFor(q.answers.length), plain = strip(q.text);
   const cls = plain.length <= 20 && /[0-9?]/.test(plain) ? 'eq' : plain.length > 70 ? 'long' : '';
   const btns = q.answers.map((a, i) => `<button class="ans${!a.includes('<') && a.length > 11 ? ' long' : ''}" data-dir="${dirs[i]}" data-i="${i}" data-act="ans" aria-label="${dirs[i] === 'up' ? 'Arriba' : dirs[i] === 'down' ? 'Abajo' : dirs[i] === 'left' ? 'Izquierda' : 'Derecha'}: ${strip(a).replace(/"/g, '')}">${ARROW(dirs[i])}<span class="av">${a}</span></button>`).join('');
+  S.removed = new Set(); setPower();
   const p = $('qpanel'); p.style.display = ''; p.innerHTML = `<div class="qcard" id="qcard" style="--c:${info.color}"><span class="qcat">${info.name}</span>${S.limit ? '<div class="tbar"><i></i><b>' + S.limit + ' s</b></div>' : ''}<div class="qtext ${cls}">${q.text}</div><div class="qvis">${q.visual}</div></div>${btns}`;
 }
 function battleKey(a) {
   if (a === 'pause') { if (S && S.paused) resumeGame(); else pauseGame(); return; }
   if (!S || S.paused) { if (a === 'ok' && S && S.paused) resumeGame(); return; }
-  if (a === 'ok') { if (S.resume && performance.now() - S.hintAt > 500) S.resume(); return; }
+  if (a === 'ok') { if (S.resume) { if (performance.now() - S.hintAt > 500) S.resume(); } else usePower(); return; }
   const dirs = S.q ? dirsFor(S.q.answers.length) : [];
   let i = dirs.indexOf(a); if (i < 0 && /^n[1-4]$/.test(a)) i = +a[1] - 1;
-  if (i >= 0 && S.q && i < S.q.answers.length) answer(i);
+  if (i >= 0 && S.q && i < S.q.answers.length && !S.removed.has(i)) answer(i);
 }
 let lastAnsAt = 0;
 async function answer(i) {
-  if (!S || S.locked || S.paused || !S.q) return;
+  if (!S || S.locked || S.paused || !S.q || (S.removed && S.removed.has(i))) return;
   const now = performance.now(); if (now - lastAnsAt < 250) return; lastAnsAt = now;
-  clearInterval(timerId); S.locked = true; const q = S.q, ok = i === q.correct, btns = [...document.querySelectorAll('.ans')];
+  clearInterval(timerId); S.locked = true; setPower(); const q = S.q, ok = i === q.correct, btns = [...document.querySelectorAll('.ans')];
   const secs = (now - S.tq) / 1000; S.answered++;
   const st = S.stats[q.cat] = S.stats[q.cat] || { c: 0, w: 0 }; ok ? st.c++ : st.w++;
   const my = tok;
   try {
     if (ok) {
-      S.streak++; S.best = Math.max(S.best, S.streak); S.correct++; S.dyn = Math.min(.2, S.dyn + .03);
+      S.streak++; S.best = Math.max(S.best, S.streak); S.correct++; { const was = S.pow >= S.powNeed; if (!was) { S.pow++; if (S.pow >= S.powNeed) setTimeout(() => { sfx('heal'); }, 600); } } S.dyn = Math.min(.2, S.dyn + .03);
       const m = mult(), turbo = Math.max(0, Math.round(60 - secs * 6)), pts = Math.round((100 * m + turbo) * (S.enc.title ? 1.5 : 1));
       S.score += pts; btns.forEach((b, j) => b.classList.add(j === i ? 'ok' : 'dim'));
       sfx(S.streak % 3 === 0 ? 'combo' : 'correct'); setHud();

@@ -13,6 +13,8 @@ Juego educativo de matemáticas para Primaria. Se juega en el navegador (sin ins
 
 Tiempo máximo por pregunta: **1 minuto** en 1.º–2.º y 3.º–4.º y **2 minutos** en 5.º–6.º. Los dos primeros ciclos tienen además más corazones y dificultad más suave. Modos: **Historia** (todos los retos, 2 jefes y jefe final) y **Duelo rápido** por categoría. Las preguntas se generan al vuelo y no se repiten en la sesión. La vinculación con el currículo de Canarias es una propuesta pendiente de contrastar.
 
+**Poder:** cada acierto carga la barra PODER; cuando está llena, **Espacio** elimina dos respuestas incorrectas (una vez por carga, no en todas las preguntas).
+
 ## Controles (Makey Makey)
 ↑ ← → ↓ para elegir respuesta, **Espacio** (clic) para aceptar, `Esc` pausa, `M` silencio. También W A S D y 1–4.
 

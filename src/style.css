@@ -261,3 +261,13 @@ kbd{display:inline-block;min-width:1.6em;padding:.1em .45em;border:.12rem solid 
 .hitplate{animation:shk2 .45s}.hitplate .hp i{box-shadow:0 0 .8rem #fff}
 .hp i{transition:width .6s cubic-bezier(.2,.8,.2,1)}
 .fplate .hp{height:1.05rem}
+
+.power{display:flex;align-items:center;gap:.5rem;background:var(--panel);border:.16rem solid var(--ink);border-radius:1rem;padding:.2rem .7rem;color:#fff;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;box-shadow:0 .2rem 0 var(--ink)}
+.power .segs{display:flex;gap:.18rem}.power .segs i{width:.9rem;height:.9rem;border-radius:.3rem;background:#12063a;border:.12rem solid var(--ink);transform:skewX(-14deg)}
+.power .segs i.on{background:linear-gradient(180deg,#a8f3ff,#2d9bff);box-shadow:0 0 .5rem #2de2ff}
+.power.ready{background:linear-gradient(180deg,#2de2ff,#2d9bff);color:var(--ink);cursor:pointer;animation:pls2 .5s infinite alternate}
+.power.ready .segs i.on{background:#fff}
+.power:not(.usable){cursor:default}.power.ready:not(.usable){animation:none;opacity:.8}
+.power kbd{font-size:.7rem}
+.ans.gone{opacity:.12;filter:grayscale(1);transform:scale(.92);pointer-events:none}
+@media (max-aspect-ratio:1/1){.power{order:5;padding:.15rem .5rem}.power .pl{display:none}.power.ready .pl{display:inline}}
