@@ -1424,9 +1424,9 @@ function closeModal() { const m = document.getElementById('modal'); if (m) m.rem
 const modalOpen = () => !!document.getElementById('modal');
 function helpModal() {
   modal(`<h3>Cómo se juega</h3><p>Tu criatura se enfrenta a otras. <b>Resuelve bien el reto</b> para atacar. Si fallas, pierdes un corazón. ¡Vence a los jefes y consigue la mejor calificación!</p>
-  <div class="ctl"><span><kbd>↑</kbd><kbd>←</kbd><kbd>→</kbd><kbd>↓</kbd></span><span>Elegir respuesta (la flecha de cada botón)</span><span><kbd>Espacio</kbd></span><span>Aceptar y continuar (clic en Makey Makey)</span><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> · <kbd>1</kbd>–<kbd>4</kbd></span><span>Alternativas de teclado</span><span><kbd>Esc</kbd> · <kbd>M</kbd></span><span>Pausa · Silenciar</span></div>
-  <p><b>Poder:</b> cada acierto carga la barra PODER. Cuando está llena, pulsa <kbd>Espacio</kbd> (o el botón) en una pregunta para eliminar dos respuestas incorrectas. Solo se puede usar una vez por carga.</p>
-  <p><b>Makey Makey:</b> conecta ↑ ← → ↓ y ESPACIO a cuatro objetos conductores (plastilina, fruta, papel de aluminio…) y la tierra a tu mano. También sirve tocar la pantalla.</p>
+  <div class="ctl"><span><kbd>↑</kbd><kbd>←</kbd><kbd>→</kbd><kbd>↓</kbd></span><span>Elegir respuesta (la flecha de cada botón)</span><span><kbd>Espacio</kbd></span><span>Aceptar, continuar y usar el PODER (el botón ESPACIO de la Makey Makey)</span><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> · <kbd>1</kbd>–<kbd>4</kbd></span><span>Alternativas de teclado</span><span><kbd>Esc</kbd> · <kbd>M</kbd></span><span>Pausa · Silenciar</span></div>
+  <p><b>Poder:</b> cada acierto carga la barra PODER. Cuando está llena, pulsa <kbd>Espacio</kbd> (o el botón) en una pregunta para eliminar dos respuestas incorrectas. Solo se puede usar una vez por carga. En la Makey Makey basta con ESPACIO; no hace falta el clic.</p>
+  <p><b>Makey Makey:</b> conecta ↑ ← → ↓ y ESPACIO a cinco objetos conductores (plastilina, fruta, papel de aluminio…) y la tierra a tu mano. También sirve tocar la pantalla.</p>
   <button class="btn" data-first data-nav data-act="closemodal">¡Entendido!</button>`);
 }
 function teacherModal() {

@@ -16,7 +16,7 @@ Tiempo máximo por pregunta: **1 minuto** en 1.º–2.º y 3.º–4.º y **2 min
 **Poder:** cada acierto carga la barra PODER; cuando está llena, **Espacio** elimina dos respuestas incorrectas (una vez por carga, no en todas las preguntas).
 
 ## Controles (Makey Makey)
-↑ ← → ↓ para elegir respuesta, **Espacio** (clic) para aceptar, `Esc` pausa, `M` silencio. También W A S D y 1–4.
+↑ ← → ↓ para elegir respuesta, **Espacio** para aceptar, continuar y usar el PODER (en la Makey Makey no hace falta el clic), `Esc` pausa, `M` silencio. También W A S D y 1–4.
 
 ## Estructura
 `index.html` es el juego completo (generado). El código fuente está en `src/`; para regenerarlo: `python3 build.py`.
