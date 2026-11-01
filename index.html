@@ -55,7 +55,7 @@ button:focus-visible,[data-nav]:focus-visible,button.focus{outline:.28rem solid 
 /* textos */
 .logo{font-size:clamp(2.4rem,9vmin + 1rem,6.2rem);line-height:.92;text-transform:uppercase;text-align:center;transform:rotate(-3deg);margin:0;font-weight:900;paint-order:stroke fill;-webkit-text-stroke:.14em var(--ink);text-shadow:0 .08em 0 var(--ink),0 .16em 0 var(--ink),0 .3em .5em rgba(0,0,0,.4)}
 .logo .a{color:var(--lime)}.logo .b{color:var(--pink);display:block;font-size:1.12em}
-.sub{font-size:1.25rem;color:var(--yellow);text-transform:uppercase;letter-spacing:.2em;text-shadow:0 .1em 0 var(--ink);text-align:center;margin:.4rem 0 0}
+.sub{display:inline-block;font-size:1.2rem;color:var(--yellow);text-transform:uppercase;letter-spacing:.16em;text-align:center;margin:.5rem 0 0;padding:.35rem 1.3rem;background:var(--ink);border:.18rem solid #fff;border-radius:2rem;box-shadow:0 .3rem 0 rgba(0,0,0,.45);transform:rotate(-1.5deg)}
 h2.t{margin:0;font-size:clamp(1.5rem,5.2vmin,2.6rem);text-transform:uppercase;text-align:center;paint-order:stroke fill;-webkit-text-stroke:.12em var(--ink);text-shadow:0 .1em 0 var(--ink);color:#fff}
 p.s{margin:.3rem 0 0;text-align:center;font-weight:700;color:#f1ebff;text-shadow:0 0 .5em var(--ink),0 .08em 0 var(--ink),0 0 .2em var(--ink)}
 .screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:3.4rem 1rem 1rem;min-height:0;overflow:auto;animation:scrIn .35s ease-out}
@@ -258,6 +258,9 @@ kbd{display:inline-block;min-width:1.6em;padding:.1em .45em;border:.12rem solid 
 .credits{margin:0;font-size:.72rem;text-align:center;color:#e6defc;text-shadow:0 0 .4em var(--ink),0 .08em 0 var(--ink);line-height:1.5}
 .credits a{display:inline-block;vertical-align:middle;-webkit-user-select:auto;user-select:auto}.credits img{display:block;border-radius:.2rem}
 .credits span{vertical-align:middle}
+.keys,.credits{background:rgba(27,17,64,.72);padding:.25rem .9rem;border-radius:1rem}
+.title-pets{height:clamp(5rem,18vmin,10rem)}
+[data-screen=title]{gap:.6rem;padding-bottom:.5rem}
 </style>
 </head>
 <body>
