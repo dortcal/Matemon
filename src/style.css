@@ -250,3 +250,10 @@ kbd{display:inline-block;min-width:1.6em;padding:.1em .45em;border:.12rem solid 
 .keys,.credits{background:rgba(27,17,64,.72);padding:.25rem .9rem;border-radius:1rem}
 .title-pets{height:clamp(5rem,18vmin,10rem)}
 [data-screen=title]{gap:.6rem;padding-bottom:.5rem}
+/* figuras: nunca desbordan la tarjeta de la pregunta */
+.qvis{flex:1 1 0;min-height:0;width:100%}
+.qvis>svg.fig,.qvis>svg.grid{height:100%!important;max-height:15rem;width:auto;max-width:100%}
+.qvis .duo{height:100%;max-height:15rem}
+.qvis .duo svg{height:100%!important;width:auto;max-width:48%}
+.qvis .seq{max-height:100%}
+.qtext{margin-top:1.35rem}
