@@ -271,3 +271,4 @@ kbd{display:inline-block;min-width:1.6em;padding:.1em .45em;border:.12rem solid 
 .power kbd{font-size:.7rem}
 .ans.gone{opacity:.12;filter:grayscale(1);transform:scale(.92);pointer-events:none}
 @media (max-aspect-ratio:1/1){.power{order:5;padding:.15rem .5rem}.power .pl{display:none}.power.ready .pl{display:inline}}
+.hintcard .oops.good{color:#7dff8a}

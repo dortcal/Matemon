@@ -418,6 +418,8 @@ async function answer(i) {
       const m = mult(), turbo = Math.max(0, Math.round(60 - secs * 6)), pts = Math.round((100 * m + turbo) * (S.enc.title ? 1.5 : 1));
       S.score += pts; btns.forEach((b, j) => b.classList.add(j === i ? 'ok' : 'dim'));
       sfx(S.streak % 3 === 0 ? 'combo' : 'correct'); setHud();
+      const card0 = $('qcard'), t0 = performance.now();
+      if (card0 && q.hint) { card0.innerHTML = `<div class="hintcard"><span class="oops good">¡Correcto!</span><div class="ht">${q.hint}</div><span class="go">Pulsa <b>ESPACIO</b> o toca para seguir</span></div>`; S.hintAt = t0; }
       anim($('me'), 'lunger', 560); setMe('happy'); anim($('me').querySelector('.inner'), 'hop', 600);
       await sleepSafe(180);
       const ac = C.ELEM[S.me.element].acc, to = await orb($('me'), $('foe'), ac, 340);
@@ -429,7 +431,8 @@ async function answer(i) {
       if (S.hp > 0) setFoe();
       if (S.stage === 1 && S.correct >= S.evo2) await evolve(2); else if (S.stage === 2 && S.correct >= S.evo3) await evolve(3);
       if (S.hp > 0) setMe();
-      await sleep(180);
+      { const left = Math.max(400, 3800 - (performance.now() - t0)); await new Promise(r => { let t; S.resume = () => { clearTimeout(t); S.resume = null; r(); }; t = setTimeout(() => { if (S && S.resume) S.resume(); }, left); const c = $('qcard'); if (c) c.onclick = () => { if (S && S.resume && performance.now() - S.hintAt > 400) S.resume(); }; }); }
+      await sleep(120);
     } else {
       S.streak = 0; S.wrong++; S.dyn = Math.max(-.2, S.dyn - .07); S.lives--;
       btns.forEach((b, j) => b.classList.add(j === i ? 'bad' : j === q.correct ? 'ok' : 'dim'));
