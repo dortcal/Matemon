@@ -1,0 +1,1764 @@
+<!doctype html>
+<html lang="es">
+<head>
+<!-- MateMonstruos · Diseñado por David OZC · © David 2026 · CC BY-NC-ND 4.0 (https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es) · Uso gratuito en centros educativos -->
+<meta charset="utf-8">
+<title>MateMonstruos · Liga del Teide</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="author" content="David OZC">
+<link rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/">
+<meta name="description" content="Juego educativo de matemáticas para Primaria, jugable con teclado, pantalla táctil o Makey Makey.">
+<meta name="theme-color" content="#12063a">
+<style>:root{--ink:#1b1140;--ink2:#2a1a66;--lime:#b6ff3b;--pink:#ff3d9a;--cyan:#2de2ff;--yellow:#ffd23f;--orange:#ff7a3d;--violet:#9b6bff;--white:#fff;--panel:rgba(22,10,62,.82)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{font-size:clamp(14px,1.55vmin + 7px,24px)}
+html,body{margin:0;height:100%;background:#12063a;color:#fff;overflow:hidden;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+body{font-family:"Arial Black","Trebuchet MS","Segoe UI",system-ui,sans-serif;font-weight:800;letter-spacing:.01em}
+#app{position:fixed;inset:0;overflow:hidden}
+#bg{position:absolute;inset:0;z-index:0;transition:opacity .4s}
+#bg svg{position:absolute;inset:0;width:100%;height:100%}
+#bg::after,#app::after{content:"";position:absolute;inset:0;pointer-events:none}
+#bg::after{background:radial-gradient(ellipse at 50% 45%,transparent 45%,rgba(10,2,40,.55) 100%),radial-gradient(rgba(255,255,255,.08) 1px,transparent 1.5px) 0 0/9px 9px}
+#fx{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
+#screen{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;outline:none}
+.sr{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.tw{animation:tw 3s infinite ease-in-out}@keyframes tw{50%{opacity:.25}}
+.drift{animation:drift 70s linear infinite}.drift.d2{animation-duration:46s;animation-direction:reverse}.drift.d3{animation-duration:90s}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-400px)}}
+.wv{animation:wv 9s linear infinite}.wv.w2{animation-duration:7s;animation-direction:reverse}.wv.w3{animation-duration:5.5s}.wv.w4{animation-duration:4.2s;animation-direction:reverse}
+@keyframes wv{from{transform:translateX(0)}to{transform:translateX(-400px)}}
+.pulse{animation:pls 2.2s infinite ease-in-out;transform-origin:860px 300px}@keyframes pls{50%{transform:scale(1.25);opacity:.7}}
+.smoke{animation:smk 6s infinite ease-in-out}@keyframes smk{50%{transform:translate(18px,-16px)}}
+.rays{animation:rays 7s infinite ease-in-out}@keyframes rays{50%{opacity:.55}}
+.float{animation:flt 7s infinite ease-in-out}@keyframes flt{50%{transform:translateY(-14px)}}
+.shoot{animation:sht 7s infinite linear;opacity:0}@keyframes sht{0%{transform:translate(200px,80px);opacity:0}4%{opacity:1}14%{transform:translate(700px,330px);opacity:0}100%{opacity:0}}
+.aur{animation:aur 9s infinite ease-in-out}@keyframes aur{50%{transform:translateY(24px);opacity:.7}}
+
+/* controles superiores */
+#topctl{position:absolute;top:.5rem;right:.6rem;z-index:20;display:flex;gap:.45rem}
+.ib{width:2.5rem;height:2.5rem;border-radius:.8rem;border:.16rem solid var(--ink);background:var(--panel);color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 .2rem 0 var(--ink);padding:0}
+.ib svg{width:1.3rem;height:1.3rem}
+.ib:active{transform:translateY(.15rem);box-shadow:0 .05rem 0 var(--ink)}
+.ib[aria-pressed=true]{background:var(--pink)}
+
+/* botones */
+button{font:inherit;color:inherit;cursor:pointer}
+.btn{--c:var(--lime);position:relative;display:inline-flex;align-items:center;justify-content:center;gap:.6rem;padding:.7rem 1.5rem;min-height:3rem;border:.2rem solid var(--ink);border-radius:1.1rem;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 70%,#fff) 0,var(--c) 55%,color-mix(in srgb,var(--c) 80%,#000) 100%);color:var(--ink);font-weight:900;font-size:1.15rem;text-transform:uppercase;letter-spacing:.04em;box-shadow:0 .38rem 0 var(--ink),0 .6rem 1.2rem rgba(0,0,0,.35);transition:transform .08s,box-shadow .08s}
+.btn:active,.btn.press{transform:translateY(.3rem);box-shadow:0 .08rem 0 var(--ink)}
+.btn.pink{--c:var(--pink);color:#fff}.btn.cyan{--c:var(--cyan)}.btn.yellow{--c:var(--yellow)}.btn.orange{--c:var(--orange)}.btn.violet{--c:var(--violet);color:#fff}
+.btn.big{font-size:1.7rem;padding:.9rem 2.6rem;min-height:4rem}
+.btn.ghost{--c:#3b2a8c;color:#fff}
+:focus-visible,.focus{outline:none}
+button:focus-visible,[data-nav]:focus-visible,button.focus{outline:.28rem solid #fff;outline-offset:.2rem;animation:ring .9s infinite alternate}
+@keyframes ring{to{outline-color:var(--yellow)}}
+
+/* textos */
+.logo{font-size:clamp(2.4rem,9vmin + 1rem,6.2rem);line-height:.92;text-transform:uppercase;text-align:center;transform:rotate(-3deg);margin:0;font-weight:900;paint-order:stroke fill;-webkit-text-stroke:.14em var(--ink);text-shadow:0 .08em 0 var(--ink),0 .16em 0 var(--ink),0 .3em .5em rgba(0,0,0,.4)}
+.logo .a{color:var(--lime)}.logo .b{color:var(--pink);display:block;font-size:1.12em}
+.sub{font-size:1.25rem;color:var(--yellow);text-transform:uppercase;letter-spacing:.2em;text-shadow:0 .1em 0 var(--ink);text-align:center;margin:.4rem 0 0}
+h2.t{margin:0;font-size:clamp(1.5rem,5.2vmin,2.6rem);text-transform:uppercase;text-align:center;paint-order:stroke fill;-webkit-text-stroke:.12em var(--ink);text-shadow:0 .1em 0 var(--ink);color:#fff}
+p.s{margin:.3rem 0 0;text-align:center;font-weight:700;color:#f1ebff;text-shadow:0 0 .5em var(--ink),0 .08em 0 var(--ink),0 0 .2em var(--ink)}
+.screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:3.4rem 1rem 1rem;min-height:0;overflow:auto;animation:scrIn .35s ease-out}
+@keyframes scrIn{from{opacity:0;transform:translateY(1rem) scale(.98)}}
+.row{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;align-items:stretch}
+.col{display:flex;flex-direction:column;gap:.8rem;align-items:center}
+.keys{font-size:.8rem;color:#d7ccff;text-align:center;opacity:.9;text-shadow:0 .08em 0 var(--ink)}
+kbd{display:inline-block;min-width:1.6em;padding:.1em .45em;border:.12rem solid var(--ink);border-radius:.4em;background:#fff;color:var(--ink);font:inherit;font-size:.9em;box-shadow:0 .12em 0 var(--ink);margin:0 .1em}
+
+/* tarjetas */
+.card{--c:var(--lime);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:.45rem;width:min(15rem,29vw);min-width:10rem;padding:1rem .8rem 1.1rem;border:.22rem solid var(--ink);border-radius:1.4rem;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 55%,#fff),var(--c));color:var(--ink);text-align:center;box-shadow:0 .5rem 0 var(--ink),0 .8rem 1.5rem rgba(0,0,0,.4);transition:transform .12s;overflow:hidden}
+.card:hover,.card:focus-visible{transform:translateY(-.25rem) scale(1.04)}
+.card:active{transform:translateY(.2rem)}
+.card .ic{width:4.2rem;height:4.2rem;border-radius:1.2rem;background:var(--ink);display:grid;place-items:center;color:var(--c)}
+.card .ic svg{width:2.8rem;height:2.8rem;fill:none;stroke:currentColor;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.card .nm{font-size:1.25rem;line-height:1.05;text-transform:uppercase;font-weight:900}
+.card .ds{font-size:.82rem;font-weight:700;line-height:1.25;color:#2a1a66}
+.card .tag{font-size:.72rem;background:var(--ink);color:#fff;border-radius:2rem;padding:.2rem .7rem;letter-spacing:.06em}
+.card .best{position:absolute;top:.4rem;right:.4rem;background:var(--ink);color:var(--yellow);border-radius:.6rem;padding:.1rem .5rem;font-size:.8rem}
+.card.wide{width:min(34rem,86vw);flex-direction:row;text-align:left;gap:1rem;padding:1rem 1.4rem}
+.card.wide .ic{flex:none}
+.card.wide .nm{font-size:1.6rem}
+.cards-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.9rem;width:min(62rem,96vw)}
+.cards-grid .card{width:auto;min-width:0;padding:.7rem .5rem .8rem}
+.cards-grid .card .ic{width:3rem;height:3rem;border-radius:.9rem}.cards-grid .card .ic svg{width:2rem;height:2rem}
+.cards-grid .card .nm{font-size:.98rem}
+.lvl .eggmini{width:4.6rem;height:5.2rem;margin-top:-.2rem}
+
+/* título */
+.title-pets{display:flex;gap:1.2rem;align-items:flex-end;justify-content:center;height:clamp(6rem,22vmin,12rem)}
+.title-pets .pet{height:100%;aspect-ratio:1;animation:bob 2.4s infinite ease-in-out}
+.title-pets .pet:nth-child(2){height:125%;animation-delay:-.7s}.title-pets .pet:nth-child(3){animation-delay:-1.3s}
+.pet svg,.sprite svg,.big-cr svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 .3rem 0 rgba(0,0,0,.25))}
+
+/* huevos */
+.eggs{display:flex;gap:clamp(.8rem,4vw,3rem);align-items:flex-end;justify-content:center}
+.egg{background:none;border:0;padding:.4rem;width:clamp(6.5rem,24vmin,12rem);transition:transform .15s;position:relative}
+.egg:hover,.egg:focus-visible{transform:scale(1.1)}
+.egg .egg-svg{width:100%;filter:drop-shadow(0 .5rem 0 rgba(0,0,0,.25));animation:eggw 2.6s infinite ease-in-out;transform-origin:50% 90%}
+.egg:nth-child(2) .egg-svg{animation-delay:-.9s}.egg:nth-child(3) .egg-svg{animation-delay:-1.7s}
+@keyframes eggw{0%,60%,100%{transform:rotate(0)}70%{transform:rotate(-7deg)}80%{transform:rotate(6deg)}90%{transform:rotate(-3deg)}}
+.egg.shaking .egg-svg{animation:eggs .9s ease-in forwards}
+@keyframes eggs{0%{transform:rotate(0)}15%{transform:rotate(-14deg)}30%{transform:rotate(14deg)}45%{transform:rotate(-18deg) scale(1.05)}60%{transform:rotate(18deg) scale(1.1)}80%{transform:rotate(-10deg) scale(1.2)}100%{transform:scale(1.35);filter:brightness(3)}}
+.egg.gone{opacity:.15;transform:scale(.8);pointer-events:none}
+.reveal{display:flex;flex-direction:column;align-items:center;gap:.6rem}
+.big-cr{width:clamp(10rem,36vmin,20rem);aspect-ratio:1;animation:popin .7s cubic-bezier(.2,1.8,.4,1),bob 2.4s .7s infinite ease-in-out}
+.chip{display:inline-block;background:var(--ink);color:#fff;border-radius:2rem;padding:.2rem .9rem;font-size:.85rem;letter-spacing:.05em;text-transform:uppercase}
+.nameplate{font-size:clamp(1.6rem,6vmin,3rem);text-transform:uppercase;color:var(--yellow);paint-order:stroke fill;-webkit-text-stroke:.14em var(--ink);text-shadow:0 .1em 0 var(--ink)}
+
+/* criaturas / animaciones */
+.sprite{position:absolute;aspect-ratio:1;transform-origin:50% 90%}
+.sprite .inner{width:100%;height:100%}
+.bob{animation:bob 2.2s infinite ease-in-out}
+@keyframes bob{50%{transform:translateY(-4%) scale(1.02,.98)}}
+.hop{animation:hop .6s ease-out}
+@keyframes hop{0%{transform:translateY(0)}35%{transform:translateY(-22%) scale(.95,1.08)}70%{transform:translateY(0) scale(1.08,.92)}100%{transform:none}}
+.shake{animation:shk .5s}
+@keyframes shk{0%,100%{transform:translateX(0)}15%{transform:translateX(-9%) rotate(-5deg)}35%{transform:translateX(8%) rotate(4deg)}55%{transform:translateX(-6%)}75%{transform:translateX(4%)}}
+.faint{animation:fnt 1s forwards}
+@keyframes fnt{to{transform:translateY(14%) rotate(88deg) scale(.9);filter:grayscale(1) brightness(.7)}}
+.lunger{animation:lr .55s ease-in-out}.lungel{animation:ll .55s ease-in-out}
+@keyframes lr{40%{transform:translate(55%,-18%) scale(1.1)}}
+@keyframes ll{40%{transform:translate(-55%,18%) scale(1.1)}}
+.popin{animation:popin .6s cubic-bezier(.2,1.8,.4,1)}
+@keyframes popin{from{transform:scale(0) rotate(-20deg)}}
+.spinout{animation:spo 1s ease-in forwards}
+@keyframes spo{to{transform:scale(0) rotate(720deg);opacity:0}}
+.flash{animation:fl .4s}@keyframes fl{30%{filter:brightness(4) saturate(0)}}
+.enter-r{animation:enr .7s cubic-bezier(.2,1.2,.4,1)}@keyframes enr{from{transform:translateX(120%)}}
+.aura{animation:aur2 1.6s infinite ease-in-out;transform-origin:100px 112px}@keyframes aur2{50%{transform:scale(1.12);opacity:.6}}
+.spark{animation:spk 1.4s infinite}.spark.s2{animation-delay:-.7s}@keyframes spk{50%{transform:scale(1.6);opacity:.4}}
+.pet svg .spark,.sprite svg .spark{transform-box:fill-box;transform-origin:center}
+
+/* batalla */
+.battle{flex:1;display:flex;flex-direction:column;min-height:0;padding-top:0}
+.hud{display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.5rem 9.4rem .3rem .7rem;z-index:5}
+.hud .hl,.hud .hr{display:flex;align-items:center;gap:.6rem}
+.hearts{display:flex;gap:.1rem}
+.hearts svg{width:1.8rem;height:1.8rem;filter:drop-shadow(0 .1rem 0 var(--ink))}
+.hearts svg.lost{opacity:.35;filter:grayscale(1)}
+.hearts svg.pop{animation:hbk .7s}@keyframes hbk{30%{transform:scale(1.7) rotate(12deg)}100%{transform:scale(1)}}
+.hpill{background:var(--panel);border:.16rem solid var(--ink);border-radius:1rem;padding:.15rem .8rem;font-size:.9rem;white-space:nowrap}
+.score{font-size:1.5rem;color:var(--yellow);paint-order:stroke fill;-webkit-text-stroke:.12em var(--ink);text-shadow:0 .1em 0 var(--ink);min-width:5ch;text-align:right}
+.streak{color:var(--lime)}
+.streak.hot{color:var(--orange);animation:pls2 .5s infinite alternate}@keyframes pls2{to{transform:scale(1.12)}}
+.arena{position:relative;flex:1 1 45%;min-height:0}
+.foe{left:auto;right:11%;top:4%;height:74%}
+.me{left:11%;bottom:2%;height:72%}
+.shadow{position:absolute;bottom:-3%;left:12%;width:76%;height:9%;border-radius:50%;background:rgba(0,0,0,.35);filter:blur(2px)}
+.plate{position:absolute;background:var(--panel);border:.18rem solid var(--ink);border-radius:1rem;padding:.35rem .8rem;width:min(17rem,30%);box-shadow:0 .25rem 0 var(--ink)}
+.plate .pn{display:flex;justify-content:space-between;gap:.5rem;font-size:.95rem;text-transform:uppercase;line-height:1.1}.plate .pn span:first-child{min-width:0}
+.plate .pe{font-size:.7rem;background:var(--ink);padding:.05rem .5rem;border-radius:1rem;color:var(--cyan)}
+.fplate{left:2%;top:3%}.mplate{right:2%;bottom:7%}
+.hp{height:.8rem;margin-top:.3rem;background:#12063a;border:.14rem solid var(--ink);border-radius:1rem;overflow:hidden}
+.hp i{display:block;height:100%;width:100%;background:linear-gradient(180deg,#d6ff7a,#6fd11c);transition:width .5s}
+.hp.boss i{background:linear-gradient(180deg,#ff8aa8,#e0143c)}
+.hp.low i{background:linear-gradient(180deg,#ffd27a,#ff7a1a)}
+.bossTag{background:var(--pink);color:#fff;border-radius:.5rem;padding:0 .4rem;margin-right:.3rem;font-size:.7rem}
+.qpanel{flex:1 1 55%;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.4fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:". up ." "left q right" ". down .";gap:.55rem;padding:.3rem .7rem .7rem;width:min(70rem,100%);margin:0 auto;z-index:4}
+.qcard{grid-area:q;position:relative;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;background:var(--panel);border:.22rem solid var(--ink);border-radius:1.4rem;padding:.6rem .8rem;box-shadow:inset 0 0 0 .14rem rgba(255,255,255,.18),0 .4rem 0 var(--ink);overflow:hidden;text-align:center}
+.qcat{position:absolute;top:.4rem;left:.5rem;font-size:.68rem;border-radius:2rem;padding:.12rem .7rem;color:var(--ink);background:var(--c,var(--lime));text-transform:uppercase;letter-spacing:.05em}
+.qtext{font-size:clamp(1.1rem,3.6vmin,2rem);line-height:1.15;font-weight:900;margin-top:.8rem;max-width:100%}
+.qtext.long{font-size:clamp(.95rem,2.6vmin,1.4rem);font-weight:800}
+.qtext.eq{font-size:clamp(1.6rem,6.4vmin,3.4rem);letter-spacing:.04em}
+.qvis{display:flex;align-items:center;justify-content:center;max-width:100%;min-height:0;flex:0 1 auto}
+.qvis svg.fig{height:clamp(4rem,17vmin,9rem);width:auto;max-width:100%;filter:drop-shadow(0 .15rem 0 rgba(0,0,0,.3))}
+.qvis svg.fig.wide{height:clamp(3.4rem,14vmin,7rem)}
+.qvis svg.grid{height:clamp(5rem,24vmin,12rem)}
+.qvis svg .dim{fill:#fff;font:900 17px "Arial Black",sans-serif;paint-order:stroke;stroke:#1b1140;stroke-width:4.5px}
+.qvis .duo{display:flex;gap:1.2rem;align-items:center}
+.qvis .duo svg{height:clamp(3.6rem,15vmin,8rem)}
+.seq{display:flex;gap:.45rem;flex-wrap:wrap;justify-content:center}
+.seq b{min-width:2.3em;padding:.2em .35em;border-radius:.6em;background:#fff;color:var(--ink);font-size:clamp(1.2rem,4.6vmin,2.4rem);border:.14rem solid var(--ink);box-shadow:0 .12em 0 var(--ink)}
+.seq b.miss{background:var(--yellow);animation:pls2 .7s infinite alternate}
+.seq.tokens{gap:.15rem}.seq.tokens .tok{width:clamp(2.2rem,9vmin,4.2rem);height:clamp(2.2rem,9vmin,4.2rem)}
+.tok.q{display:grid;place-items:center;font-size:2rem;color:var(--yellow);width:clamp(1.8rem,7vmin,3.4rem);animation:pls2 .7s infinite alternate}
+.blank{display:inline-block;min-width:1.2em;border-bottom:.12em dashed var(--yellow);color:var(--yellow);animation:pls2 .7s infinite alternate}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;margin:0 .1em}
+.fr i{font-style:normal;padding:0 .2em}.fr i:first-child{border-bottom:.1em solid currentColor;padding-bottom:.08em}.fr i:last-child{padding-top:.08em}
+.ans{--c:var(--cyan);position:relative;display:flex;align-items:center;justify-content:center;gap:.4rem;min-height:3.1rem;min-width:0;padding:.4rem .5rem;border:.2rem solid var(--ink);border-radius:1.1rem;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 60%,#fff),var(--c));color:var(--ink);font-weight:900;font-size:clamp(1rem,3.4vmin,1.9rem);box-shadow:0 .35rem 0 var(--ink);transition:transform .08s,box-shadow .08s,opacity .3s}
+.ans:active{transform:translateY(.28rem);box-shadow:0 .07rem 0 var(--ink)}
+.ans[data-dir=up]{grid-area:up;--c:var(--cyan)}.ans[data-dir=left]{grid-area:left;--c:var(--lime)}.ans[data-dir=right]{grid-area:right;--c:var(--yellow)}.ans[data-dir=down]{grid-area:down;--c:var(--pink);color:#fff}
+.ans svg.a{flex:none;width:1.1em;height:1.1em;fill:var(--ink);opacity:.65}
+.ans[data-dir=down] svg.a{fill:#fff}
+.ans .av{display:flex;align-items:center;justify-content:center;min-width:0;text-align:center;line-height:1.05;overflow-wrap:anywhere}
+.ans .av svg{height:2.2em;width:auto;max-width:100%}
+.ans .av .fr{font-size:1.05em}
+.ans.long{font-size:clamp(.78rem,2.3vmin,1.15rem)}
+.ans.ok{--c:#4cff6a!important;animation:okp .5s}
+@keyframes okp{40%{transform:scale(1.12)}}
+.ans.bad{--c:#ff4d4d!important;color:#fff;animation:shk2 .4s}
+@keyframes shk2{25%{transform:translateX(-.5rem)}75%{transform:translateX(.5rem)}}
+.ans.dim{opacity:.3}
+.ans:disabled{cursor:default}
+.hintcard{display:flex;flex-direction:column;gap:.5rem;align-items:center;animation:popin .35s}
+.hintcard .oops{font-size:1.5rem;color:var(--orange);text-transform:uppercase}
+.hintcard .ht{font-size:clamp(.95rem,2.8vmin,1.5rem);font-weight:800;line-height:1.25}
+.hintcard .ht svg{height:1.5em;width:auto;vertical-align:middle}
+.hintcard .go{font-size:.8rem;color:var(--cyan)}
+.banner{position:absolute;left:0;right:0;top:34%;z-index:12;text-align:center;pointer-events:none}
+.banner .bt{display:inline-block;font-size:clamp(1.8rem,8vmin,4.4rem);text-transform:uppercase;line-height:1;color:var(--yellow);paint-order:stroke fill;-webkit-text-stroke:.16em var(--ink);text-shadow:0 .1em 0 var(--ink),0 .3em .6em rgba(0,0,0,.5);transform:rotate(-3deg);animation:ban 1.7s forwards}
+.banner .bs{display:block;margin-top:.5rem;font-size:clamp(1rem,3.4vmin,1.8rem);color:#fff;text-shadow:0 .1em 0 var(--ink);animation:ban 1.7s forwards}
+.banner.boss .bt{color:#ff4d6d;animation-duration:2.4s;font-size:clamp(2.2rem,10vmin,5.6rem)}
+.banner.boss .bs{animation-duration:2.4s}
+@keyframes ban{0%{opacity:0;transform:scale(2.4) rotate(-10deg)}12%{opacity:1;transform:scale(1) rotate(-3deg)}80%{opacity:1}100%{opacity:0;transform:translateY(-1rem) scale(.9) rotate(-3deg)}}
+.flt{position:absolute;z-index:11;pointer-events:none;font-size:clamp(1.3rem,5vmin,2.6rem);color:var(--lime);paint-order:stroke fill;-webkit-text-stroke:.14em var(--ink);animation:flt 1.1s ease-out forwards;white-space:nowrap}
+@keyframes flt{from{opacity:1;transform:translate(-50%,0) scale(.6)}20%{transform:translate(-50%,-.6rem) scale(1.2)}to{opacity:0;transform:translate(-50%,-4rem) scale(1)}}
+.orb{position:absolute;z-index:9;width:2.4rem;height:2.4rem;border-radius:50%;pointer-events:none;border:.14rem solid var(--ink);box-shadow:0 0 1.2rem 0.4rem var(--oc)}
+.whiteout{position:fixed;inset:0;background:#fff;z-index:30;pointer-events:none;animation:wo .9s forwards}@keyframes wo{0%{opacity:0}35%{opacity:1}100%{opacity:0}}
+.shk{animation:scr .4s}@keyframes scr{20%{transform:translate(-.5rem,.3rem)}40%{transform:translate(.5rem,-.3rem)}60%{transform:translate(-.3rem,-.2rem)}80%{transform:translate(.3rem,.2rem)}}
+.bossflash{position:fixed;inset:0;z-index:25;background:radial-gradient(circle,rgba(255,40,90,.0),rgba(60,0,40,.85));pointer-events:none;animation:bf 2.2s forwards}@keyframes bf{0%{opacity:0}15%,70%{opacity:1}100%{opacity:0}}
+
+/* resultados */
+.rating{display:flex;flex-direction:column;align-items:center;gap:.3rem}
+.letter{font-size:clamp(5rem,26vmin,12rem);line-height:.9;font-weight:900;color:var(--yellow);paint-order:stroke fill;-webkit-text-stroke:.1em var(--ink);text-shadow:0 .06em 0 var(--ink),0 .12em 0 var(--ink),0 0 1em var(--pink);animation:popin .8s cubic-bezier(.2,1.8,.4,1)}
+.stars{display:flex;gap:.3rem}.stars svg{width:2.2rem;height:2.2rem;filter:drop-shadow(0 .12rem 0 var(--ink))}.stars svg.off{filter:grayscale(1) brightness(.5)}
+.stars svg{animation:popin .5s backwards}.stars svg:nth-child(2){animation-delay:.15s}.stars svg:nth-child(3){animation-delay:.3s}.stars svg:nth-child(4){animation-delay:.45s}.stars svg:nth-child(5){animation-delay:.6s}
+.rtitle{font-size:clamp(1.2rem,4.4vmin,2.2rem);text-transform:uppercase;color:#fff;paint-order:stroke fill;-webkit-text-stroke:.12em var(--ink);text-shadow:0 .1em 0 var(--ink);text-align:center}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.4rem .9rem;background:var(--panel);border:.2rem solid var(--ink);border-radius:1.2rem;padding:.8rem 1.2rem;min-width:min(26rem,90vw);box-shadow:0 .35rem 0 var(--ink)}
+.stats div{display:flex;justify-content:space-between;gap:1rem;font-size:.95rem}.stats b{color:var(--yellow)}
+.stats .tot{grid-column:1/-1;border-top:.14rem dashed #6c5bb8;padding-top:.4rem;font-size:1.2rem}
+.minipets{display:flex;gap:.3rem;flex-wrap:wrap;justify-content:center;max-width:min(36rem,92vw)}
+.minipets div{width:3.4rem;height:3.4rem}
+.newb{background:var(--pink);color:#fff;border-radius:.6rem;padding:.1rem .6rem;font-size:.8rem;animation:pls2 .5s infinite alternate}
+.dex{display:grid;grid-template-columns:repeat(auto-fill,minmax(7rem,1fr));gap:.6rem;width:min(60rem,94vw);max-height:62vh;overflow:auto;padding:.6rem;background:var(--panel);border:.2rem solid var(--ink);border-radius:1.2rem}
+.dex div{text-align:center;font-size:.7rem;text-transform:uppercase}.dex svg{width:100%}
+/* modal */
+.modal{position:fixed;inset:0;z-index:40;background:rgba(10,2,40,.82);display:flex;align-items:center;justify-content:center;padding:1rem;animation:scrIn .25s}
+.mbox{width:min(44rem,100%);max-height:92vh;overflow:auto;background:linear-gradient(180deg,#3b2a8c,#2a1a66);border:.25rem solid var(--ink);border-radius:1.5rem;padding:1.2rem 1.4rem;box-shadow:0 .6rem 0 var(--ink);display:flex;flex-direction:column;gap:.7rem}
+.mbox h3{margin:0;font-size:1.5rem;text-transform:uppercase;color:var(--yellow);text-shadow:0 .08em 0 var(--ink)}
+.mbox p,.mbox li{font-size:.95rem;font-weight:700;line-height:1.35;margin:.2rem 0}
+.mbox ul{margin:0;padding-left:1.2rem}
+.mbox table{border-collapse:collapse;width:100%;font-size:.85rem}.mbox th,.mbox td{border:.1rem solid #6c5bb8;padding:.3rem .5rem;text-align:left;vertical-align:top}.mbox th{background:var(--ink);color:var(--cyan)}
+.ctl{display:grid;grid-template-columns:auto 1fr;gap:.3rem .8rem;align-items:center}
+
+@media (max-aspect-ratio:1/1){
+  .qtext{font-size:clamp(1.2rem,5.4vmin,2.2rem)}.qtext.eq{font-size:clamp(2rem,12vmin,4rem)}.qtext.long{font-size:clamp(1rem,4.4vmin,1.6rem)}
+  .qvis svg.fig{height:clamp(5rem,30vmin,12rem)}.qvis svg.fig.wide{height:clamp(4rem,22vmin,9rem)}.qvis svg.grid{height:clamp(5rem,30vmin,12rem)}.qvis .duo svg{height:clamp(4rem,24vmin,9rem)}
+  .seq b{font-size:clamp(1.2rem,6.4vmin,2.6rem)}.seq.tokens .tok{width:clamp(2rem,9vmin,3.6rem);height:clamp(2rem,9vmin,3.6rem)}
+  .qpanel{grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,1fr) auto auto;grid-template-areas:"q q" "up left" "right down";padding-bottom:.5rem}
+  .ans{min-height:3.2rem}
+  .cards-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .card{width:min(15rem,44vw)}
+  .hud{flex-wrap:wrap;padding-right:9.4rem}
+  .plate{width:46%;padding:.25rem .5rem}
+  .fplate{left:2%;top:3%}.mplate{right:2%;bottom:3%}
+  .arena{flex-basis:34%}
+  .foe{right:3%;top:auto;bottom:34%;height:52%}.me{left:3%;height:56%}
+}
+@media (max-height:520px){.logo{font-size:2.4rem}.title-pets{height:5rem}.screen{gap:.5rem;padding-top:2.8rem}.btn.big{font-size:1.3rem;padding:.5rem 1.6rem;min-height:3rem}}
+@media (prefers-reduced-motion:reduce){.banner .bt,.banner .bs,.flt{animation:none!important;opacity:1}*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.bob,.title-pets .pet{animation:none!important}}
+
+.eggmini .egg-svg{width:100%;height:100%}
+
+.tbar{position:absolute;top:.5rem;right:.6rem;width:34%;height:1.1rem;background:#12063a;border:.14rem solid var(--ink);border-radius:1rem;overflow:hidden;display:flex;align-items:center}
+.tbar i{position:absolute;left:0;top:0;bottom:0;width:100%;background:linear-gradient(180deg,#8be9ff,#2d9bff);transition:width .1s linear}
+.tbar b{position:relative;margin:0 auto;font-size:.7rem;color:#fff;text-shadow:0 .08em 0 var(--ink)}
+.tbar.low i{background:linear-gradient(180deg,#ff8aa8,#e0143c)}.tbar.low{animation:pls2 .5s infinite alternate}
+
+.credits{margin:0;font-size:.72rem;text-align:center;color:#e6defc;text-shadow:0 0 .4em var(--ink),0 .08em 0 var(--ink);line-height:1.5}
+.credits a{display:inline-block;vertical-align:middle;-webkit-user-select:auto;user-select:auto}.credits img{display:block;border-radius:.2rem}
+.credits span{vertical-align:middle}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="bg" aria-hidden="true"></div>
+  <canvas id="fx" aria-hidden="true"></canvas>
+  <div id="topctl"></div>
+  <main id="screen" tabindex="-1"></main>
+  <div id="sr" class="sr" aria-live="assertive" role="status"></div>
+</div>
+<noscript>Este juego necesita JavaScript.</noscript>
+<script>/* MateMonstruos · motor de preguntas
+   Generadores paramétricos por categoría y ciclo. d = dificultad 0..1 dentro del ciclo. */
+(function (G) {
+'use strict';
+
+/* ---------- utilidades ---------- */
+const R = {
+  int: (a, b) => a + Math.floor(Math.random() * (b - a + 1)),
+  pick: a => a[Math.floor(Math.random() * a.length)],
+  chance: p => Math.random() < p,
+  shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; },
+  lerp: (d, a, b) => Math.round(a + (b - a) * d)
+};
+const nf = new Intl.NumberFormat('es-ES');
+const D = n => String(Math.round(n * 1000) / 1000).replace('.', ',');
+const N = n => Number.isInteger(n) ? (Math.abs(n) >= 10000 ? nf.format(n) : String(n)) : D(n);
+const F = (n, d) => `<span class="fr"><i>${n}</i><i>${d}</i></span>`;
+const BLANK = '<span class="blank">?</span>';
+const gcd = (a, b) => b ? gcd(b, a % b) : a;
+
+function numWrong(c, extra) {
+  const m = Math.abs(c) < 10 ? [1, 2, 3] : Math.abs(c) < 100 ? [1, 2, 10, 5] : Math.abs(c) < 1000 ? [1, 10, 100, 2] : [1, 10, 100, 1000];
+  const out = [];
+  m.forEach(s => out.push(c + s, c - s));
+  (extra || []).forEach(x => out.push(x));
+  return out.filter(v => Number.isFinite(v) && v >= 0 && v !== c && (Number.isInteger(v) || !Number.isInteger(c))).map(N);
+}
+
+function build(o) {
+  const bad = s => s == null || /NaN|undefined|Infinity/.test(String(s));
+  if (bad(o.correct) || bad(o.text)) return null;
+  const seen = new Set([o.correct]); const opts = [o.correct];
+  const max = o.n || 4, min = o.min || 3;
+  for (const w of R.shuffle(o.wrong || [])) {
+    if (bad(w) || seen.has(w)) continue;
+    seen.add(w); opts.push(w);
+    if (opts.length >= max) break;
+  }
+  if (opts.length < min) return null;
+  const order = o.keepOrder ? opts : R.shuffle(opts);
+  return { cat: o.cat, text: o.text, visual: o.visual || '', answers: order, correct: order.indexOf(o.correct), hint: o.hint || '', key: o.key || (o.cat + '|' + o.text + '|' + o.correct), big: !!o.big };
+}
+
+/* ---------- SVG ---------- */
+const INK = '#1b1140';
+const TCOL = ['#ff3d9a', '#2de2ff', '#b6ff3b', '#ffd23f', '#ff7a3d', '#9b6bff'];
+const svg = (vb, inner, cls) => `<svg viewBox="${vb}" class="${cls || ''}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${inner}</svg>`;
+const ngon = (n, cx, cy, r, rot) => { rot = rot == null ? (n % 2 === 0 ? -90 + 180 / n : -90) : rot; let p = []; for (let i = 0; i < n; i++) { const a = (rot + 360 * i / n) * Math.PI / 180; p.push((cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1)); } return p.join(' '); };
+const starPts = (cx, cy, R1, R2, n) => { let p = []; for (let i = 0; i < n * 2; i++) { const r = i % 2 ? R2 : R1, a = (-90 + 180 * i / n) * Math.PI / 180; p.push((cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1)); } return p.join(' '); };
+const ST = `stroke="${INK}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"`;
+
+function tok(shape, col) {
+  let p;
+  switch (shape) {
+    case 'circle': p = '<circle cx="20" cy="20" r="14"/>'; break;
+    case 'square': p = '<rect x="6" y="6" width="28" height="28" rx="4"/>'; break;
+    case 'triangle': p = '<polygon points="20,5 35,33 5,33"/>'; break;
+    case 'star': p = `<polygon points="${starPts(20, 21, 17, 7.5, 5)}"/>`; break;
+    case 'diamond': p = '<polygon points="20,3 36,20 20,37 4,20"/>'; break;
+    default: p = '<path d="M20 35 C4 24 4 10 13 9 C17 9 19 12 20 14 C21 12 23 9 27 9 C36 10 36 24 20 35Z"/>';
+  }
+  return svg('0 0 40 40', `<g fill="${col}" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round">${p}</g>`, 'tok');
+}
+const TSHAPES = ['circle', 'square', 'triangle', 'star', 'diamond', 'heart'];
+
+/* figuras 2D / 3D (120x120) */
+function shape2d(name, col) {
+  col = col || R.pick(TCOL);
+  const f = `fill="${col}" ${ST}`;
+  const m = {
+    circulo: `<circle cx="60" cy="60" r="44" ${f}/>`,
+    cuadrado: `<rect x="18" y="18" width="84" height="84" rx="3" ${f}/>`,
+    rectangulo: `<rect x="8" y="34" width="104" height="52" rx="3" ${f}/>`,
+    triangulo: `<polygon points="60,12 108,100 12,100" ${f}/>`,
+    rombo: `<polygon points="60,8 106,60 60,112 14,60" ${f}/>`
+  };
+  return svg('0 0 120 120', m[name], 'fig');
+}
+function solid(name) {
+  const c1 = '#ff3d9a', c2 = '#2de2ff', c3 = '#ffd23f';
+  const m = {
+    esfera: `<defs><radialGradient id="gs" cx="35%" cy="30%"><stop offset="0" stop-color="#fff"/><stop offset=".25" stop-color="${c2}"/><stop offset="1" stop-color="#1668c9"/></radialGradient></defs><circle cx="60" cy="62" r="46" fill="url(#gs)" ${ST}/>`,
+    cubo: `<polygon points="60,10 104,34 60,58 16,34" fill="${c3}" ${ST}/><polygon points="16,34 60,58 60,110 16,86" fill="${c1}" ${ST}/><polygon points="104,34 60,58 60,110 104,86" fill="#b3126a" ${ST}/>`,
+    cono: `<ellipse cx="60" cy="96" rx="40" ry="14" fill="#ff7a3d" ${ST}/><polygon points="60,10 20,96 100,96" fill="#ff7a3d" ${ST}/><ellipse cx="60" cy="96" rx="40" ry="14" fill="#ffa266" ${ST}/>`,
+    cilindro: `<rect x="20" y="28" width="80" height="68" fill="#b6ff3b" ${ST}/><ellipse cx="60" cy="96" rx="40" ry="14" fill="#b6ff3b" ${ST}/><rect x="22" y="28" width="76" height="66" fill="#b6ff3b"/><ellipse cx="60" cy="28" rx="40" ry="14" fill="#e4ff9e" ${ST}/>`,
+    piramide: `<polygon points="60,8 18,86 60,106" fill="#ffd23f" ${ST}/><polygon points="60,8 60,106 104,80" fill="#e0a800" ${ST}/>`
+  };
+  return svg('0 0 120 120', m[name], 'fig');
+}
+function polyFig(n, col, rot) { return svg('0 0 120 120', `<polygon points="${ngon(n, 60, 62, 48, rot)}" fill="${col || R.pick(TCOL)}" ${ST}/>`, 'fig'); }
+
+/* ---------- SUMAS Y RESTAS ---------- */
+const NAMES = ['Ayoze', 'Naira', 'Yeray', 'Candela', 'Dácil', 'Airam', 'Acaymo', 'Nauzet', 'Kenia', 'Beneharo'];
+const THINGS = [['plátanos', 'm'], ['papas', 'f'], ['cabras', 'f'], ['barcos', 'm'], ['cometas', 'f'], ['conchas', 'f'], ['lagartos', 'm'], ['gaviotas', 'f'], ['piedras', 'f'], ['sandías', 'f'], ['pegatinas', 'f'], ['tomates', 'm']];
+const Cuan = g => g === 'f' ? 'Cuántas' : 'Cuántos';
+
+function sumres(c, d) {
+  const kind = (c === 1 && d < .3) ? R.pick(['sum', 'sub', 'sum', 'sub', 'miss']) : R.pick(['sum', 'sub', 'miss', 'prob', 'prob']);
+  if (c === 3 && d > .5 && R.chance(.35)) {
+    const a = R.int(11, 899) / 10, b = R.int(11, 899) / 10, sub = R.chance(.5);
+    const x = sub ? Math.max(a, b) : a, y = sub ? Math.min(a, b) : b;
+    if (x === y) return null;
+    const ans = Math.round((sub ? x - y : x + y) * 10) / 10;
+    const w = [ans + .1, ans - .1, ans + 1, ans - 1, ans + 10, ans - 10, Math.round((sub ? x + y : Math.abs(x - y)) * 10) / 10].filter(v => v >= 0 && v !== ans).map(D);
+    return build({ cat: 'sumres', text: `${D(x)} ${sub ? '−' : '+'} ${D(y)} = ?`, correct: D(ans), wrong: w, hint: `Alinea las comas: ${D(x)} ${sub ? '−' : '+'} ${D(y)} = ${D(ans)}` });
+  }
+  let max;
+  if (c === 1) max = d < .2 ? 10 : d < .45 ? 20 : d < .75 ? 50 : 100;
+  else if (c === 2) max = R.lerp(d, 300, 9999);
+  else max = d < .4 ? R.lerp(d, 1000, 99999) : 999999;
+  const lo = c === 1 ? 1 : Math.max(2, Math.floor(max / 10));
+  const sub = kind === 'sub' || ((kind === 'miss' || kind === 'prob') && R.chance(.5));
+  let a, b, s;
+  if (!sub) {
+    a = R.int(lo, c === 1 ? max - 1 : Math.floor(max * .7));
+    b = R.int(lo, c === 1 ? Math.max(1, max - a) : Math.floor(max * .7));
+    s = a + b;
+  } else {
+    s = R.int(c === 1 ? 2 : lo * 2, max);
+    a = R.int(c === 1 ? 1 : lo, s - (c === 1 ? 1 : lo));
+    if (a >= s) return null;
+    b = s - a;
+  }
+  // sum: a+b=s ; sub: s-a=b
+  let text, ans, hint;
+  if (kind === 'sum' || kind === 'sub') {
+    if (!sub) { text = `${N(a)} + ${N(b)} = ?`; ans = s; hint = `${N(a)} + ${N(b)} = ${N(s)}`; }
+    else { text = `${N(s)} − ${N(a)} = ?`; ans = b; hint = `${N(s)} − ${N(a)} = ${N(b)}`; }
+  } else if (kind === 'miss') {
+    if (!sub) { text = `${N(a)} + ${BLANK} = ${N(s)}`; ans = b; hint = `Lo que falta: ${N(s)} − ${N(a)} = ${N(b)}`; }
+    else { text = `${N(s)} − ${BLANK} = ${N(b)}`; ans = a; hint = `Lo que falta: ${N(s)} − ${N(b)} = ${N(a)}`; }
+  } else {
+    const [u, g] = R.pick(THINGS), n1 = R.pick(NAMES), n2 = R.pick(NAMES.filter(x => x !== n1));
+    if (!sub) {
+      text = R.pick([
+        `${n1} tiene ${N(a)} ${u} y ${n2} tiene ${N(b)}. ¿${Cuan(g)} ${u} tienen entre los dos?`,
+        `En una cesta hay ${N(a)} ${u} y en otra hay ${N(b)}. ¿${Cuan(g)} ${u} hay en total?`,
+        `${n1} tenía ${N(a)} ${u} y encuentra ${N(b)} más. ¿${Cuan(g)} ${u} tiene ahora?`]);
+      ans = s; hint = `Suma: ${N(a)} + ${N(b)} = ${N(s)}`;
+    } else {
+      text = R.pick([
+        `${n1} tenía ${N(s)} ${u} y regala ${N(a)}. ¿${Cuan(g)} ${u} le quedan?`,
+        `En el puerto había ${N(s)} ${u} y se llevan ${N(a)}. ¿${Cuan(g)} quedan?`,
+        `${n1} tiene ${N(s)} ${u} y ${n2} tiene ${N(a)}. ¿${Cuan(g)} ${u} más tiene ${n1}?`]);
+      ans = b; hint = `Resta: ${N(s)} − ${N(a)} = ${N(b)}`;
+    }
+  }
+  return build({ cat: 'sumres', text, correct: N(ans), wrong: numWrong(ans, [a + b, Math.abs(a - b), s + a]), hint });
+}
+
+/* ---------- TABLAS ---------- */
+function mulHint(a, b) {
+  const p = a * b;
+  if (b > 5) return `${a} × ${b} = ${a} × 5 + ${a} × ${b - 5} = ${a * 5} + ${a * (b - 5)} = ${p}`;
+  return `${a} × ${b} = ${Array(b).fill(a).join(' + ')} = ${p}`;
+}
+function tablas(c, d) {
+  if (c === 2) {
+    const pool = d < .3 ? [2, 5, 10] : d < .6 ? [2, 3, 4, 5, 10] : [2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const a = R.pick(pool), b = R.int(2, d < .3 ? 5 : 10), p = a * b;
+    const form = R.pick(['mul', 'mul', 'mul', 'miss', 'miss', 'prob', 'dbl']);
+    const w = [a * (b + 1), a * (b - 1), (a + 1) * b, (a - 1) * b, a + b, p + a, p - a, p + b, p - b];
+    if (form === 'mul') return build({ cat: 'tablas', text: `${a} × ${b} = ?`, correct: N(p), wrong: w.filter(x => x > 0 && x !== p).map(N).concat(numWrong(p)), hint: mulHint(a, b) });
+    if (form === 'miss') {
+      const left = R.chance(.5);
+      return build({ cat: 'tablas', text: left ? `${a} × ${BLANK} = ${p}` : `${BLANK} × ${b} = ${p}`, correct: N(left ? b : a), wrong: numWrong(left ? b : a, [a, b, p / 2 | 0]), hint: `${p} ÷ ${left ? a : b} = ${left ? b : a}, porque ${a} × ${b} = ${p}` });
+    }
+    if (form === 'dbl') {
+      const n = R.int(3, d < .5 ? 20 : 50), t = R.chance(.5);
+      const ans = n * (t ? 2 : 3);
+      return build({ cat: 'tablas', text: `¿Cuál es el ${t ? 'doble' : 'triple'} de ${n}?`, correct: N(ans), wrong: numWrong(ans, [n + (t ? 2 : 3), n * (t ? 3 : 2)]), hint: `${t ? 'Doble' : 'Triple'} de ${n}: ${n} × ${t ? 2 : 3} = ${ans}` });
+    }
+    const [u, g] = R.pick(THINGS);
+    return build({ cat: 'tablas', text: `Hay ${a} cajas con ${b} ${u} cada una. ¿${Cuan(g)} ${u} hay en total?`, correct: N(p), wrong: w.filter(x => x > 0 && x !== p).map(N).concat(numWrong(p)), hint: `${a} × ${b} = ${p}` });
+  }
+  // ciclo 3
+  const form = d < .25 ? R.pick(['t', 'p10', 'miss']) : d < .6 ? R.pick(['t', 'm2', 'p10', 'miss', 'prob']) : R.pick(['m2', 'm2', 'mm', 'p10', 'miss', 'prob', 'dec']);
+  if (form === 't') {
+    const a = R.pick([6, 7, 8, 9, 11, 12, 13, 14, 15]), b = R.int(3, 12), p = a * b;
+    return build({ cat: 'tablas', text: `${a} × ${b} = ?`, correct: N(p), wrong: [a * (b + 1), a * (b - 1), (a + 1) * b, (a - 1) * b, p + 10, p - 10].filter(x => x > 0).map(N), hint: b > 10 ? `${a} × ${b} = ${a} × 10 + ${a} × ${b - 10} = ${a * 10} + ${a * (b - 10)} = ${p}` : `${a} × ${b} = ${a} × 5 + ${a} × ${b - 5} = ${a * 5} + ${a * (b - 5)} = ${p}` });
+  }
+  if (form === 'm2') {
+    const x = R.int(12, 99), y = R.int(2, 9), p = x * y;
+    return build({ cat: 'tablas', text: `${x} × ${y} = ?`, correct: N(p), wrong: numWrong(p, [x * (y + 1), x * (y - 1), p + 20, p - 20]), hint: `${x} × ${y} = ${Math.floor(x / 10) * 10} × ${y} + ${x % 10} × ${y} = ${Math.floor(x / 10) * 10 * y} + ${(x % 10) * y} = ${p}` });
+  }
+  if (form === 'mm') {
+    const x = R.int(11, 25), y = R.int(11, 15), p = x * y;
+    return build({ cat: 'tablas', text: `${x} × ${y} = ?`, correct: N(p), wrong: numWrong(p, [x * y + 10, x * y - 10, x * (y + 1), x * (y - 1), (x + 1) * y]), hint: `${x} × ${y} = ${x} × 10 + ${x} × ${y - 10} = ${x * 10} + ${x * (y - 10)} = ${p}` });
+  }
+  if (form === 'p10') {
+    const n = R.int(2, 99), k = R.pick([10, 100, 1000]), p = n * k;
+    return build({ cat: 'tablas', text: `${n} × ${N(k)} = ?`, correct: N(p), wrong: [n * k * 10, n * k / 10, n * (k / 10 || 1) * 10 + n, n * k + n, n * (k * 10 > 1000 ? 100 : 1000)].filter(x => x !== p && x >= 1).map(N), hint: `Multiplicar por ${N(k)}: añade ${String(k).length - 1} cero${k > 10 ? 's' : ''} → ${N(p)}` });
+  }
+  if (form === 'dec') {
+    const n = R.int(11, 99) / 10, k = R.pick([10, 100]), p = Math.round(n * k * 100) / 100;
+    return build({ cat: 'tablas', text: `${D(n)} × ${k} = ?`, correct: N(p), wrong: [p * 10, p / 10, n * k + n, n + k].filter(x => x !== p).map(N), hint: `Multiplicar por ${k} desplaza la coma ${k === 10 ? 'un lugar' : 'dos lugares'}: ${N(p)}` });
+  }
+  if (form === 'miss') {
+    const a = R.int(6, 15), b = R.int(3, 12), p = a * b;
+    return build({ cat: 'tablas', text: `${a} × ${BLANK} = ${p}`, correct: N(b), wrong: numWrong(b, [a, p / 10 | 0]), hint: `${p} ÷ ${a} = ${b}` });
+  }
+  const a = R.int(12, 60), b = R.int(3, 9), p = a * b, [u, g] = R.pick(THINGS);
+  return build({ cat: 'tablas', text: `Cada caja trae ${a} ${u}. Con ${b} cajas, ¿${Cuan(g)} ${u} hay?`, correct: N(p), wrong: numWrong(p, [a + b, a * (b + 1)]), hint: `${a} × ${b} = ${p}` });
+}
+
+/* ---------- DIVISIONES ---------- */
+function divisiones(c, d) {
+  if (c === 2) {
+    const pool = d < .3 ? [2, 5, 10] : d < .6 ? [2, 3, 4, 5, 10] : [2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const b = R.pick(pool), q = R.int(2, 10);
+    const form = d > .65 ? R.pick(['div', 'resto', 'resto', 'miss']) : R.pick(['div', 'div', 'miss', 'rep']);
+    if (form === 'div') return build({ cat: 'divisiones', text: `${b * q} ÷ ${b} = ?`, correct: N(q), wrong: numWrong(q, [b, q + b]), hint: `${b} × ${q} = ${b * q}, así que ${b * q} ÷ ${b} = ${q}` });
+    if (form === 'miss') return build({ cat: 'divisiones', text: `${BLANK} ÷ ${b} = ${q}`, correct: N(b * q), wrong: numWrong(b * q, [q + b, b * (q + 1)]), hint: `${q} × ${b} = ${b * q}` });
+    if (form === 'rep') { const [u, g] = R.pick(THINGS); return build({ cat: 'divisiones', text: `Reparto ${b * q} ${u} entre ${b} amigos por igual. ¿${Cuan(g)} ${u} recibe cada uno?`, correct: N(q), wrong: numWrong(q, [b]), hint: `${b * q} ÷ ${b} = ${q}` }); }
+    const r = R.int(1, b - 1), D0 = b * q + r;
+    const ok = `${q} y sobran ${r}`;
+    return build({ cat: 'divisiones', text: `${D0} ÷ ${b}: ¿cociente y resto?`, correct: ok, wrong: [`${q} y sobran ${r + 1 < b ? r + 1 : r - 1 || 1}`, `${q + 1} y sobran ${r}`, `${q - 1} y sobran ${r}`, `${q} y sobran 0`, `${r} y sobran ${q % b}`].filter(x => x !== ok), hint: `${b} × ${q} = ${b * q}; ${D0} − ${b * q} = ${r}` });
+  }
+  const form = d < .3 ? R.pick(['div', 'p10']) : d < .65 ? R.pick(['div', 'resto', 'p10', 'prob']) : R.pick(['div2', 'resto', 'prueba', 'div', 'miss']);
+  if (form === 'div') { const b = R.int(2, 9), q = R.int(12, 110); return build({ cat: 'divisiones', text: `${b * q} ÷ ${b} = ?`, correct: N(q), wrong: numWrong(q, [q + b, q - b]), hint: `${b} × ${q} = ${b * q}` }); }
+  if (form === 'p10') { const k = R.pick([10, 100]), q = R.int(2, 99), n = q * k; return build({ cat: 'divisiones', text: `${N(n)} ÷ ${k} = ?`, correct: N(q), wrong: [q * 10, q / 10, q + 1, q * 100].filter(x => x !== q && x >= 1).map(N), hint: `Dividir entre ${k}: quita ${k === 10 ? 'un cero' : 'dos ceros'} → ${q}` }); }
+  if (form === 'resto') {
+    const b = R.int(3, 9), q = R.int(11, 99), r = R.int(1, b - 1), D0 = b * q + r, ok = `${q} y sobran ${r}`;
+    return build({ cat: 'divisiones', text: `${D0} ÷ ${b}: ¿cociente y resto?`, correct: ok, wrong: [`${q} y sobran ${r + 1 < b ? r + 1 : r - 1}`, `${q + 1} y sobran ${r}`, `${q - 1} y sobran ${r}`, `${q + 10} y sobran ${r}`, `${q} y sobran 0`].filter(x => x !== ok), hint: `${b} × ${q} = ${b * q}; ${D0} − ${b * q} = ${r}` });
+  }
+  if (form === 'prob') { const b = R.int(3, 9), q = R.int(12, 80), [u, g] = R.pick(THINGS); return build({ cat: 'divisiones', text: `Se reparten ${b * q} ${u} en ${b} bolsas iguales. ¿${Cuan(g)} ${u} hay en cada bolsa?`, correct: N(q), wrong: numWrong(q, [q + b]), hint: `${b * q} ÷ ${b} = ${q}` }); }
+  if (form === 'div2') { const b = R.int(11, 15), q = R.int(6, 19); return build({ cat: 'divisiones', text: `${b * q} ÷ ${b} = ?`, correct: N(q), wrong: numWrong(q, [q + 10, q - 10, q + b]), hint: `${b} × ${q} = ${b * q}` }); }
+  if (form === 'prueba') {
+    const b = R.int(4, 9), q = R.int(12, 40), r = R.int(1, b - 1), D0 = b * q + r;
+    return build({ cat: 'divisiones', text: `En una división el divisor es ${b}, el cociente ${q} y el resto ${r}. ¿Cuál es el dividendo?`, correct: N(D0), wrong: numWrong(D0, [b * q, b * q - r, q + b + r]), hint: `Dividendo = divisor × cociente + resto = ${b} × ${q} + ${r} = ${D0}` });
+  }
+  const b = R.int(4, 12), q = R.int(11, 60);
+  return build({ cat: 'divisiones', text: `${BLANK} ÷ ${b} = ${q}`, correct: N(b * q), wrong: numWrong(b * q, [q + b, b * (q + 1)]), hint: `${q} × ${b} = ${b * q}` });
+}
+
+/* ---------- SECUENCIAS ---------- */
+function seqBox(arr, bi) {
+  return '<div class="seq">' + arr.map((v, i) => `<b class="${i === bi ? 'miss' : ''}">${i === bi ? '?' : N(v)}</b>`).join('') + '</div>';
+}
+function seqNum(c, d) {
+  let seq = [], hint = '';
+  const len = 5;
+  if (c === 1) {
+    const steps = d < .3 ? [1, 2] : d < .6 ? [1, 2, 5, 10] : [2, 3, 5, 10, 20];
+    const st = R.pick(steps), down = d > .35 && R.chance(.35);
+    const start = down ? R.int(st * 5, Math.max(st * 5 + 10, 60)) : R.int(0, 30);
+    for (let i = 0; i < len; i++) seq.push(down ? start - st * i : start + st * i);
+    hint = `Cada número ${down ? 'baja' : 'sube'} de ${st} en ${st}`;
+  } else if (c === 2) {
+    const mode = d > .7 && R.chance(.3) ? 'dbl' : 'ar';
+    if (mode === 'dbl') { const s = R.pick([1, 2, 3, 5]); for (let i = 0; i < len; i++) seq.push(s * 2 ** i); hint = 'Cada número es el doble del anterior'; }
+    else {
+      const st = R.pick(d < .4 ? [2, 3, 4, 5, 6] : [3, 4, 6, 7, 8, 9, 10, 25, 50, 100]), down = R.chance(.35);
+      const start = down ? st * R.int(6, 14) : R.int(0, 5) * st + R.int(0, 3);
+      for (let i = 0; i < len; i++) seq.push(down ? start - st * i : start + st * i);
+      hint = `Cada número ${down ? 'baja' : 'sube'} de ${st} en ${st}`;
+    }
+  } else {
+    const m = R.pick(d < .4 ? ['ar', 'ar', 'dec', 'geo'] : ['ar', 'dec', 'geo', 'alt', 'grow', 'sq', 'tri', 'fib']);
+    if (m === 'ar') { const st = R.pick([12, 15, 25, 35, 125, 250, 1000]), s = R.int(2, 40) * 10; for (let i = 0; i < len; i++) seq.push(s + st * i); hint = `Cada número suma ${N(st)}`; }
+    else if (m === 'dec') { const st = R.pick([.5, .25, 1.5, .1, 2.5]), s = R.int(1, 20) / 2; for (let i = 0; i < len; i++) seq.push(Math.round((s + st * i) * 100) / 100); hint = `Cada número suma ${D(st)}`; }
+    else if (m === 'geo') { const k = R.pick([2, 3, 10]), s = R.pick([1, 2, 3, 5]); for (let i = 0; i < len; i++) seq.push(s * k ** i); hint = `Cada número se multiplica por ${k}`; }
+    else if (m === 'alt') { const a = R.int(2, 9), b = R.int(1, a - 1) * -1 || -1, s = R.int(20, 60); seq = [s]; for (let i = 1; i < len + 1; i++) seq.push(seq[i - 1] + (i % 2 ? a : b)); seq = seq.slice(0, len + 1); hint = `Alterna: suma ${a}, resta ${-b}`; }
+    else if (m === 'grow') { const s = R.int(1, 20), k = R.int(1, 3); seq = [s]; for (let i = 1; i < len; i++) seq.push(seq[i - 1] + k * i + k); hint = `Se suma ${k * 2}, luego ${k * 3}, luego ${k * 4}…: cada vez ${k} más`; seq = []; let v = s; for (let i = 0; i < len; i++) { seq.push(v); v += k * (i + 2); } hint = `Se suma ${k * 2}, luego ${k * 3}, luego ${k * 4}… (cada vez ${k} más)`; }
+    else if (m === 'sq') { const s = R.int(1, 7); for (let i = 0; i < len; i++) seq.push((s + i) ** 2); hint = 'Son cuadrados: 1×1, 2×2, 3×3…'; }
+    else if (m === 'tri') { const s = R.int(1, 4); for (let i = 0; i < len; i++) { const n = s + i; seq.push(n * (n + 1) / 2); } hint = 'Se suma 2, 3, 4, 5… cada vez uno más'; }
+    else { const a = R.int(1, 5), b = R.int(2, 6); seq = [a, b]; for (let i = 2; i < len; i++) seq.push(seq[i - 1] + seq[i - 2]); hint = 'Cada número es la suma de los dos anteriores'; }
+  }
+  const bi = R.int(1, seq.length - 1), ans = seq[bi];
+  const wrong = [ans + 1, ans - 1, ans + 2, ans - 2, ans + 10, ans - 10, ans * 2, Math.round(ans / 2)].filter(v => v >= 0 && v !== ans && !seq.includes(v));
+  const stepEst = Math.abs((seq[1] - seq[0]) || 1);
+  wrong.push(ans + stepEst, ans - stepEst, ans + 2 * stepEst);
+  return build({ cat: 'secuencias', text: '¿Qué número falta en la secuencia?', visual: seqBox(seq, bi), correct: N(ans), wrong: wrong.filter(v => v >= 0 && v !== ans).map(N), hint, key: 'seq|' + seq.join(',') + '|' + bi });
+}
+function seqShape(c, d) {
+  let tokens, len = 7;
+  const shapes = R.shuffle(TSHAPES), cols = R.shuffle(TCOL);
+  const T = (i, j) => [shapes[i % shapes.length], cols[j % cols.length]];
+  let pat, hint;
+  if (c <= 2) {
+    const opts = c === 1 ? (d < .4 ? ['AB', 'AAB'] : ['AB', 'AAB', 'ABB', 'ABC']) : (d < .4 ? ['ABC', 'AABC', 'ABB'] : ['ABC', 'AABC', 'ABAC', 'ABCD', 'AABB']);
+    pat = R.pick(opts);
+    const letters = [...new Set(pat)]; const map = {}; letters.forEach((l, i) => map[l] = T(i, i));
+    const units = pat.split('').map(l => map[l]);
+    tokens = []; for (let i = 0; i < len + 1; i++) tokens.push(units[i % units.length]);
+    hint = `El patrón se repite: ` + units.map(t => tok(t[0], t[1])).join('') + ` y vuelve a empezar`;
+  } else {
+    const p1 = R.pick([2, 3]), p2 = p1 === 2 ? 3 : R.pick([2, 4]);
+    tokens = []; for (let i = 0; i < 9; i++) tokens.push(T(i % p1, (i % p2) + 1));
+    hint = `Las formas se repiten cada ${p1} y los colores cada ${p2}`;
+  }
+  const shown = tokens.slice(0, tokens.length - 1), ans = tokens[tokens.length - 1];
+  const key = t => t[0] + t[1];
+  const poolW = [];
+  tokens.forEach(t => { if (key(t) !== key(ans)) poolW.push(t); });
+  if (c === 3) { poolW.push([ans[0], R.pick(cols.filter(x => x !== ans[1]))], [R.pick(shapes.filter(x => x !== ans[0])), ans[1]]); }
+  poolW.push([R.pick(shapes), R.pick(cols)]);
+  const row = '<div class="seq tokens">' + shown.map(t => tok(t[0], t[1])).join('') + `<span class="tok q">?</span></div>`;
+  return build({ cat: 'secuencias', text: '¿Qué figura sigue?', visual: row, correct: tok(ans[0], ans[1]), wrong: poolW.filter(t => key(t) !== key(ans)).map(t => tok(t[0], t[1])), hint, key: 'sq|' + tokens.map(key).join(''), big: true });
+}
+function secuencias(c, d) {
+  const pv = c === 1 ? .5 : c === 2 ? .3 : .2;
+  return R.chance(pv) ? seqShape(c, d) : seqNum(c, d);
+}
+
+/* ---------- COMPARAR ---------- */
+function compRange(c, d) { return c === 1 ? (d < .3 ? 20 : d < .65 ? 100 : 999) : c === 2 ? R.lerp(d, 999, 9999) : R.lerp(d, 9999, 999999); }
+function opExpr(c, d) {
+  let t, v;
+  const k = R.pick(c === 1 ? ['+', '−'] : ['+', '−', '×']);
+  if (k === '+') { const a = R.int(2, c === 1 ? 30 : 60), b = R.int(2, c === 1 ? 30 : 60); t = `${a} + ${b}`; v = a + b; }
+  else if (k === '−') { const a = R.int(10, c === 1 ? 60 : 99), b = R.int(1, a - 1); t = `${a} − ${b}`; v = a - b; }
+  else { const a = R.int(2, 10), b = R.int(2, c === 2 ? 10 : 12); t = `${a} × ${b}`; v = a * b; }
+  return { t, v };
+}
+function comparar(c, d) {
+  const form = R.pick(c === 1 ? (d < .4 ? ['max', 'min', 'sym'] : ['max', 'min', 'sym', 'ops']) : ['max', 'min', 'sym', 'ops', 'dec']);
+  const mx = compRange(c, d);
+  if (form === 'dec' && c < 3) return comparar(c, d);
+  if (form === 'max' || form === 'min') {
+    const isMax = form === 'max'; const set = new Set();
+    let tries = 0; while (set.size < 4 && tries++ < 50) set.add(R.int(c === 1 ? 0 : Math.floor(mx / 20), mx));
+    if (c >= 2 && d > .5) { // cifras parecidas
+      const base = R.int(Math.floor(mx / 10), mx), digs = String(base).split(''); set.clear(); set.add(base);
+      let t2 = 0; while (set.size < 4 && t2++ < 80) { const dd = digs.slice(); const i = R.int(0, dd.length - 1), j = R.int(0, dd.length - 1); [dd[i], dd[j]] = [dd[j], dd[i]]; const v = +dd.join(''); if (String(v).length === String(base).length) set.add(v); }
+      let t3 = 0; while (set.size < 4 && t3++ < 50) set.add(base + R.int(-90, 90));
+    }
+    const arr = [...set]; if (arr.length < 4) return null;
+    const ans = isMax ? Math.max(...arr) : Math.min(...arr);
+    return build({ cat: 'comparar', text: `¿Cuál es el número ${isMax ? 'MAYOR' : 'MENOR'}?`, correct: N(ans), wrong: arr.filter(v => v !== ans).map(N), hint: `Compara cifra a cifra desde la izquierda. ${isMax ? 'Mayor' : 'Menor'}: ${N(ans)}`, key: 'cmp|' + form + arr.sort().join(',') });
+  }
+  if (form === 'dec') {
+    const isMax = R.chance(.5); const set = new Set(); const w = R.int(1, 9);
+    while (set.size < 4) set.add(Math.round((w + R.int(0, 99) / 100) * 100) / 100);
+    const arr = [...set]; const ans = isMax ? Math.max(...arr) : Math.min(...arr);
+    return build({ cat: 'comparar', text: `¿Cuál es el número decimal ${isMax ? 'MAYOR' : 'MENOR'}?`, correct: D(ans), wrong: arr.filter(v => v !== ans).map(D), hint: 'Compara primero la parte entera y luego décimas y centésimas', key: 'dec|' + arr.sort().join(',') });
+  }
+  if (form === 'ops') {
+    const isMax = R.chance(.5); const ex = []; let t = 0;
+    while (ex.length < 4 && t++ < 60) { const e = opExpr(c, d); if (!ex.some(x => x.v === e.v || x.t === e.t)) ex.push(e); }
+    if (ex.length < 4) return null;
+    const best = ex.reduce((a, b) => (isMax ? b.v > a.v : b.v < a.v) ? b : a);
+    return build({ cat: 'comparar', text: `¿Qué operación da el resultado ${isMax ? 'MAYOR' : 'MENOR'}?`, correct: best.t, wrong: ex.filter(e => e !== best).map(e => e.t), hint: ex.map(e => `${e.t} = ${e.v}`).join(' · '), key: 'ops|' + ex.map(e => e.t).sort().join(',') });
+  }
+  // sym
+  let L, Rr, lv, rv;
+  const rel = R.pick(['<', '>', '=']);
+  if (d > .45 && R.chance(.5)) {
+    const e = opExpr(c, d); L = e.t; lv = e.v;
+    if (rel === '=') { rv = lv; Rr = N(lv); }
+    else if (rel === '<') { rv = lv + R.int(1, 9); Rr = N(rv); }
+    else { if (lv < 2) return null; rv = lv - R.int(1, Math.min(9, lv - 1)); Rr = N(rv); }
+  } else {
+    lv = R.int(c === 1 ? 0 : Math.floor(mx / 20), mx); L = N(lv);
+    if (rel === '=') { if (lv < 4) return null; rv = lv; Rr = R.chance(.5) ? `${N(lv - 1)} + 1` : N(lv); if (Rr === L) { Rr = `${N(lv - 1)} + 1`; } }
+    else { let delta = R.int(1, Math.max(2, Math.floor(c === 1 ? 6 : mx / 10))); delta = Math.min(delta, Math.max(1, Math.floor(lv / 2))); rv = rel === '<' ? lv + delta : Math.max(0, lv - delta); if (rv === lv) return null; Rr = N(rv); }
+  }
+  const real = lv < rv ? '<' : lv > rv ? '>' : '=';
+  return build({ cat: 'comparar', text: `${L} ${BLANK} ${Rr}`, correct: real, wrong: ['<', '>', '='].filter(x => x !== real), n: 3, hint: `${N(lv)} ${real} ${N(rv)}`, keepOrder: false, big: true, key: 'sym|' + L + '|' + Rr });
+}
+
+/* ---------- FRACCIONES ---------- */
+function pie(n, k, col) {
+  col = col || '#ff3d9a'; let s = '';
+  for (let i = 0; i < n; i++) {
+    const a1 = (-90 + 360 * i / n) * Math.PI / 180, a2 = (-90 + 360 * (i + 1) / n) * Math.PI / 180;
+    const x1 = 60 + 50 * Math.cos(a1), y1 = 60 + 50 * Math.sin(a1), x2 = 60 + 50 * Math.cos(a2), y2 = 60 + 50 * Math.sin(a2);
+    s += `<path d="M60 60 L${x1.toFixed(1)} ${y1.toFixed(1)} A50 50 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}Z" fill="${i < k ? col : '#fff'}" ${ST} stroke-width="2.5"/>`;
+  }
+  if (n === 1) s = `<circle cx="60" cy="60" r="50" fill="${k ? col : '#fff'}" ${ST}/>`;
+  return svg('0 0 120 120', s, 'fig');
+}
+function bar(n, k, col) {
+  col = col || '#2de2ff'; let s = ''; const w = 200 / n;
+  for (let i = 0; i < n; i++) s += `<rect x="${5 + i * w}" y="14" width="${w}" height="42" fill="${i < k ? col : '#fff'}" ${ST} stroke-width="2.5"/>`;
+  return svg('0 0 210 70', s, 'fig wide');
+}
+function dots(n, k, col) {
+  col = col || '#ffd23f'; const cols = Math.min(n, n > 8 ? 6 : 4), rows = Math.ceil(n / cols); let s = '';
+  for (let i = 0; i < n; i++) s += `<circle cx="${16 + (i % cols) * 28}" cy="${16 + Math.floor(i / cols) * 28}" r="11" fill="${i < k ? col : '#fff'}" ${ST} stroke-width="2.5"/>`;
+  return svg(`0 0 ${cols * 28 + 4} ${rows * 28 + 4}`, s, 'fig wide');
+}
+function fracciones(c, d) {
+  const dens = c === 2 ? (d < .4 ? [2, 3, 4] : [2, 3, 4, 5, 6, 8, 10]) : [2, 3, 4, 5, 6, 8, 10, 12];
+  const form = c === 2 ? R.pick(['read', 'read', 'read', 'of', 'of', d > .55 ? 'equiv' : 'cmp1', 'cmp1']) : R.pick(['read', 'of', 'of', 'equiv', 'add', 'sub', 'dec', 'cmpv', 'pct', 'simp']);
+  if (form === 'read') {
+    const n = R.pick(dens), k = R.int(1, n - 1), v = R.pick([pie, pie, bar, dots]);
+    const vis = v === dots ? dots(n, k) : v(n, k);
+    const comp = F(n - k, n);
+    return build({ cat: 'fracciones', text: '¿Qué fracción está pintada?', visual: vis, correct: F(k, n), wrong: [comp, F(k, n + 1), F(k + 1, n), F(k, n - 1 > 1 ? n - 1 : n + 2), F(n, k), F(k - 1 > 0 ? k - 1 : k + 2, n)], hint: `Hay ${n} partes iguales y ${k} están pintadas: ${k}/${n}`, big: true, key: 'frr|' + n + k + (v === pie ? 'p' : v === bar ? 'b' : 'd') });
+  }
+  if (form === 'of') {
+    const q = R.pick(c === 2 ? (d < .5 ? [2, 3, 4] : [2, 3, 4, 5, 10]) : [2, 3, 4, 5, 6, 8, 10]);
+    const k = c === 2 ? 1 : R.int(1, q - 1), unit = R.int(2, c === 2 ? 10 : 12), tot = q * unit, ans = unit * k;
+    return build({ cat: 'fracciones', text: `¿Cuánto es ${F(k, q)} de ${tot}?`, correct: N(ans), wrong: numWrong(ans, [tot - ans, unit, tot / 2, tot - unit]), hint: `Divide entre ${q}: ${tot} ÷ ${q} = ${unit}${k > 1 ? `; multiplica por ${k}: ${ans}` : ''}`, key: 'fof|' + k + q + tot });
+  }
+  if (form === 'cmp1') {
+    const a = R.pick([2, 3, 4, 5, 6, 8]), b = R.pick([2, 3, 4, 5, 6, 8].filter(x => x !== a));
+    const big = a < b ? a : b; // 1/menor denominador es mayor
+    return build({ cat: 'fracciones', text: '¿Qué fracción es MAYOR?', visual: `<div class="duo">${pie(a, 1)}${pie(b, 1)}</div>`, correct: F(1, big), wrong: [F(1, big === a ? b : a)], n: 2, min: 2, hint: `Cuantas más partes, más pequeñas: 1/${big} es mayor que 1/${big === a ? b : a}`, key: 'fc1|' + a + b });
+  }
+  if (form === 'equiv') {
+    const base = R.pick([[1, 2], [1, 3], [1, 4], [2, 3], [3, 4], [2, 5]]), m = R.int(2, c === 2 ? 4 : 6), n2 = base[1] * m, k2 = base[0] * m;
+    return build({ cat: 'fracciones', text: `${F(base[0], base[1])} = ${F(BLANK, n2)}`, correct: N(k2), wrong: numWrong(k2, [base[0] + m, k2 + 1]), hint: `Multiplica arriba y abajo por ${m}: ${base[0]}×${m} = ${k2}`, key: 'feq|' + base + m });
+  }
+  if (form === 'simp') {
+    const base = R.pick([[1, 2], [1, 3], [3, 4], [2, 3], [2, 5], [3, 5], [1, 4]]), m = R.int(2, 5);
+    const ok = F(base[0], base[1]);
+    return build({ cat: 'fracciones', text: `Simplifica ${F(base[0] * m, base[1] * m)}`, correct: ok, wrong: [F(base[0] * m, base[1]), F(base[0], base[1] * m), F(base[1], base[0]), F(base[0] + 1, base[1] + 1)], hint: `Divide arriba y abajo entre ${m}: ${base[0]}/${base[1]}`, key: 'fsi|' + base + m, big: true });
+  }
+  if (form === 'add' || form === 'sub') {
+    const n = R.pick([5, 6, 7, 8, 9, 10, 12]); let a = R.int(1, n - 2), b = R.int(1, n - a - 1 || 1);
+    if (form === 'sub') { a = R.int(2, n - 1); b = R.int(1, a - 1); }
+    const r = form === 'add' ? a + b : a - b;
+    return build({ cat: 'fracciones', text: `${F(a, n)} ${form === 'add' ? '+' : '−'} ${F(b, n)} = ?`, correct: F(r, n), wrong: [F(r, n * 2), F(r + 1, n), F(r > 1 ? r - 1 : r + 2, n), F(r, n + n), F(a + b + (form === 'sub' ? 2 : 0), n + n)], hint: `Mismo denominador: ${form === 'add' ? 'sumas' : 'restas'} los numeradores: ${a} ${form === 'add' ? '+' : '−'} ${b} = ${r}`, big: true, key: 'fas|' + form + a + b + n });
+  }
+  if (form === 'dec') {
+    const t = R.pick([[1, 2, '0,5'], [1, 4, '0,25'], [3, 4, '0,75'], [1, 5, '0,2'], [2, 5, '0,4'], [1, 10, '0,1'], [3, 10, '0,3'], [7, 10, '0,7'], [3, 5, '0,6']]);
+    return build({ cat: 'fracciones', text: `¿Qué decimal es ${F(t[0], t[1])}?`, correct: t[2], wrong: ['0,5', '0,25', '0,75', '0,2', '0,4', '0,1', '0,3', '0,7', '0,6', '1,2'].filter(x => x !== t[2]), hint: `${t[0]} ÷ ${t[1]} = ${t[2]}`, key: 'fde|' + t });
+  }
+  if (form === 'pct') {
+    const p = R.pick([[50, 2], [25, 4], [10, 10], [20, 5], [75, 4]]), unit = R.int(2, 20), tot = unit * p[1] * (p[0] === 75 ? 1 : 1), ans = p[0] === 75 ? unit * 3 : tot / p[1];
+    return build({ cat: 'fracciones', text: `¿Cuánto es el ${p[0]} % de ${tot}?`, correct: N(ans), wrong: numWrong(ans, [tot - ans, tot / 2]), hint: `${p[0]} % equivale a ${p[0] === 50 ? '1/2' : p[0] === 25 ? '1/4' : p[0] === 10 ? '1/10' : p[0] === 20 ? '1/5' : '3/4'}`, key: 'fpc|' + p + tot });
+  }
+  // cmpv: dos pies distintos denominadores
+  const a = R.pick([[1, 2], [2, 3], [3, 4], [3, 5], [2, 5], [5, 6], [3, 8], [7, 10]]), b = R.pick([[1, 2], [2, 3], [3, 4], [3, 5], [2, 5], [5, 6], [3, 8], [7, 10]]);
+  if (a[0] * b[1] === b[0] * a[1]) return null;
+  const left = a[0] * b[1] > b[0] * a[1];
+  return build({ cat: 'fracciones', text: '¿Cuál es MAYOR?', visual: `<div class="duo">${pie(a[1], a[0], '#ff3d9a')}${pie(b[1], b[0], '#2de2ff')}</div>`, correct: F(...(left ? a : b)), wrong: [F(...(left ? b : a))], n: 2, min: 2, hint: `${a[0]}/${a[1]} = ${(a[0] / a[1]).toFixed(2).replace('.', ',')} y ${b[0]}/${b[1]} = ${(b[0] / b[1]).toFixed(2).replace('.', ',')}`, key: 'fcv|' + a + b, big: true });
+}
+
+/* ---------- GEOMETRÍA ---------- */
+const POLYNAMES = { 3: 'triángulo', 4: 'cuadrilátero', 5: 'pentágono', 6: 'hexágono', 7: 'heptágono', 8: 'octógono', 9: 'eneágono', 10: 'decágono' };
+function angleSvg(deg) {
+  const ox = 28, oy = 92, L = 78, rad = deg * Math.PI / 180, ex = ox + L * Math.cos(rad), ey = oy - L * Math.sin(rad);
+  const ar = 22, ax = ox + ar * Math.cos(rad), ay = oy - ar * Math.sin(rad);
+  let mark = deg === 90 ? `<path d="M${ox + 16} ${oy} V${oy - 16} H${ox}" fill="none" stroke="#ffd23f" stroke-width="3"/>` : `<path d="M${ox + ar} ${oy} A${ar} ${ar} 0 ${deg > 180 ? 1 : 0} 0 ${ax.toFixed(1)} ${ay.toFixed(1)}" fill="none" stroke="#ffd23f" stroke-width="3"/>`;
+  return svg('0 0 120 110', `<line x1="${ox}" y1="${oy}" x2="${ox + L + 10}" y2="${oy}" ${ST} stroke="#fff"/><line x1="${ox}" y1="${oy}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" ${ST} stroke="#fff"/>${mark}<circle cx="${ox}" cy="${oy}" r="4" fill="#ff3d9a"/>`, 'fig');
+}
+function geometria(c, d) {
+  if (c === 1) {
+    const form = R.pick(['name2d', 'name2d', 'sides', 'name3d', 'real', 'find2d', 'find3d']);
+    const n2 = ['círculo', 'cuadrado', 'triángulo', 'rectángulo'], k2 = ['circulo', 'cuadrado', 'triangulo', 'rectangulo'];
+    const n3 = ['esfera', 'cubo', 'cono', 'cilindro'];
+    if (form === 'name2d') { const i = R.int(0, 3); return build({ cat: 'geometria', text: '¿Cómo se llama esta figura?', visual: shape2d(k2[i]), correct: n2[i], wrong: n2.filter((_, j) => j !== i), hint: `Es un ${n2[i]}`, key: 'g1n|' + i + Math.random(), big: false }); }
+    if (form === 'sides') { const i = R.int(0, 3), lados = [0, 4, 3, 4][i]; return build({ cat: 'geometria', text: '¿Cuántos lados tiene?', visual: shape2d(k2[i]), correct: String(lados), wrong: ['0', '1', '2', '3', '4', '5'], hint: `El ${n2[i]} ${lados ? 'tiene ' + lados + ' lados' : 'no tiene lados rectos'}`, key: 'g1s|' + i + Math.random() }); }
+    if (form === 'name3d') { const i = R.int(0, 3); return build({ cat: 'geometria', text: '¿Qué cuerpo geométrico es?', visual: solid(n3[i]), correct: n3[i], wrong: n3.filter((_, j) => j !== i), hint: `Es ${i === 1 ? 'un' : i === 0 ? 'una' : 'un'} ${n3[i]}`, key: 'g1c|' + i + Math.random() }); }
+    if (form === 'real') { const t = R.pick([['una pelota', 'esfera'], ['un dado', 'cubo'], ['un cucurucho de helado', 'cono'], ['una lata de atún', 'cilindro'], ['una caja de zapatos', 'cubo'], ['un gorro de cumpleaños', 'cono']]); return build({ cat: 'geometria', text: `¿Qué cuerpo geométrico se parece a ${t[0]}?`, correct: t[1], wrong: n3.filter(x => x !== t[1]), hint: `${t[0]} se parece a un ${t[1]}`, key: 'g1r|' + t[0] }); }
+    if (form === 'find2d') { const i = R.int(0, 3), cols = R.shuffle(TCOL); return build({ cat: 'geometria', text: `Busca el ${n2[i].toUpperCase()}`, correct: shape2d(k2[i], cols[0]), wrong: k2.filter((_, j) => j !== i).map((k, j) => shape2d(k, cols[j + 1])), hint: `El ${n2[i]} es la figura correcta`, big: true, key: 'g1f|' + i + Math.random() }); }
+    const i = R.int(0, 3); return build({ cat: 'geometria', text: `Busca ${i === 0 ? 'la' : 'el'} ${n3[i].toUpperCase()}`, correct: solid(n3[i]), wrong: n3.filter((_, j) => j !== i).map(solid), hint: `${i === 0 ? 'La' : 'El'} ${n3[i]} es la correcta`, big: true, key: 'g1f3|' + i + Math.random() });
+  }
+  if (c === 2) {
+    const form = R.pick(['poly', 'poly', 'sides', 'verts', 'faces', 'right', 'par']);
+    const maxN = d < .5 ? 6 : 8;
+    if (form === 'poly') { const n = R.int(3, maxN); return build({ cat: 'geometria', text: '¿Cómo se llama este polígono?', visual: polyFig(n), correct: POLYNAMES[n], wrong: [3, 4, 5, 6, 7, 8].filter(x => x !== n).map(x => POLYNAMES[x]), hint: `${n} lados → ${POLYNAMES[n]}`, key: 'g2p|' + n + Math.random() }); }
+    if (form === 'sides' || form === 'verts') { const n = R.int(3, maxN), w = form === 'sides' ? 'lados' : 'vértices'; return build({ cat: 'geometria', text: `¿Cuántos ${w} tiene este polígono?`, visual: polyFig(n), correct: String(n), wrong: numWrong(n).filter(x => +x >= 3), hint: `Un ${POLYNAMES[n]} tiene ${n} ${w}`, key: 'g2s|' + form + n + Math.random() }); }
+    if (form === 'faces') {
+      const t = R.pick([['cubo', 'cubo', 6, 'caras'], ['cubo', 'cubo', 8, 'vértices'], ['cubo', 'cubo', 12, 'aristas'], ['piramide', 'pirámide de base cuadrada', 5, 'caras'], ['piramide', 'pirámide de base cuadrada', 5, 'vértices'], ['piramide', 'pirámide de base cuadrada', 8, 'aristas']]);
+      return build({ cat: 'geometria', text: `¿Cuántas ${t[3]} tiene ${t[0] === 'cubo' ? 'un' : 'una'} ${t[1]}?`.replace('Cuántas vértices', 'Cuántos vértices').replace('Cuántas aristas', 'Cuántas aristas'), visual: solid(t[0]), correct: String(t[2]), wrong: [4, 5, 6, 7, 8, 9, 10, 12].map(String), hint: `${t[1][0].toUpperCase() + t[1].slice(1)}: ${t[2]} ${t[3]}`, key: 'g2f|' + t });
+    }
+    if (form === 'right') {
+      const t = R.pick([['cuadrado', 4], ['rectángulo', 4], ['triángulo equilátero', 0], ['rombo (no cuadrado)', 0]]);
+      return build({ cat: 'geometria', text: `¿Cuántos ángulos rectos tiene un ${t[0]}?`, correct: String(t[1]), wrong: ['0', '1', '2', '3', '4'], hint: `Un ${t[0]} tiene ${t[1]} ángulos rectos`, key: 'g2r|' + t });
+    }
+    const t = R.pick([['rectángulo', 2], ['cuadrado', 2], ['hexágono regular', 3], ['triángulo', 0]]);
+    return build({ cat: 'geometria', text: `¿Cuántos pares de lados paralelos tiene un ${t[0]}?`, correct: String(t[1]), wrong: ['0', '1', '2', '3', '4'], hint: `El ${t[0]} tiene ${t[1]} pares de lados paralelos`, key: 'g2l|' + t });
+  }
+  // ciclo 3
+  const form = R.pick(['angle', 'angle', 'tri', 'trisum', 'poly', 'circle', 'perim', 'solid']);
+  if (form === 'angle') {
+    const deg = R.pick([30, 45, 60, 75, 90, 90, 110, 120, 135, 150, 180]), type = deg < 90 ? 'agudo' : deg === 90 ? 'recto' : deg < 180 ? 'obtuso' : 'llano';
+    return build({ cat: 'geometria', text: `Este ángulo mide ${deg}°. ¿Qué tipo de ángulo es?`, visual: deg === 180 ? svg('0 0 120 110', `<line x1="14" y1="80" x2="106" y2="80" ${ST} stroke="#fff"/><circle cx="60" cy="80" r="4" fill="#ff3d9a"/>`, 'fig') : angleSvg(deg), correct: type, wrong: ['agudo', 'recto', 'obtuso', 'llano'].filter(x => x !== type), hint: `Agudo < 90°, recto = 90°, obtuso entre 90° y 180°, llano = 180°`, key: 'g3a|' + deg });
+  }
+  if (form === 'tri') {
+    const t = R.pick(['equilátero', 'isósceles', 'escaleno']), a = R.int(3, 12);
+    const sides = t === 'equilátero' ? [a, a, a] : t === 'isósceles' ? [a, a, a + R.int(1, 4)] : [a, a + 1 + R.int(0, 2), a + 4 + R.int(0, 3)];
+    const pts = t === 'equilátero' ? '60,14 104,92 16,92' : t === 'isósceles' ? '60,10 90,96 30,96' : '22,96 100,96 70,18';
+    const v = svg('0 0 120 110', `<polygon points="${pts}" fill="#b6ff3b" ${ST}/>`, 'fig') ;
+    return build({ cat: 'geometria', text: `Un triángulo tiene lados de ${sides[0]} cm, ${sides[1]} cm y ${sides[2]} cm. ¿Cómo es?`, visual: v, correct: t, wrong: ['equilátero', 'isósceles', 'escaleno'].filter(x => x !== t), n: 3, hint: `Equilátero: 3 lados iguales · Isósceles: 2 iguales · Escaleno: ninguno igual`, key: 'g3t|' + sides + Math.random() });
+  }
+  if (form === 'trisum') {
+    const a = R.int(30, 80), b = R.int(30, 80), ans = 180 - a - b;
+    return build({ cat: 'geometria', text: `Un triángulo tiene ángulos de ${a}° y ${b}°. ¿Cuánto mide el tercero?`, correct: ans + '°', wrong: [ans + 10, ans - 10, 180 - a, 360 - a - b, ans + 5, ans - 5].filter(x => x > 0).map(x => x + '°'), hint: `Los ángulos de un triángulo suman 180°: 180 − ${a} − ${b} = ${ans}`, key: 'g3s|' + a + b });
+  }
+  if (form === 'poly') { const n = R.int(5, 10); return build({ cat: 'geometria', text: `¿Cómo se llama un polígono de ${n} lados?`, visual: polyFig(n), correct: POLYNAMES[n], wrong: [5, 6, 7, 8, 9, 10].filter(x => x !== n).map(x => POLYNAMES[x]), hint: `${n} lados → ${POLYNAMES[n]}`, key: 'g3p|' + n + Math.random() }); }
+  if (form === 'circle') {
+    const r = R.int(2, 25), toD = R.chance(.5), v = svg('0 0 120 120', `<circle cx="60" cy="60" r="46" fill="#2de2ff" ${ST}/><line x1="60" y1="60" x2="106" y2="60" ${ST} stroke="#fff"/><circle cx="60" cy="60" r="4" fill="#ff3d9a"/>`, 'fig');
+    return build({ cat: 'geometria', text: toD ? `El radio de un círculo mide ${r} cm. ¿Cuánto mide su diámetro?` : `El diámetro mide ${2 * r} cm. ¿Cuánto mide el radio?`, visual: v, correct: (toD ? 2 * r : r) + ' cm', wrong: [r, 2 * r, 4 * r, r + 2, r * r, r / 2 | 0].filter(x => x > 0 && x !== (toD ? 2 * r : r)).map(x => x + ' cm'), hint: 'Diámetro = 2 × radio', key: 'g3c|' + r + toD });
+  }
+  if (form === 'perim') {
+    const n = R.pick([3, 4, 5, 6, 8]), l = R.int(2, 15), p = n * l;
+    return build({ cat: 'geometria', text: `Un ${POLYNAMES[n]} regular tiene lados de ${l} cm. ¿Cuál es su perímetro?`, visual: polyFig(n), correct: p + ' cm', wrong: [p + l, p - l, l * l, p + 2, l + n, 2 * p].filter(x => x > 0 && x !== p).map(x => x + ' cm'), hint: `Perímetro = ${n} lados × ${l} cm = ${p} cm`, key: 'g3pe|' + n + l });
+  }
+  const t = R.pick([['prisma triangular', 5, 'caras'], ['prisma triangular', 6, 'vértices'], ['prisma triangular', 9, 'aristas'], ['pirámide triangular', 4, 'caras'], ['pirámide triangular', 6, 'aristas'], ['prisma rectangular', 6, 'caras'], ['prisma rectangular', 8, 'vértices'], ['prisma rectangular', 12, 'aristas']]);
+  return build({ cat: 'geometria', text: `¿Cuántas ${t[2]} tiene un${t[0].startsWith('pirámide') ? 'a' : ''} ${t[0]}?`.replace('Cuántas vértices', 'Cuántos vértices'), correct: String(t[1]), wrong: ['4', '5', '6', '7', '8', '9', '10', '12'], hint: `${t[0][0].toUpperCase() + t[0].slice(1)}: ${t[1]} ${t[2]}`, key: 'g3s2|' + t });
+}
+
+/* ---------- ÁREAS ---------- */
+function cellsSvg(cols, rows, shaded, col, labels) {
+  const s = 24, pad = 22; let o = '';
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+    const on = shaded(r, c);
+    o += `<rect x="${pad + c * s}" y="${pad + r * s}" width="${s}" height="${s}" fill="${on ? col : '#fff'}" ${ST} stroke-width="2" stroke="${on ? INK : '#8a7fb8'}"/>`;
+  }
+  if (labels) o += `<text x="${pad + cols * s / 2}" y="14" text-anchor="middle" class="dim">${labels[0]}</text><text x="${pad + cols * s + 6}" y="${pad + rows * s / 2 + 5}" class="dim">${labels[1]}</text>`;
+  return svg(`0 0 ${pad * 2 + cols * s + (labels ? 24 : 0)} ${pad * 2 + rows * s}`, o, 'fig grid');
+}
+function areas(c, d) {
+  if (c === 1) {
+    if (d > .5 && R.chance(.4)) {
+      const cols = 4, rows = 3, mk = k => { const set = new Set(); while (set.size < k) set.add(R.int(0, rows * cols - 1)); return set; };
+      const ka = R.int(3, 9); let kb = R.int(3, 9); const A = mk(ka), B = mk(kb);
+      const v = `<div class="duo">${cellsSvg(cols, rows, (r, c0) => A.has(r * cols + c0), '#ff3d9a')}${cellsSvg(cols, rows, (r, c0) => B.has(r * cols + c0), '#2de2ff')}</div>`;
+      const real = ka > kb ? 'La rosa' : ka < kb ? 'La azul' : 'Igual';
+      return build({ cat: 'areas', text: '¿Qué figura tiene MÁS cuadraditos pintados?', visual: v, correct: real, wrong: ['La rosa', 'La azul', 'Igual'].filter(x => x !== real), n: 3, hint: `Rosa: ${ka} cuadraditos · Azul: ${kb} cuadraditos`, key: 'a1c|' + [...A] + '|' + [...B], big: true });
+    }
+    const cols = R.int(3, d < .4 ? 4 : 6), rows = R.int(2, d < .4 ? 3 : 4), k = R.int(3, Math.min(rows * cols - 1, Math.round(5 + d * 9)));
+    const set = new Set(); while (set.size < k) set.add(R.int(0, rows * cols - 1));
+    return build({ cat: 'areas', text: '¿Cuántos cuadraditos están pintados?', visual: cellsSvg(cols, rows, (r, c0) => set.has(r * cols + c0), R.pick(TCOL)), correct: String(k), wrong: numWrong(k), hint: `Cuenta uno a uno: hay ${k} cuadraditos pintados`, key: 'a1|' + cols + rows + [...set] });
+  }
+  if (c === 2) {
+    const form = R.pick(d < .4 ? ['rect', 'rect', 'count'] : ['rect', 'L', 'perim', 'dims', 'count']);
+    if (form === 'rect') { const w = R.int(2, d < .5 ? 6 : 9), h = R.int(2, d < .5 ? 5 : 7); return build({ cat: 'areas', text: 'Cada cuadrito mide 1 cm². ¿Cuál es el área?', visual: cellsSvg(w, h, () => true, R.pick(TCOL), [w + ' cm', h + ' cm']), correct: (w * h) + ' cm²', wrong: [w * h + w, w * h - w, w + h, 2 * (w + h), w * h + h, w * h - h].filter(x => x > 0 && x !== w * h).map(x => x + ' cm²'), hint: `Área = ${w} × ${h} = ${w * h} cm²`, key: 'a2r|' + w + h }); }
+    if (form === 'count') { const cols = R.int(4, 8), rows = R.int(3, 5), k = R.int(5, Math.min(rows * cols - 2, 16)); const set = new Set(); while (set.size < k) set.add(R.int(0, rows * cols - 1)); return build({ cat: 'areas', text: 'Cada cuadrito mide 1 cm². ¿Qué área tiene la parte pintada?', visual: cellsSvg(cols, rows, (r, c0) => set.has(r * cols + c0), R.pick(TCOL)), correct: k + ' cm²', wrong: numWrong(k).map(x => x + ' cm²'), hint: `Cuenta los cuadritos pintados: ${k} cm²`, key: 'a2c|' + cols + rows + [...set] }); }
+    if (form === 'L') { const W = R.int(4, 7), H = R.int(4, 6), cw = R.int(1, W - 2), ch = R.int(1, H - 2), area = W * H - cw * ch; return build({ cat: 'areas', text: 'Cada cuadrito mide 1 cm². ¿Qué área tiene la figura pintada?', visual: cellsSvg(W, H, (r, c0) => !(r < ch && c0 >= W - cw), R.pick(TCOL)), correct: area + ' cm²', wrong: [W * H, area + cw, area - ch, area + 2, area - 2, W + H].filter(x => x > 0 && x !== area).map(x => x + ' cm²'), hint: `Rectángulo grande ${W}×${H} = ${W * H}; quitas ${cw}×${ch} = ${cw * ch}; queda ${area} cm²`, key: 'a2L|' + W + H + cw + ch }); }
+    if (form === 'perim') { const w = R.int(2, 8), h = R.int(2, 6), p = 2 * (w + h); return build({ cat: 'areas', text: 'Cada cuadrito mide 1 cm de lado. ¿Cuál es el PERÍMETRO?', visual: cellsSvg(w, h, () => true, R.pick(TCOL), [w + ' cm', h + ' cm']), correct: p + ' cm', wrong: [w * h, w + h, p + 2, p - 2, p + 4].filter(x => x > 0 && x !== p).map(x => x + ' cm'), hint: `Perímetro = ${w} + ${h} + ${w} + ${h} = ${p} cm`, key: 'a2p|' + w + h }); }
+    const w = R.int(3, 12), h = R.int(2, 9); return build({ cat: 'areas', text: `Un rectángulo mide ${w} cm de largo y ${h} cm de ancho. ¿Cuál es su área?`, correct: (w * h) + ' cm²', wrong: [w * h + w, w * h - h, w + h, 2 * (w + h), w * h + 10].filter(x => x > 0 && x !== w * h).map(x => x + ' cm²'), hint: `Área = largo × ancho = ${w} × ${h} = ${w * h} cm²`, key: 'a2d|' + w + h });
+  }
+  const form = R.pick(d < .35 ? ['rect', 'square', 'perim'] : ['rect', 'square', 'tri', 'para', 'L', 'miss', 'tri']);
+  const u = R.pick(['cm', 'm']);
+  if (form === 'rect') {
+    const l = R.int(4, 25), w = R.int(3, 15), v = svg('0 0 200 120', `<rect x="25" y="25" width="140" height="70" fill="#2de2ff" ${ST}/><text x="95" y="18" text-anchor="middle" class="dim">${l} ${u}</text><text x="172" y="64" class="dim">${w} ${u}</text>`, 'fig wide');
+    return build({ cat: 'areas', text: '¿Cuál es el área de este rectángulo?', visual: v, correct: `${l * w} ${u}²`, wrong: [l * w + l, l * w - w, 2 * (l + w), l + w, l * w + 10, l * w - 10].filter(x => x > 0 && x !== l * w).map(x => x + ' ' + u + '²'), hint: `Área = base × altura = ${l} × ${w} = ${l * w} ${u}²`, key: 'a3r|' + l + w + u });
+  }
+  if (form === 'square') {
+    const l = R.int(3, 16), v = svg('0 0 140 130', `<rect x="25" y="25" width="85" height="85" fill="#b6ff3b" ${ST}/><text x="67" y="18" text-anchor="middle" class="dim">${l} ${u}</text>`, 'fig');
+    return build({ cat: 'areas', text: '¿Cuál es el área de este cuadrado?', visual: v, correct: `${l * l} ${u}²`, wrong: [4 * l, 2 * l, l * l + l, l * l - l, l * 3].filter(x => x > 0 && x !== l * l).map(x => x + ' ' + u + '²'), hint: `Área = lado × lado = ${l} × ${l} = ${l * l} ${u}²`, key: 'a3s|' + l + u });
+  }
+  if (form === 'perim') {
+    const l = R.int(4, 25), w = R.int(3, 15), p = 2 * (l + w), v = svg('0 0 200 120', `<rect x="25" y="25" width="140" height="70" fill="#ffd23f" ${ST}/><text x="95" y="18" text-anchor="middle" class="dim">${l} ${u}</text><text x="172" y="64" class="dim">${w} ${u}</text>`, 'fig wide');
+    return build({ cat: 'areas', text: '¿Cuál es el PERÍMETRO de este rectángulo?', visual: v, correct: `${p} ${u}`, wrong: [l * w, l + w, p + 2, p - 2, p + 4].filter(x => x > 0 && x !== p).map(x => x + ' ' + u), hint: `Perímetro = 2 × (${l} + ${w}) = ${p} ${u}`, key: 'a3p|' + l + w + u });
+  }
+  if (form === 'tri') {
+    const b = 2 * R.int(2, 12), h = R.int(3, 14), a = b * h / 2, v = svg('0 0 200 130', `<polygon points="20,105 180,105 120,25" fill="#ff7a3d" ${ST}/><line x1="120" y1="25" x2="120" y2="105" stroke="#fff" stroke-width="3" stroke-dasharray="6 5"/><text x="100" y="124" text-anchor="middle" class="dim">base ${b} ${u}</text><text x="128" y="70" class="dim">${h} ${u}</text>`, 'fig wide');
+    return build({ cat: 'areas', text: '¿Cuál es el área de este triángulo?', visual: v, correct: `${a} ${u}²`, wrong: [b * h, a + b, a - h, b + h, a * 2 + 2].filter(x => x > 0 && x !== a).map(x => x + ' ' + u + '²'), hint: `Área = base × altura ÷ 2 = ${b} × ${h} ÷ 2 = ${a} ${u}²`, key: 'a3t|' + b + h + u });
+  }
+  if (form === 'para') {
+    const b = R.int(4, 20), h = R.int(3, 12), a = b * h, v = svg('0 0 200 130', `<polygon points="40,105 170,105 200,35 70,35" fill="#9b6bff" ${ST}/><line x1="70" y1="35" x2="70" y2="105" stroke="#fff" stroke-width="3" stroke-dasharray="6 5"/><text x="105" y="124" text-anchor="middle" class="dim">base ${b} ${u}</text><text x="76" y="75" class="dim">${h} ${u}</text>`, 'fig wide');
+    return build({ cat: 'areas', text: '¿Cuál es el área de este paralelogramo?', visual: v, correct: `${a} ${u}²`, wrong: [a / 2, a + b, a - h, b + h, 2 * (b + h)].filter(x => x > 0 && x !== a && Number.isInteger(x)).map(x => x + ' ' + u + '²'), hint: `Área = base × altura = ${b} × ${h} = ${a} ${u}²`, key: 'a3g|' + b + h + u });
+  }
+  if (form === 'L') {
+    const W = R.int(8, 16), H = R.int(8, 14), cw = R.int(3, W - 3), ch = R.int(3, H - 3), a = W * H - cw * ch;
+    const v = svg('0 0 200 140', `<polygon points="20,20 ${180 - 60},20 ${180 - 60},${20 + 40} 180,${20 + 40} 180,120 20,120" fill="#ff3d9a" ${ST}/><text x="100" y="14" text-anchor="middle" class="dim">${W} ${u}</text><text x="186" y="85" class="dim">${H - ch}</text><text x="10" y="75" class="dim" text-anchor="end">${H}</text>`, 'fig wide');
+    return build({ cat: 'areas', text: `Un rectángulo de ${W} × ${H} ${u} al que le quitamos una esquina de ${cw} × ${ch} ${u}. ¿Qué área queda?`, correct: `${a} ${u}²`, wrong: [W * H, a + cw, a - ch, cw * ch, a + 10, a - 10].filter(x => x > 0 && x !== a).map(x => x + ' ' + u + '²'), hint: `${W} × ${H} = ${W * H}; ${cw} × ${ch} = ${cw * ch}; ${W * H} − ${cw * ch} = ${a} ${u}²`, key: 'a3L|' + W + H + cw + ch });
+  }
+  const l = R.int(3, 15), w = R.int(2, 12), a = l * w;
+  return build({ cat: 'areas', text: `Un rectángulo tiene un área de ${a} ${u}² y un lado de ${l} ${u}. ¿Cuánto mide el otro lado?`, correct: `${w} ${u}`, wrong: [a - l, l + w, w + 1, w - 1, a / 2 | 0, l].filter(x => x > 0 && x !== w).map(x => x + ' ' + u), hint: `${a} ÷ ${l} = ${w} ${u}`, key: 'a3m|' + l + w + u });
+}
+
+/* ---------- registro ---------- */
+const GEN = { sumres, tablas, divisiones, secuencias, comparar, fracciones, geometria, areas };
+const BYCYCLE = {
+  1: ['sumres', 'secuencias', 'comparar', 'geometria', 'areas'],
+  2: ['sumres', 'tablas', 'divisiones', 'secuencias', 'fracciones', 'comparar', 'geometria', 'areas'],
+  3: ['sumres', 'tablas', 'divisiones', 'secuencias', 'fracciones', 'comparar', 'geometria', 'areas']
+};
+const INFO = {
+  sumres: { name: 'Sumas y restas', color: '#ff7a3d', boss: 'Gran Sumador' },
+  tablas: { name: 'Tablas de multiplicar', color: '#ff3d9a', boss: 'Rey de las Tablas' },
+  divisiones: { name: 'Divisiones', color: '#9b6bff', boss: 'Divisor Supremo' },
+  secuencias: { name: 'Secuencias lógicas', color: '#2de2ff', boss: 'Maga del Patrón' },
+  fracciones: { name: 'Fracciones', color: '#ffd23f', boss: 'Lord Pizza' },
+  comparar: { name: 'Mayor y menor', color: '#b6ff3b', boss: 'Juez Mayor-Menor' },
+  geometria: { name: 'Geometría', color: '#4d8dff', boss: 'Arquitecto Prisma' },
+  areas: { name: 'Áreas', color: '#ff8fb8', boss: 'Gigante Cuadrícula' }
+};
+const seen = new Set();
+function generate(cat, cycle, d) {
+  d = Math.max(0, Math.min(1, d));
+  let last = null;
+  for (let i = 0; i < 60; i++) {
+    let q = null;
+    try { q = GEN[cat](cycle, d); } catch (e) { q = null; }
+    if (!q) continue;
+    last = q;
+    if (!seen.has(q.key)) { seen.add(q.key); return q; }
+  }
+  return last || generate(cat, cycle, d + .01 > 1 ? 0 : d);
+}
+G.Q = {
+  generate, resetSeen: () => seen.clear(),
+  cats: c => BYCYCLE[c].slice(),
+  info: (cat, cycle) => { const o = Object.assign({}, INFO[cat]); if (cat === 'areas' && cycle === 1) { o.name = 'Cuadraditos'; o.boss = 'Gigante Cuadrícula'; } return o; },
+  _R: R
+};
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* MateMonstruos · generador de criaturas originales en SVG
+   Todas las criaturas se dibujan por código (no hay personajes de terceros). */
+(function (G) {
+'use strict';
+const INK = '#1b1140';
+function rng(seed) { let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function hex(c) { return [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)]; }
+function mix(a, b, t) { const A = hex(a), B = hex(b); return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, '0')).join(''); }
+
+const ELEM = {
+  fuego: { body: '#ff7a3d', belly: '#ffe3ac', acc: '#ffd23f', dark: '#8a2412', label: 'Fuego' },
+  agua: { body: '#3fa7ff', belly: '#d9f2ff', acc: '#2de2c6', dark: '#0b3a7a', label: 'Agua' },
+  planta: { body: '#5fd35f', belly: '#f0ffc4', acc: '#ff6fc0', dark: '#1d5a2a', label: 'Planta' },
+  rayo: { body: '#b8f03c', belly: '#f4ffc8', acc: '#ff4fa0', dark: '#2d5a00', label: 'Rayo' },
+  tierra: { body: '#c8935f', belly: '#f6e3c4', acc: '#7de0a3', dark: '#4a2f18', label: 'Tierra' },
+  cosmos: { body: '#9b6bff', belly: '#e6dcff', acc: '#ff5fd0', dark: '#2a1670', label: 'Cosmos' }
+};
+const BODIES = ['blob', 'cat', 'dino', 'bird', 'fish', 'bug'];
+const SYL = {
+  fuego: [['Pir', 'Brasi', 'Lavi', 'Tiz', 'Ceni', 'Cráter', 'Fogo', 'Chispi'], ['ko', 'tón', 'la', 'zo', 'ito', 'ín', 'run', 'ñoz']],
+  agua: [['Bur', 'Mari', 'Ola', 'Gotu', 'Coral', 'Nauti', 'Splu', 'Bubi'], ['xa', 'ño', 'ta', 'bi', 'llo', 'mar', 'pi', 'dú']],
+  planta: [['Hoji', 'Brot', 'Lauri', 'Musgo', 'Fron', 'Pétal', 'Raíz', 'Helec'], ['to', 'lín', 'na', 'ba', 'zol', 'ño', 'fa', 'rrí']],
+  rayo: [['Chis', 'Volti', 'Trueni', 'Zap', 'Relam', 'Elec', 'Fulgu', 'Rayu'], ['pi', 'to', 'zo', 'ra', 'ín', 'ka', 'tón', 'lo']],
+  tierra: [['Roki', 'Tobo', 'Pedri', 'Basal', 'Lapi', 'Malpa', 'Grava', 'Terro'], ['to', 'no', 'llo', 'ñón', 'co', 'rro', 'zo', 'mi']],
+  cosmos: [['Astro', 'Luni', 'Cosmi', 'Nebu', 'Estre', 'Orbi', 'Cometi', 'Galax'], ['to', 'ka', 'ín', 'lú', 'ña', 'xi', 'mo', 'ro']]
+};
+const EPITHET = ['', '', '', ' el Veloz', ' la Bromista', ' el Valiente', ' la Lista', ' el Curioso'];
+
+function make(seed, elements) {
+  const r = rng(seed);
+  const el = elements[Math.floor(r() * elements.length)];
+  const body = BODIES[Math.floor(r() * BODIES.length)];
+  const tail = Math.floor(r() * 3);
+  const hue = (r() - .5) * .35; // variación de tono
+  const E = ELEM[el];
+  const s = SYL[el];
+  const name = s[0][Math.floor(r() * s[0].length)] + s[1][Math.floor(r() * s[1].length)];
+  const col = { body: mix(E.body, r() < .5 ? '#ffffff' : E.dark, Math.abs(hue)), belly: E.belly, acc: E.acc, dark: E.dark };
+  return { seed, element: el, body, tail, name: name.charAt(0).toUpperCase() + name.slice(1), col, label: E.label };
+}
+
+/* decoraciones elementales (origen en la base, crecen hacia arriba) */
+function decor(el, x, y, sc, col, rot) {
+  const a = col.acc, dk = col.dark;
+  let d = '';
+  switch (el) {
+    case 'fuego': d = `<path d="M0 0 C-15 -4 -17 -24 -6 -38 C-5 -26 1 -24 3 -33 C13 -24 17 -8 0 0Z" fill="${a}" stroke="${INK}" stroke-width="3"/><path d="M0 -2 C-7 -5 -7 -14 -1 -20 C3 -14 8 -10 0 -2Z" fill="#fff3b0"/>`; break;
+    case 'agua': d = `<path d="M0 0 C-14 -2 -16 -16 0 -38 C16 -16 14 -2 0 0Z" fill="${a}" stroke="${INK}" stroke-width="3"/><ellipse cx="-4" cy="-12" rx="2.5" ry="5" fill="#fff" opacity=".7"/>`; break;
+    case 'planta': d = `<path d="M0 0 C-2 -12 -2 -20 0 -26" stroke="${INK}" stroke-width="5" fill="none"/><path d="M0 -4 C-26 -8 -26 -34 -8 -32 C-4 -22 -2 -12 0 -4Z" fill="#6fe06f" stroke="${INK}" stroke-width="3"/><path d="M0 -4 C26 -8 26 -34 8 -32 C4 -22 2 -12 0 -4Z" fill="#43b843" stroke="${INK}" stroke-width="3"/><circle cx="0" cy="-30" r="6" fill="${a}" stroke="${INK}" stroke-width="3"/>`; break;
+    case 'rayo': d = `<polygon points="5,-42 -12,-16 -2,-16 -8,4 14,-22 3,-22" fill="${a}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`; break;
+    case 'tierra': d = `<polygon points="-18,0 -12,-24 -3,-4" fill="${mix(col.body, dk, .35)}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><polygon points="-6,0 2,-34 12,0" fill="${mix(col.body, dk, .15)}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><polygon points="8,0 16,-22 22,0" fill="${mix(col.body, dk, .4)}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`; break;
+    default: d = `<polygon points="0,-40 5,-26 20,-26 8,-17 12,-2 0,-11 -12,-2 -8,-17 -20,-26 -5,-26" fill="${a}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`;
+  }
+  return `<g transform="translate(${x} ${y}) rotate(${rot || 0}) scale(${sc})">${d}</g>`;
+}
+
+function eyes(mood, fx, fy, boss) {
+  const L = fx - 17, Rx = fx + 17;
+  const pup = boss ? '#e0143c' : INK;
+  if (mood === 'happy') {
+    return `<path d="M${L - 9} ${fy + 3} Q${L} ${fy - 11} ${L + 9} ${fy + 3}" fill="none" stroke="${INK}" stroke-width="5" stroke-linecap="round"/><path d="M${Rx - 9} ${fy + 3} Q${Rx} ${fy - 11} ${Rx + 9} ${fy + 3}" fill="none" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>`;
+  }
+  if (mood === 'hurt') {
+    return `<polyline points="${L - 9},${fy - 7} ${L + 7},${fy + 1} ${L - 9},${fy + 9}" fill="none" stroke="${INK}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="${Rx + 9},${fy - 7} ${Rx - 7},${fy + 1} ${Rx + 9},${fy + 9}" fill="none" stroke="${INK}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }
+  if (mood === 'faint') {
+    const x = (cx) => `<path d="M${cx - 8} ${fy - 8} L${cx + 8} ${fy + 8} M${cx + 8} ${fy - 8} L${cx - 8} ${fy + 8}" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>`;
+    return x(L) + x(Rx);
+  }
+  const one = cx => `<ellipse cx="${cx}" cy="${fy}" rx="10" ry="11.5" fill="#fff" stroke="${INK}" stroke-width="3.5"/><circle cx="${cx + 1}" cy="${fy + 1}" r="6" fill="${pup}"/><circle cx="${cx - 2}" cy="${fy - 3}" r="2.4" fill="#fff"/>`;
+  let s = one(L) + one(Rx);
+  if (boss) s += `<path d="M${L - 14} ${fy - 17} L${L + 9} ${fy - 8}" stroke="${INK}" stroke-width="6" stroke-linecap="round"/><path d="M${Rx + 14} ${fy - 17} L${Rx - 9} ${fy - 8}" stroke="${INK}" stroke-width="6" stroke-linecap="round"/>`;
+  return s;
+}
+function mouth(mood, fx, fy, boss) {
+  if (mood === 'happy') return `<path d="M${fx - 13} ${fy + 12} Q${fx} ${fy + 36} ${fx + 13} ${fy + 12}Z" fill="#7a1030" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/><ellipse cx="${fx}" cy="${fy + 23}" rx="6" ry="4" fill="#ff7a9a"/>`;
+  if (mood === 'hurt') return `<path d="M${fx - 13} ${fy + 22} q6.5 -9 13 0 q6.5 9 13 0" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><path d="M${fx + 32} ${fy - 18} q-6 9 0 14 q6 -5 0 -14z" fill="#8ee6ff" stroke="${INK}" stroke-width="2.5"/>`;
+  if (mood === 'faint') return `<path d="M${fx - 9} ${fy + 14} h18" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><ellipse cx="${fx + 4}" cy="${fy + 22}" rx="5" ry="8" fill="#ff7a9a" stroke="${INK}" stroke-width="3"/>`;
+  if (boss) return `<path d="M${fx - 14} ${fy + 20} Q${fx} ${fy + 8} ${fx + 14} ${fy + 20}" fill="none" stroke="${INK}" stroke-width="4.5" stroke-linecap="round"/><path d="M${fx - 8} ${fy + 17} l3 6 l3 -7 M${fx + 2} ${fy + 14} l3 7 l3 -6" fill="#fff" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/>`;
+  return `<path d="M${fx - 9} ${fy + 14} Q${fx} ${fy + 24} ${fx + 9} ${fy + 14}" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`;
+}
+
+function tailPath(cr, col) {
+  const D = ['M140 150 C176 152 188 122 168 98', 'M142 154 C164 160 176 152 180 138', 'M140 146 C168 168 190 150 188 128'][cr.tail];
+  const tip = { 'M140 150 C176 152 188 122 168 98': [168, 98], 'M142 154 C164 160 176 152 180 138': [180, 138], 'M140 146 C168 168 190 150 188 128': [188, 128] }[D];
+  return { svg: `<path d="${D}" fill="none" stroke="${INK}" stroke-width="22" stroke-linecap="round"/><path d="${D}" fill="none" stroke="${col}" stroke-width="12" stroke-linecap="round"/>`, tip };
+}
+
+/* mood: idle | happy | hurt | faint ; stage 1..3 ; boss: false | 'mini' | 'final' */
+function svg(cr, o) {
+  o = o || {};
+  const mood = o.mood || 'idle', stage = o.stage || 1, boss = o.boss || false;
+  let c = Object.assign({}, cr.col);
+  if (boss) { c.body = mix(c.body, '#2a0f4d', boss === 'final' ? .5 : .32); c.belly = mix(c.belly, '#b9a6e0', .35); }
+  const id = 'g' + (cr.seed % 9973) + (o.uid || '');
+  const blob = cr.body === 'blob';
+  const fx = 100, fy = blob ? 108 : 86;
+  let b = '';
+  // aura
+  if (stage >= 3 || boss) {
+    const ac = boss ? (boss === 'final' ? '#ff2b6a' : '#9b30ff') : c.acc;
+    b += `<defs><radialGradient id="${id}a"><stop offset="0" stop-color="${ac}" stop-opacity=".75"/><stop offset="1" stop-color="${ac}" stop-opacity="0"/></radialGradient></defs><circle class="aura" cx="100" cy="112" r="92" fill="url(#${id}a)"/>`;
+  }
+  // alas / aletas traseras
+  if (cr.body === 'bird') b += `<ellipse cx="46" cy="128" rx="22" ry="34" transform="rotate(20 46 128)" fill="${mix(c.body, c.dark, .2)}" stroke="${INK}" stroke-width="5"/><ellipse cx="154" cy="128" rx="22" ry="34" transform="rotate(-20 154 128)" fill="${mix(c.body, c.dark, .2)}" stroke="${INK}" stroke-width="5"/>`;
+  if (cr.body === 'bug') b += `<ellipse cx="52" cy="108" rx="30" ry="22" transform="rotate(-25 52 108)" fill="#fff" fill-opacity=".6" stroke="${INK}" stroke-width="4"/><ellipse cx="148" cy="108" rx="30" ry="22" transform="rotate(25 148 108)" fill="#fff" fill-opacity=".6" stroke="${INK}" stroke-width="4"/>`;
+  if (stage >= 3 && cr.body !== 'bird' && cr.body !== 'bug') b += `<path d="M58 118 C20 96 12 130 30 150 C40 132 50 128 62 134Z" fill="${c.acc}" stroke="${INK}" stroke-width="4.5" stroke-linejoin="round"/><path d="M142 118 C180 96 188 130 170 150 C160 132 150 128 138 134Z" fill="${c.acc}" stroke="${INK}" stroke-width="4.5" stroke-linejoin="round"/>`;
+  // cola
+  if (cr.body !== 'blob' && cr.body !== 'bird') {
+    const t = tailPath(cr, c.body); b += t.svg;
+    if (cr.body === 'cat' || cr.body === 'dino') b += decor(cr.element, t.tip[0], t.tip[1] + 4, stage >= 2 ? .8 : .6, c, 20);
+  }
+  if (cr.body === 'fish') b += `<path d="M142 140 L186 112 L180 150 L186 178 Z" fill="${c.acc}" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/>`;
+  // cuerpo
+  if (blob) {
+    b += `<ellipse cx="62" cy="172" rx="20" ry="11" fill="${mix(c.body, c.dark, .25)}" stroke="${INK}" stroke-width="5"/><ellipse cx="138" cy="172" rx="20" ry="11" fill="${mix(c.body, c.dark, .25)}" stroke="${INK}" stroke-width="5"/>`;
+    b += `<ellipse cx="100" cy="116" rx="68" ry="64" fill="${c.body}" stroke="${INK}" stroke-width="5.5"/><ellipse cx="100" cy="146" rx="42" ry="30" fill="${c.belly}" opacity=".9"/>`;
+    b += `<circle cx="52" cy="62" r="15" fill="${c.body}" stroke="${INK}" stroke-width="5"/><circle cx="148" cy="62" r="15" fill="${c.body}" stroke="${INK}" stroke-width="5"/><circle cx="52" cy="62" r="7" fill="${c.acc}"/><circle cx="148" cy="62" r="7" fill="${c.acc}"/>`;
+  } else {
+    const rx = cr.body === 'dino' ? 52 : 47, ry = cr.body === 'fish' ? 38 : 42;
+    b += `<ellipse cx="80" cy="172" rx="17" ry="10" fill="${mix(c.body, c.dark, .25)}" stroke="${INK}" stroke-width="5"/><ellipse cx="120" cy="172" rx="17" ry="10" fill="${mix(c.body, c.dark, .25)}" stroke="${INK}" stroke-width="5"/>`;
+    b += `<ellipse cx="100" cy="134" rx="${rx}" ry="${ry}" fill="${c.body}" stroke="${INK}" stroke-width="5.5"/><ellipse cx="100" cy="144" rx="${rx - 18}" ry="${ry - 12}" fill="${c.belly}" opacity=".92"/>`;
+    b += `<ellipse cx="${100 - rx - 2}" cy="132" rx="11" ry="16" transform="rotate(18 ${100 - rx - 2} 132)" fill="${c.body}" stroke="${INK}" stroke-width="5"/><ellipse cx="${100 + rx + 2}" cy="132" rx="11" ry="16" transform="rotate(-18 ${100 + rx + 2} 132)" fill="${c.body}" stroke="${INK}" stroke-width="5"/>`;
+    if (cr.body === 'bug') b += `<path d="M60 126 q40 10 80 0 M62 144 q38 9 76 0" fill="none" stroke="${c.acc}" stroke-width="6" stroke-linecap="round"/>`;
+    if (stage >= 2 && cr.body !== 'bug') b += `<path d="M62 118 l10 12 M78 112 l10 14 M126 112 l-10 14 M142 118 l-10 12" stroke="${c.acc}" stroke-width="6" stroke-linecap="round"/>`;
+    if (stage >= 3) b += `<polygon points="58,112 44,92 70,100" fill="${c.acc}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/><polygon points="142,112 156,92 130,100" fill="${c.acc}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>`;
+    // cabeza
+    b += `<circle cx="100" cy="84" r="38" fill="${c.body}" stroke="${INK}" stroke-width="5.5"/>`;
+    // rasgos de cabeza según tipo
+    if (cr.body === 'cat') b += `<polygon points="68,66 70,32 96,52" fill="${c.body}" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/><polygon points="132,66 130,32 104,52" fill="${c.body}" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/><polygon points="74,56 75,41 88,52" fill="${c.acc}"/><polygon points="126,56 125,41 112,52" fill="${c.acc}"/>`;
+    if (cr.body === 'dino') b += `<polygon points="80,52 88,34 96,48" fill="${c.acc}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/><polygon points="100,46 108,26 116,46" fill="${c.acc}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/><polygon points="116,50 126,36 128,56" fill="${c.acc}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/><ellipse cx="100" cy="102" rx="19" ry="12" fill="${c.belly}" opacity=".9"/>`;
+    if (cr.body === 'bird') b += `<path d="M84 50 q-6 -18 4 -26 q2 12 8 22 M100 46 q0 -22 12 -28 q-2 14 -4 28 M112 50 q8 -14 20 -14 q-8 8 -12 18" fill="${c.acc}" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/><polygon points="100,92 88,104 112,104" fill="${c.acc}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>`;
+    if (cr.body === 'fish') b += `<path d="M66 70 Q100 18 134 70 Q100 52 66 70Z" fill="${c.acc}" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/><ellipse cx="62" cy="92" rx="10" ry="16" transform="rotate(30 62 92)" fill="${c.acc}" stroke="${INK}" stroke-width="4"/><ellipse cx="138" cy="92" rx="10" ry="16" transform="rotate(-30 138 92)" fill="${c.acc}" stroke="${INK}" stroke-width="4"/>`;
+    if (cr.body === 'bug') b += `<path d="M82 52 Q70 28 56 24 M118 52 Q130 28 144 24" fill="none" stroke="${INK}" stroke-width="5" stroke-linecap="round"/><circle cx="55" cy="23" r="8" fill="${c.acc}" stroke="${INK}" stroke-width="4"/><circle cx="145" cy="23" r="8" fill="${c.acc}" stroke="${INK}" stroke-width="4"/>`;
+  }
+  // decoración elemental en la cabeza
+  const topY = blob ? 56 : cr.body === 'bug' || cr.body === 'bird' || cr.body === 'dino' ? 50 : 50;
+  if (cr.body === 'blob' || cr.body === 'fish' || cr.body === 'bug' || cr.body === 'bird') b += decor(cr.element, 100, topY, stage === 1 ? .85 : stage === 2 ? 1.15 : 1.45, c);
+  else if (cr.body === 'cat' || cr.body === 'dino') b += decor(cr.element, 100, topY - 4, stage === 1 ? .55 : stage === 2 ? .8 : 1.05, c);
+  // cara
+  if (o.mood !== 'faint' && mood !== 'hurt') b += `<ellipse cx="${fx - 36}" cy="${fy + 12}" rx="9" ry="6" fill="${c.acc}" opacity=".65"/><ellipse cx="${fx + 36}" cy="${fy + 12}" rx="9" ry="6" fill="${c.acc}" opacity=".65"/>`;
+  b += eyes(mood, fx, fy, boss) + mouth(mood, fx, fy, boss);
+  if (boss) { // corona o cuernos
+    b += boss === 'final'
+      ? `<path d="M64 ${blob ? 52 : 56} L70 ${blob ? 22 : 26} L84 ${blob ? 40 : 44} L100 ${blob ? 14 : 18} L116 ${blob ? 40 : 44} L130 ${blob ? 22 : 26} L136 ${blob ? 52 : 56}Z" fill="#ffd23f" stroke="${INK}" stroke-width="4.5" stroke-linejoin="round"/><circle cx="100" cy="${blob ? 40 : 44}" r="5" fill="#ff3d9a" stroke="${INK}" stroke-width="2.5"/>`
+      : `<path d="M62 54 C40 40 44 16 58 10 C56 28 70 36 78 44Z" fill="#fff" stroke="${INK}" stroke-width="4.5" stroke-linejoin="round"/><path d="M138 54 C160 40 156 16 142 10 C144 28 130 36 122 44Z" fill="#fff" stroke="${INK}" stroke-width="4.5" stroke-linejoin="round"/>`;
+  }
+  if (stage >= 3 && !boss) b += `<polygon points="30,60 34,70 44,72 34,76 30,86 26,76 16,72 26,70" fill="#fff" stroke="${INK}" stroke-width="2" class="spark"/><polygon points="170,50 173,58 181,59 173,63 170,71 167,63 159,59 167,58" fill="#fff" stroke="${INK}" stroke-width="2" class="spark s2"/>`;
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="cr-svg" aria-hidden="true">${b}</svg>`;
+}
+
+function egg(el, o) {
+  o = o || {}; const E = ELEM[el];
+  const crack = o.crack ? `<path d="M52 92 l14 -12 l10 14 l12 -14 l12 14 l12 -14 l12 14 l12 -12" fill="none" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>` : '';
+  return `<svg viewBox="0 0 150 190" xmlns="http://www.w3.org/2000/svg" class="egg-svg" aria-hidden="true"><defs><radialGradient id="eg${el}" cx="35%" cy="30%"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="${E.belly}"/><stop offset="1" stop-color="${E.body}"/></radialGradient></defs><path d="M75 12 C112 12 138 66 138 118 C138 158 110 182 75 182 C40 182 12 158 12 118 C12 66 38 12 75 12Z" fill="url(#eg${el})" stroke="${INK}" stroke-width="6"/><circle cx="48" cy="80" r="11" fill="${E.acc}" stroke="${INK}" stroke-width="4"/><circle cx="104" cy="104" r="14" fill="${E.dark}" opacity=".85"/><circle cx="62" cy="136" r="9" fill="${E.acc}" stroke="${INK}" stroke-width="4"/><circle cx="100" cy="58" r="7" fill="${E.dark}" opacity=".85"/>${crack}</svg>`;
+}
+
+G.Creature = { make, svg, egg, ELEM, rng, mix };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* MateMonstruos · audio sintetizado (WebAudio). Sin archivos externos. */
+(function (G) {
+'use strict';
+let ctx = null, master = null, musicG = null, sfxG = null, noiseBuf = null;
+let muted = false, music = null, timer = null;
+try { muted = localStorage.getItem('mm_muted') === '1'; } catch (e) {}
+
+const mf = m => 440 * Math.pow(2, (m - 69) / 12);
+
+function init() {
+  if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
+  const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+  ctx = new AC();
+  master = ctx.createGain(); master.gain.value = muted ? 0 : 0.9;
+  const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4;
+  master.connect(comp); comp.connect(ctx.destination);
+  musicG = ctx.createGain(); musicG.gain.value = 0.22; musicG.connect(master);
+  sfxG = ctx.createGain(); sfxG.gain.value = 0.55; sfxG.connect(master);
+  const len = ctx.sampleRate; noiseBuf = ctx.createBuffer(1, len, ctx.sampleRate);
+  const d = noiseBuf.getChannelData(0); for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+}
+
+function tone(dest, f, t, dur, type, vol, slideTo, att) {
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = type || 'square'; o.frequency.setValueAtTime(f, t);
+  if (slideTo) o.frequency.exponentialRampToValueAtTime(Math.max(20, slideTo), t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + (att || 0.008));
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(dest); o.start(t); o.stop(t + dur + 0.03);
+}
+function noise(dest, t, dur, vol, fq, q) {
+  const s = ctx.createBufferSource(); s.buffer = noiseBuf;
+  const f = ctx.createBiquadFilter(); f.type = fq > 3000 ? 'highpass' : 'bandpass'; f.frequency.value = fq || 1500; f.Q.value = q || 0.8;
+  const g = ctx.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  s.connect(f); f.connect(g); g.connect(dest); s.start(t); s.stop(t + dur + 0.02);
+}
+
+/* ---------- efectos ---------- */
+const SFX = {
+  click: t => tone(sfxG, 660, t, .07, 'square', .25, 880),
+  move: t => tone(sfxG, 420, t, .05, 'triangle', .22),
+  select: t => { tone(sfxG, 523, t, .08, 'square', .28); tone(sfxG, 784, t + .07, .12, 'square', .28); },
+  correct: t => { [72, 76, 79, 84].forEach((m, i) => tone(sfxG, mf(m), t + i * .06, .16, 'square', .3)); tone(sfxG, mf(60), t, .3, 'triangle', .35); },
+  combo: t => { [79, 83, 86, 91, 95].forEach((m, i) => tone(sfxG, mf(m), t + i * .05, .18, 'square', .28)); tone(sfxG, mf(67), t, .35, 'sawtooth', .18); },
+  hit: t => { noise(sfxG, t, .18, .6, 900, 1); tone(sfxG, 220, t, .2, 'sawtooth', .35, 70); },
+  wrong: t => { tone(sfxG, 196, t, .28, 'sawtooth', .35, 90); tone(sfxG, 147, t + .12, .35, 'square', .3, 60); noise(sfxG, t, .15, .3, 700, 1); },
+  heart: t => { tone(sfxG, 330, t, .1, 'triangle', .4, 110); noise(sfxG, t, .12, .35, 4500); },
+  heal: t => [72, 76, 79, 84, 88].forEach((m, i) => tone(sfxG, mf(m), t + i * .07, .22, 'triangle', .3)),
+  boss: t => { tone(sfxG, 55, t, 1.4, 'sawtooth', .5, 40, .05); tone(sfxG, 82, t, 1.4, 'square', .25, 55, .05); noise(sfxG, t, 1.1, .25, 300, 1); [0, .35, .7].forEach(o => noise(sfxG, t + o, .15, .5, 200, 1)); },
+  win: t => { [72, 72, 72, 76, 79, 76, 79, 84].forEach((m, i) => tone(sfxG, mf(m), t + i * .11, i === 7 ? .7 : .14, 'square', .3)); [48, 55, 60].forEach(m => tone(sfxG, mf(m), t + .8, .9, 'triangle', .35)); },
+  lose: t => [67, 64, 61, 55].forEach((m, i) => tone(sfxG, mf(m), t + i * .22, .35, 'sawtooth', .3, mf(m) * .94)),
+  crack: t => { noise(sfxG, t, .08, .7, 3000); noise(sfxG, t + .12, .08, .7, 3500); },
+  hatch: t => { noise(sfxG, t, .35, .6, 2000); [76, 83, 88, 95].forEach((m, i) => tone(sfxG, mf(m), t + .1 + i * .06, .3, 'triangle', .3)); },
+  evolve: t => { for (let i = 0; i < 14; i++) tone(sfxG, mf(60 + i * 2), t + i * .06, .2, 'square', .2); [84, 88, 91].forEach(m => tone(sfxG, mf(m), t + .95, .8, 'triangle', .35)); },
+  capture: t => { [84, 88, 91, 96].forEach((m, i) => tone(sfxG, mf(m), t + i * .08, .25, 'triangle', .32)); noise(sfxG, t, .4, .25, 6000); },
+  whoosh: t => { noise(sfxG, t, .3, .35, 1200, 2); tone(sfxG, 200, t, .3, 'sawtooth', .12, 900); }
+};
+function sfx(name) {
+  if (muted) return; init(); if (!ctx || !SFX[name]) return;
+  try { SFX[name](ctx.currentTime + 0.005); } catch (e) {}
+}
+
+/* ---------- música procedural ---------- */
+// escalas: raíz MIDI, progresión [semitono raíz, calidad]
+const WORLDS = {
+  teide:       { root: 45, prog: [[0, 'm'], [8, 'M'], [3, 'M'], [10, 'M']], pent: [0, 3, 5, 7, 10] },
+  atlantico:   { root: 50, prog: [[0, 'm'], [5, 'M'], [10, 'M'], [7, 'm']], pent: [0, 2, 5, 7, 9] },
+  laurisilva:  { root: 43, prog: [[0, 'M'], [7, 'M'], [9, 'm'], [5, 'M']], pent: [0, 2, 4, 7, 9] },
+  cosmos:      { root: 52, prog: [[0, 'm'], [3, 'M'], [8, 'M'], [7, 'M']], pent: [0, 3, 5, 7, 10] }
+};
+const TRACKS = { menu: { bpm: 104, drums: false, lead: .5 }, battle: { bpm: 132, drums: true, lead: .8 }, boss: { bpm: 156, drums: true, lead: 1, dark: true }, final: { bpm: 168, drums: true, lead: 1, dark: true } };
+
+function startMusic(track, world) {
+  init(); if (!ctx) return;
+  stopMusic(true);
+  const W = WORLDS[world] || WORLDS.teide, T = TRACKS[track] || TRACKS.battle;
+  const r = G.Creature ? G.Creature.rng(Math.floor(Math.random() * 1e9)) : Math.random;
+  // motivo de 8 notas que se repite con variación
+  const motif = []; for (let i = 0; i < 8; i++) motif.push(r() < .2 ? null : W.pent[Math.floor(r() * 5)] + (r() < .35 ? 12 : 0));
+  music = { W, T, step: 0, next: ctx.currentTime + .08, motif, world, track };
+  const sixteenth = () => 60 / T.bpm / 4;
+  const sched = () => {
+    if (!music) return;
+    while (music.next < ctx.currentTime + .18) {
+      play(music, music.next); music.next += sixteenth(); music.step++;
+    }
+  };
+  sched(); timer = setInterval(sched, 40);
+}
+function chordTones(root, q) { return q === 'm' ? [0, 3, 7, 12] : [0, 4, 7, 12]; }
+function play(m, t) {
+  const s = m.step % 64, bar = Math.floor(s / 16), st = s % 16;
+  const [off, q] = m.W.prog[bar], base = m.W.root + off, tones = chordTones(base, q);
+  const T = m.T, bassVol = T.dark ? .5 : .38;
+  // bajo
+  if (st % 4 === 0 || (T.drums && st % 8 === 6)) tone(musicG, mf(base - 12), t, .2, T.dark ? 'sawtooth' : 'triangle', bassVol);
+  if (T.dark && st % 2 === 0) tone(musicG, mf(base - 12), t, .1, 'square', .18);
+  // arpegio
+  const ar = tones[(st * (T.dark ? 3 : 1)) % tones.length] + 12;
+  if (st % 2 === 0 || T.dark) tone(musicG, mf(base + ar), t, .09, 'square', T.dark ? .12 : .1);
+  // melodía
+  if (st % 2 === 0 && Math.random() < T.lead) {
+    const n = m.motif[(st / 2 + (bar % 2) * 4) % 8];
+    if (n != null) tone(musicG, mf(m.W.root + 24 + n + (bar === 3 && st > 8 ? 2 : 0)), t, .22, 'square', .15, null, .01);
+  }
+  // percusión
+  if (T.drums) {
+    if (st % 4 === 0) { tone(musicG, 150, t, .14, 'sine', .8, 45); }
+    if (st % 8 === 4) noise(musicG, t, .12, .45, 1800, .8);
+    if (st % 2 === 1) noise(musicG, t, .04, .18, 7000);
+    if (T.dark && st === 15) noise(musicG, t, .1, .35, 2500);
+  } else if (st % 8 === 0) noise(musicG, t, .05, .1, 6000);
+}
+function stopMusic(quick) {
+  if (timer) { clearInterval(timer); timer = null; }
+  music = null;
+}
+function setMuted(v) {
+  muted = !!v; try { localStorage.setItem('mm_muted', muted ? '1' : '0'); } catch (e) {}
+  if (master) master.gain.setTargetAtTime(muted ? 0 : .9, ctx.currentTime, .02);
+}
+function duck(on) { if (musicG) musicG.gain.setTargetAtTime(on ? .06 : .22, ctx.currentTime, .05); }
+
+G.MMAudio = { init, sfx, startMusic, stopMusic, setMuted, isMuted: () => muted, duck };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* MateMonstruos · fondos por mundo y partículas */
+(function (G) {
+'use strict';
+const reduce = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- fondos SVG ---------- */
+function stars(n, seed, ymax) {
+  const r = G.Creature.rng(seed); let s = '';
+  for (let i = 0; i < n; i++) s += `<circle class="tw" style="animation-delay:${(r() * 4).toFixed(2)}s" cx="${(r() * 1600).toFixed(0)}" cy="${(r() * ymax).toFixed(0)}" r="${(r() * 2 + .7).toFixed(1)}" fill="#fff"/>`;
+  return s;
+}
+function wave(y, fill, op, cls) { return `<g class="wv ${cls}"><path d="M0 ${y} q100 -34 200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 V900 H0Z" fill="${fill}" opacity="${op}"/></g>`; }
+const SCENES = {
+  teide: () => `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="skT" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a0a5c"/><stop offset=".5" stop-color="#b52a7e"/><stop offset=".82" stop-color="#ff8a4c"/><stop offset="1" stop-color="#ffd27a"/></linearGradient><radialGradient id="snT"><stop offset="0" stop-color="#fff2b8"/><stop offset=".35" stop-color="#ffc872" stop-opacity=".8"/><stop offset="1" stop-color="#ffc872" stop-opacity="0"/></radialGradient><radialGradient id="lvT"><stop offset="0" stop-color="#ffec8a"/><stop offset="1" stop-color="#ff5a2a" stop-opacity="0"/></radialGradient></defs>
+<rect width="1600" height="900" fill="url(#skT)"/>${stars(40, 11, 330)}
+<circle cx="1220" cy="560" r="260" fill="url(#snT)"/><circle cx="1220" cy="560" r="70" fill="#fff6c8"/>
+<path d="M-50 900 L180 650 L330 600 L470 690 L640 560 L820 900Z" fill="#6d2380"/>
+<path d="M-100 900 L520 600 L690 480 L790 340 L860 300 L930 340 L1020 480 L1190 600 L1750 900Z" fill="#3b1259"/>
+<path d="M770 352 L800 332 L860 300 L930 332 L948 366 L906 352 L880 376 L850 354 L816 376 L790 360Z" fill="#fff5e8"/>
+<ellipse cx="860" cy="300" rx="64" ry="20" fill="url(#lvT)" class="pulse"/>
+<g class="smoke"><circle cx="860" cy="270" r="26" fill="#fff" opacity=".3"/><circle cx="880" cy="228" r="34" fill="#fff" opacity=".22"/><circle cx="910" cy="180" r="44" fill="#fff" opacity=".15"/></g>
+<g class="drift d1" opacity=".92"><ellipse cx="300" cy="760" rx="300" ry="46" fill="#fff" opacity=".75"/><ellipse cx="760" cy="790" rx="360" ry="50" fill="#ffe6ef" opacity=".8"/><ellipse cx="1300" cy="750" rx="320" ry="44" fill="#fff" opacity=".7"/></g>
+<g class="drift d2"><ellipse cx="100" cy="830" rx="340" ry="60" fill="#fff" opacity=".9"/><ellipse cx="900" cy="840" rx="420" ry="64" fill="#ffd9e6" opacity=".9"/><ellipse cx="1550" cy="825" rx="300" ry="56" fill="#fff" opacity=".85"/></g>
+<path d="M0 900 L0 860 Q120 830 210 870 Q330 820 460 880 L520 900Z M1200 900 L1290 868 Q1420 820 1520 862 Q1580 850 1600 870 L1600 900Z" fill="#1b0a3d"/></svg>`,
+  atlantico: () => `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="skA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#062067"/><stop offset=".5" stop-color="#1676c9"/><stop offset="1" stop-color="#56e0d8"/></linearGradient><radialGradient id="snA"><stop offset="0" stop-color="#fff"/><stop offset=".4" stop-color="#c8fbff" stop-opacity=".7"/><stop offset="1" stop-color="#c8fbff" stop-opacity="0"/></radialGradient></defs>
+<rect width="1600" height="900" fill="url(#skA)"/>
+<circle cx="1180" cy="170" r="230" fill="url(#snA)"/><circle cx="1180" cy="170" r="60" fill="#fff"/>
+<g class="rays"><polygon points="1180,170 700,900 900,900" fill="#fff" opacity=".07"/><polygon points="1180,170 1000,900 1200,900" fill="#fff" opacity=".07"/><polygon points="1180,170 1320,900 1500,900" fill="#fff" opacity=".06"/></g>
+<g class="drift d3"><path d="M300 400 q40 -20 80 0 q-40 -4 -80 0Z M420 360 q40 -20 80 0 q-40 -4 -80 0Z" fill="#fff" opacity=".5"/></g>
+${wave(560, '#2fb7e8', .55, 'w1')}${wave(640, '#1a8ad0', .75, 'w2')}${wave(730, '#1160b3', .9, 'w3')}${wave(820, '#0a3f8f', 1, 'w4')}
+<g class="fishes"><path d="M100 780 q40 -30 80 0 q-40 30 -80 0 M180 780 l26 -18 v36z" fill="#0a2a6e" opacity=".55"/></g></svg>`,
+  laurisilva: () => { const r = G.Creature.rng(77); let t = '';
+    for (let i = 0; i < 9; i++) { const x = 40 + i * 190 + (r() * 60 - 30), w = 50 + r() * 50, c = ['#0b3a2a', '#0f4a35', '#145a40'][i % 3]; t += `<rect x="${x}" y="-20" width="${w}" height="960" rx="22" fill="${c}"/><circle cx="${x + w / 2}" cy="${120 + r() * 60}" r="${140 + r() * 70}" fill="${['#1f8a55', '#2fa36b', '#166f45'][i % 3]}" opacity=".9"/>`; }
+    return `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="skL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a2f2a"/><stop offset=".5" stop-color="#1f8a60"/><stop offset="1" stop-color="#b9f5a0"/></linearGradient></defs><rect width="1600" height="900" fill="url(#skL)"/>
+<g class="rays"><polygon points="500,0 760,0 380,900 80,900" fill="#fff6b0" opacity=".14"/><polygon points="1000,0 1200,0 980,900 700,900" fill="#fff6b0" opacity=".12"/><polygon points="1350,0 1500,0 1560,900 1250,900" fill="#fff6b0" opacity=".1"/></g>
+${t}<g class="drift d1"><ellipse cx="300" cy="640" rx="380" ry="60" fill="#e8fff0" opacity=".35"/><ellipse cx="1100" cy="700" rx="460" ry="70" fill="#e8fff0" opacity=".3"/></g><g class="drift d2"><ellipse cx="600" cy="790" rx="520" ry="80" fill="#f3fff6" opacity=".4"/><ellipse cx="1500" cy="800" rx="380" ry="70" fill="#f3fff6" opacity=".35"/></g>
+<path d="M0 900 V820 Q60 760 120 830 Q150 770 220 840 Q280 780 340 850 L420 900Z M1180 900 L1260 850 Q1330 770 1390 840 Q1450 770 1520 835 Q1570 790 1600 840 V900Z" fill="#06241c"/></svg>`; },
+  cosmos: () => `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="skC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05021c"/><stop offset=".6" stop-color="#2a0f6e"/><stop offset="1" stop-color="#8a38f0"/></linearGradient><radialGradient id="plC" cx="35%" cy="30%"><stop offset="0" stop-color="#ffd8f4"/><stop offset=".5" stop-color="#ff5fd0"/><stop offset="1" stop-color="#5a1aa8"/></radialGradient><linearGradient id="auC" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2de2ff" stop-opacity="0"/><stop offset=".5" stop-color="#b6ff3b" stop-opacity=".35"/><stop offset="1" stop-color="#ff3d9a" stop-opacity="0"/></linearGradient></defs>
+<rect width="1600" height="900" fill="url(#skC)"/>${stars(150, 5, 700)}
+<path class="aur" d="M0 260 Q400 120 800 240 T1600 200 V330 Q1200 400 800 320 T0 370Z" fill="url(#auC)"/>
+<g class="float"><circle cx="1220" cy="270" r="120" fill="url(#plC)"/><ellipse cx="1220" cy="270" rx="210" ry="40" fill="none" stroke="#ffd23f" stroke-width="12" opacity=".8" transform="rotate(-18 1220 270)"/><path d="M1100 270 A120 120 0 0 0 1340 270" fill="none"/></g>
+<circle cx="330" cy="200" r="46" fill="#e6dcff"/><circle cx="318" cy="190" r="10" fill="#c5b6f0"/><circle cx="346" cy="214" r="7" fill="#c5b6f0"/>
+<g class="shoot"><line x1="0" y1="0" x2="160" y2="60" stroke="#fff" stroke-width="4" stroke-linecap="round"/></g>
+<path d="M-50 900 L260 720 L420 650 L520 720 L760 640 L930 740 L1180 700 L1380 780 L1700 900Z" fill="#12063a"/>
+<path d="M740 650 q40 -60 80 0Z" fill="#cfc4ff"/><rect x="740" y="650" width="80" height="26" fill="#9a8ae0"/><line x1="780" y1="598" x2="800" y2="570" stroke="#fff" stroke-width="5"/>
+<path d="M0 900 V850 Q200 800 420 860 L520 900Z M1100 900 L1250 840 Q1450 800 1600 850 V900Z" fill="#07021f"/></svg>`
+};
+
+/* ---------- partículas ---------- */
+let cv, cx, W = 0, H = 0, parts = [], world = 'teide', raf = 0, last = 0;
+function resize() { const dpr = Math.min(2, window.devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight; cv.width = W * dpr; cv.height = H * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+function init() { cv = document.getElementById('fx'); cx = cv.getContext('2d'); resize(); window.addEventListener('resize', resize); last = performance.now(); loop(last); }
+function setWorld(w) {
+  world = w; const bg = document.getElementById('bg'); bg.dataset.world = w; bg.innerHTML = SCENES[w]();
+}
+function add(p) { if (parts.length < 600) parts.push(p); }
+function burst(x, y, colors, n, speed, o) {
+  o = o || {}; if (reduce()) n = Math.ceil(n / 3);
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2, v = (.3 + Math.random()) * (speed || 6);
+    add({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - (o.up || 0), g: o.g == null ? .25 : o.g, life: 0, max: 30 + Math.random() * 30, s: 3 + Math.random() * 5, c: colors[i % colors.length], shape: o.shape || (Math.random() < .4 ? 'star' : 'circle'), rot: Math.random() * 6, vr: (Math.random() - .5) * .3 });
+  }
+}
+function confetti(n) {
+  if (reduce()) n = Math.ceil(n / 4);
+  const cols = ['#ff3d9a', '#2de2ff', '#b6ff3b', '#ffd23f', '#ff7a3d', '#9b6bff', '#fff'];
+  for (let i = 0; i < n; i++) add({ x: Math.random() * W, y: -20 - Math.random() * H * .3, vx: (Math.random() - .5) * 3, vy: 2 + Math.random() * 4, g: .05, life: 0, max: 140 + Math.random() * 80, s: 5 + Math.random() * 6, c: cols[i % cols.length], shape: 'rect', rot: Math.random() * 6, vr: (Math.random() - .5) * .4 });
+}
+function ambient() {
+  if (reduce() || parts.length > 160) return;
+  const rn = Math.random();
+  if (world === 'teide' && rn < .25) add({ x: Math.random() * W, y: H + 10, vx: (Math.random() - .5) * .8, vy: -(1 + Math.random() * 2), g: -.005, life: 0, max: 200, s: 2 + Math.random() * 3, c: Math.random() < .5 ? '#ffb347' : '#ffe27a', shape: 'circle', amb: 1 });
+  if (world === 'atlantico' && rn < .18) add({ x: Math.random() * W, y: H + 10, vx: (Math.random() - .5) * .6, vy: -(.8 + Math.random() * 1.6), g: 0, life: 0, max: 280, s: 3 + Math.random() * 7, c: '#bff6ff', shape: 'ring', amb: 1 });
+  if (world === 'laurisilva' && rn < .12) add({ x: Math.random() * W, y: H * (.3 + Math.random() * .6), vx: (Math.random() - .5) * 1, vy: (Math.random() - .5) * .6, g: 0, life: 0, max: 220, s: 2.5 + Math.random() * 2.5, c: '#f3ff7a', shape: 'glow', amb: 1 });
+  if (world === 'cosmos' && rn < .08) add({ x: Math.random() * W, y: Math.random() * H * .7, vx: -.2, vy: .15, g: 0, life: 0, max: 160, s: 2 + Math.random() * 2, c: '#fff', shape: 'star', amb: 1 });
+}
+function draw(p) {
+  const k = p.life / p.max, a = p.amb ? Math.sin(Math.PI * k) * .8 : 1 - k * k;
+  cx.globalAlpha = Math.max(0, a); cx.fillStyle = p.c; cx.strokeStyle = p.c;
+  cx.save(); cx.translate(p.x, p.y); cx.rotate(p.rot);
+  switch (p.shape) {
+    case 'rect': cx.fillRect(-p.s / 2, -p.s / 3, p.s, p.s * .6); break;
+    case 'ring': cx.lineWidth = 1.6; cx.beginPath(); cx.arc(0, 0, p.s, 0, 7); cx.stroke(); break;
+    case 'glow': cx.shadowColor = p.c; cx.shadowBlur = 14; cx.beginPath(); cx.arc(0, 0, p.s, 0, 7); cx.fill(); cx.shadowBlur = 0; break;
+    case 'star': cx.beginPath(); for (let i = 0; i < 8; i++) { const r = i % 2 ? p.s * .45 : p.s * 1.2, an = i * Math.PI / 4; cx.lineTo(Math.cos(an) * r, Math.sin(an) * r); } cx.closePath(); cx.fill(); break;
+    default: cx.beginPath(); cx.arc(0, 0, p.s, 0, 7); cx.fill();
+  }
+  cx.restore();
+}
+function loop(t) {
+  raf = requestAnimationFrame(loop);
+  if (document.hidden) return;
+  cx.clearRect(0, 0, W, H); ambient();
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const p = parts[i]; p.life++; p.x += p.vx; p.y += p.vy; p.vy += p.g; p.rot += p.vr || 0;
+    if (p.life > p.max || p.y > H + 40) { parts.splice(i, 1); continue; }
+    draw(p);
+  }
+  cx.globalAlpha = 1;
+}
+G.FX = { init, setWorld, burst, confetti, SCENES };
+})(window);
+
+/* MateMonstruos · lógica de juego y pantallas */
+(function () {
+'use strict';
+const Q = window.Q, C = window.Creature, AU = window.MMAudio, FX = window.FX;
+const app = document.getElementById('screen');
+const sfx = n => AU.sfx(n);
+const R = Q._R;
+const strip = h => String(h).replace(/<svg[\s\S]*?<\/svg>/g, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+const sleepRaw = ms => new Promise(r => setTimeout(r, ms));
+
+/* ---------- datos ---------- */
+const LEVELS = {
+  1: { name: 'Cría Chispa', grades: '1.º y 2.º de Primaria', desc: 'Sumas y restas, secuencias, mayor y menor, formas y cuadraditos', color: '#b6ff3b', el: 'planta' },
+  2: { name: 'Domador Rayo', grades: '3.º y 4.º de Primaria', desc: 'Tablas, divisiones, fracciones sencillas, geometría y áreas', color: '#2de2ff', el: 'agua' },
+  3: { name: 'Maestro Volcán', grades: '5.º y 6.º de Primaria', desc: 'Decimales, fracciones, ángulos, áreas de triángulos y más', color: '#ff3d9a', el: 'fuego' }
+};
+const WORLDS = {
+  teide: { name: 'Volcán Teide', els: ['fuego', 'tierra', 'rayo'], color: '#ff7a3d', desc: 'Lava, rocas y chispas' },
+  atlantico: { name: 'Abismo Atlántico', els: ['agua', 'rayo', 'planta'], color: '#2de2ff', desc: 'Mareas, burbujas y corales' },
+  laurisilva: { name: 'Laurisilva Mágica', els: ['planta', 'tierra', 'agua'], color: '#b6ff3b', desc: 'Niebla, hojas y luciérnagas' },
+  cosmos: { name: 'Cielo del Teide', els: ['cosmos', 'rayo', 'fuego'], color: '#9b6bff', desc: 'Estrellas, planetas y cometas' }
+};
+const ICON = {
+  sumres: '<path d="M8 14h16M16 6v16M24 38h16"/>',
+  tablas: '<path d="M12 12l24 24M36 12L12 36"/>',
+  divisiones: '<path d="M8 24h32"/><circle cx="24" cy="11" r="3.5" fill="currentColor"/><circle cx="24" cy="37" r="3.5" fill="currentColor"/>',
+  secuencias: '<circle cx="9" cy="36" r="3" fill="currentColor"/><circle cx="22" cy="26" r="3" fill="currentColor"/><circle cx="35" cy="16" r="3" fill="currentColor"/><path d="M10 10h28M32 5l6 5-6 5"/>',
+  fracciones: '<circle cx="24" cy="24" r="16"/><path d="M24 24V8M24 24l13 9" /><path d="M24 24l-13 9" />',
+  comparar: '<path d="M20 10L7 24l13 14M28 10l13 14-13 14"/>',
+  geometria: '<path d="M6 40L20 10l14 30zM30 8h12v12H30z"/>',
+  areas: '<path d="M8 8h32v32H8zM8 19h32M8 29h32M19 8v32M29 8v32"/><path d="M19 19h10v10H19z" fill="currentColor"/>'
+};
+const catIcon = c => `<svg viewBox="0 0 48 48" aria-hidden="true">${ICON[c]}</svg>`;
+const STAR = '<svg viewBox="0 0 40 40" aria-hidden="true"><polygon points="20,2 25,14 38,15 28,24 31,37 20,30 9,37 12,24 2,15 15,14" fill="#ffd23f" stroke="#1b1140" stroke-width="3" stroke-linejoin="round"/></svg>';
+const STAR_OFF = STAR.replace('<svg', '<svg class="off"');
+const HEART = '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 35C4 24 4 9 13 8c4 0 6 3 7 5 1-2 3-5 7-5 9 1 9 16-7 27z" fill="#ff3d6a" stroke="#1b1140" stroke-width="3" stroke-linejoin="round"/><ellipse cx="13" cy="14" rx="3" ry="2" fill="#fff" opacity=".7"/></svg>';
+const ARROW = d => `<svg class="a" viewBox="0 0 24 24" style="transform:rotate(${{ up: 0, right: 90, down: 180, left: 270 }[d]}deg)" aria-hidden="true"><path d="M12 3L22 19H2z"/></svg>`;
+const I = {
+  mute: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 4V5L7 9z"/><path d="M15 9c2 1.5 2 4.500 0 6M17.500 6.500c3.500 3 3.500 8 0 11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  muteOff: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 4V5L7 9z"/><path d="M16 9l6 6M22 9l-6 6" stroke="currentColor" stroke-width="2.200" stroke-linecap="round"/></svg>',
+  pause: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4.500" height="16" rx="1"/><rect x="13.500" y="4" width="4.500" height="16" rx="1"/></svg>',
+  full: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.500" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
+  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>'
+};
+
+/* ---------- guardado ---------- */
+let SAVE = { best: {}, dex: [], last: {} };
+try { const j = localStorage.getItem('mm_save'); if (j) SAVE = Object.assign(SAVE, JSON.parse(j)); } catch (e) {}
+function save() { try { localStorage.setItem('mm_save', JSON.stringify(SAVE)); } catch (e) {} }
+
+/* ---------- estado ---------- */
+const P = { cycle: SAVE.last.cycle || 2, world: SAVE.last.world || 'teide', cr: null };
+let UI = { screen: '', back: null }, S = null, tok = 0;
+const CANCEL = { cancelled: true };
+async function sleep(ms) {
+  const my = tok; let t = 0;
+  while (t < ms) { await sleepRaw(40); if (my !== tok) throw CANCEL; if (!S || !S.paused) t += 40; }
+}
+const live = txt => { const l = document.getElementById('sr'); if (l) { l.textContent = ''; setTimeout(() => l.textContent = txt, 30); } };
+
+/* ---------- pantallas ---------- */
+function show(name, html, opt) {
+  opt = opt || {};
+  UI.screen = name; UI.back = opt.back || null;
+  app.innerHTML = `<div class="screen" data-screen="${name}">${html}</div>`;
+  const b = app.querySelector('[data-first]') || app.querySelector('[data-nav]');
+  if (b && !opt.noFocus) b.focus({ preventScroll: true });
+  if (opt.backBtn) {
+    const bb = document.createElement('button'); bb.className = 'ib'; bb.setAttribute('aria-label', 'Volver'); bb.dataset.act = 'back'; bb.dataset.nav = ''; bb.innerHTML = I.back;
+    bb.style.cssText = 'position:absolute;top:.5rem;left:.6rem;z-index:20'; app.appendChild(bb);
+  }
+}
+function pet(cr, o) { return `<div class="pet">${C.svg(cr, o)}</div>`; }
+function mkCr(c) { return C.make(c.seed != null ? c.seed : c.s, [c.element || c.e]); }
+
+function titleScreen() {
+  FX.setWorld(P.world);
+  const els = ['fuego', 'agua', 'planta', 'cosmos', 'tierra', 'rayo'], r = R.shuffle(els).slice(0, 3);
+  const pets = r.map((e, i) => pet(C.make(1000 + Math.floor(Math.random() * 99999), [e]), { stage: i === 1 ? 2 : 1, mood: 'idle', uid: 't' + i })).join('');
+  show('title', `<h1 class="logo"><span class="a">Mate</span><span class="b">Monstruos</span></h1><p class="sub">Liga del Teide · Matemáticas</p>
+  <div class="title-pets">${pets}</div>
+  <div class="col"><button class="btn big" data-nav data-first data-act="play">¡Jugar!</button>
+  <div class="row"><button class="btn cyan" data-nav data-act="dex">Mi colección (${SAVE.dex.length})</button><button class="btn yellow" data-nav data-act="help">Cómo se juega</button><button class="btn ghost" data-nav data-act="teacher">Para docentes</button></div></div>
+  <p class="keys"><kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd> moverte · <kbd>Espacio</kbd> aceptar · o toca la pantalla · Makey Makey listo</p>
+  <p class="credits">Diseñado por <b>David OZC</b> · © David 2026 · Uso gratuito en centros educativos<br><a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es" target="_blank" rel="noopener license"><img src="https://licensebuttons.net/l/by-nc-nd/4.0/88x31.png" width="88" height="31" alt="Licencia Creative Commons BY-NC-ND 4.0"></a> <span>CC BY-NC-ND 4.0 · Reconocimiento · NoComercial · SinObraDerivada</span></p>`);
+  musicFor('menu');
+}
+function levelScreen() {
+  show('level', `<h2 class="t">¿Qué nivel eliges?</h2><p class="s">Cada nivel adapta las preguntas a tu ciclo</p>
+  <div class="row">${[1, 2, 3].map(n => { const L = LEVELS[n]; const cr = C.make(n * 31, [L.el]); return `<button class="card lvl" style="--c:${L.color}" data-nav ${n === P.cycle ? 'data-first' : ''} data-act="level" data-v="${n}"><span class="tag">${L.grades}</span><div class="eggmini">${C.egg(L.el)}</div><span class="nm">${L.name}</span><span class="ds">${L.desc}</span></button>`; }).join('')}</div>`, { back: 'title', backBtn: true });
+}
+function worldScreen() {
+  show('world', `<h2 class="t">Elige tu mundo</h2><p class="s">Cambia los fondos, la música y las criaturas</p>
+  <div class="row">${Object.keys(WORLDS).map(k => { const W = WORLDS[k]; return `<button class="card" style="--c:${W.color}" data-nav data-world="${k}" ${k === P.world ? 'data-first' : ''} data-act="world" data-v="${k}"><div class="minis" style="display:flex;gap:.2rem;height:4rem">${W.els.map((e, i) => `<div style="width:4rem">${C.svg(C.make(k.length * 17 + i * 5, [e]), { uid: k + i })}</div>`).join('')}</div><span class="nm">${W.name}</span><span class="ds">${W.desc}</span></button>`; }).join('')}</div>`, { back: 'level', backBtn: true });
+}
+let eggSeeds = [];
+function eggScreen() {
+  const els = WORLDS[P.world].els;
+  eggSeeds = [0, 1, 2].map(i => ({ seed: Math.floor(Math.random() * 1e6) + 1, el: els[i % els.length] }));
+  show('egg', `<h2 class="t">¡Elige un huevo misterioso!</h2><p class="s">Dentro hay tu compañero de aventuras</p>
+  <div class="eggs">${eggSeeds.map((e, i) => `<button class="egg" data-nav ${i === 1 ? 'data-first' : ''} data-act="egg" data-v="${i}" aria-label="Huevo ${i + 1}">${C.egg(e.el)}</button>`).join('')}</div>`, { back: 'world', backBtn: true });
+}
+async function hatch(i) {
+  const e = eggSeeds[i]; UI.busy = true;
+  const eggs = [...app.querySelectorAll('.egg')];
+  eggs.forEach((b, j) => { if (j !== i) b.classList.add('gone'); });
+  const b = eggs[i]; b.classList.add('shaking'); sfx('crack'); setTimeout(() => sfx('crack'), 330); setTimeout(() => sfx('crack'), 640);
+  await sleepRaw(900);
+  const wo = document.createElement('div'); wo.className = 'whiteout'; document.body.appendChild(wo); setTimeout(() => wo.remove(), 950);
+  sfx('hatch'); const r = b.getBoundingClientRect(); FX.burst(r.left + r.width / 2, r.top + r.height / 2, ['#fff', '#ffd23f', '#ff3d9a', '#2de2ff'], 50, 9); FX.confetti(40);
+  await sleepRaw(350);
+  const cr = C.make(e.seed, [e.el]); P.cr = { seed: cr.seed, element: cr.element };
+  UI.busy = false;
+  show('reveal', `<div class="reveal"><span class="chip">¡Ha nacido!</span><div class="big-cr">${C.svg(cr, { mood: 'happy', uid: 'rv' })}</div><div class="nameplate">${cr.name}</div><span class="chip" style="background:${C.ELEM[cr.element].body};color:#1b1140">${cr.label}</span>
+  <div class="row"><button class="btn" data-nav data-first data-act="accept">¡Será mi compañero!</button><button class="btn ghost" data-nav data-act="reroll">Otro huevo</button></div></div>`, { back: 'egg' });
+  live('Ha nacido ' + cr.name);
+}
+function best(key) { return SAVE.best[key]; }
+function modeScreen() {
+  const cats = Q.cats(P.cycle), cr = mkCr(P.cr);
+  const bk = k => { const b = best(P.cycle + '|' + k); return b ? `<span class="best">${b.letter} · ${b.score}</span>` : ''; };
+  show('mode', `<div style="display:flex;align-items:center;gap:1rem"><div style="width:clamp(4rem,12vmin,7rem)">${C.svg(cr, { mood: 'happy', uid: 'md' })}</div><div><h2 class="t" style="text-align:left">¿A qué jugamos?</h2><p class="s" style="text-align:left">${cr.name} · ${LEVELS[P.cycle].name}</p></div></div>
+  <button class="card wide" style="--c:var(--yellow)" data-nav data-first data-act="story">${bk('story')}<div class="ic" style="color:var(--yellow)"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 5l5.500 12 13 1.500-9.700 9 2.800 12.800L24 33l-11.600 7.300 2.800-12.800-9.700-9 13-1.500z"/></svg></div><div><span class="nm">Modo historia</span><br><span class="ds">Recorre la liga mezclando todos los retos, con 2 jefes y el JEFE FINAL</span></div></button>
+  <div class="cards-grid">${cats.map(c => { const I2 = Q.info(c, P.cycle); return `<button class="card" style="--c:${I2.color}" data-nav data-act="single" data-v="${c}">${bk(c)}<div class="ic" style="color:${I2.color}">${catIcon(c)}</div><span class="nm">${I2.name}</span></button>`; }).join('')}</div>
+  <p class="keys">Duelo rápido: 2 combates + jefe de la categoría</p>`, { back: 'egg', backBtn: true });
+}
+function dexScreen() {
+  const n = SAVE.dex.length;
+  show('dex', `<h2 class="t">Mi colección · ${n}</h2>${n ? `<div class="dex">${SAVE.dex.map((d, i) => { const cr = mkCr(d); return `<div>${C.svg(cr, { mood: 'happy', uid: 'd' + i })}<br>${cr.name}</div>`; }).join('')}</div>` : '<p class="s">Todavía no has domado ninguna criatura. ¡Gana combates para conseguirlas!</p>'}
+  <button class="btn" data-nav data-first data-act="back">Volver</button>`, { back: 'title' });
+}
+
+/* ---------- ventanas ---------- */
+function modal(html) {
+  closeModal();
+  const m = document.createElement('div'); m.className = 'modal'; m.id = 'modal'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true');
+  m.innerHTML = `<div class="mbox">${html}</div>`; document.getElementById('app').appendChild(m);
+  const f = m.querySelector('[data-first]'); if (f) f.focus();
+}
+function closeModal() { const m = document.getElementById('modal'); if (m) m.remove(); }
+const modalOpen = () => !!document.getElementById('modal');
+function helpModal() {
+  modal(`<h3>Cómo se juega</h3><p>Tu criatura se enfrenta a otras. <b>Resuelve bien el reto</b> para atacar. Si fallas, pierdes un corazón. ¡Vence a los jefes y consigue la mejor calificación!</p>
+  <div class="ctl"><span><kbd>↑</kbd><kbd>←</kbd><kbd>→</kbd><kbd>↓</kbd></span><span>Elegir respuesta (la flecha de cada botón)</span><span><kbd>Espacio</kbd></span><span>Aceptar y continuar (clic en Makey Makey)</span><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> · <kbd>1</kbd>–<kbd>4</kbd></span><span>Alternativas de teclado</span><span><kbd>Esc</kbd> · <kbd>M</kbd></span><span>Pausa · Silenciar</span></div>
+  <p><b>Makey Makey:</b> conecta ↑ ← → ↓ y ESPACIO a cuatro objetos conductores (plastilina, fruta, papel de aluminio…) y la tierra a tu mano. También sirve tocar la pantalla.</p>
+  <button class="btn" data-first data-nav data-act="closemodal">¡Entendido!</button>`);
+}
+function teacherModal() {
+  modal(`<h3>Para docentes</h3><p>Contenidos por nivel (propuesta del juego, <b>pendiente de contrastar con el currículo oficial de Canarias</b> de cada centro):</p>
+  <table><tr><th>Nivel</th><th>Contenidos</th></tr>
+  <tr><td>Cría Chispa<br>1.º–2.º</td><td>Sumas y restas (hasta 100), huecos y problemas · secuencias de figuras y de 1 en 1, 2, 5, 10 · mayor/menor y signos &lt; &gt; = (hasta 999) · figuras planas y cuerpos geométricos · contar cuadraditos de superficie. <b>Sin tablas, divisiones ni fracciones.</b></td></tr>
+  <tr><td>Domador Rayo<br>3.º–4.º</td><td>Sumas y restas hasta 9.999 y problemas · tablas del 2 al 10 · divisiones exactas y con resto · secuencias · fracciones sencillas (leer, fracción de una cantidad, comparar) · comparar números y operaciones · polígonos, cuerpos, ángulos rectos, paralelas · áreas en cuadrícula y perímetro.</td></tr>
+  <tr><td>Maestro Volcán<br>5.º–6.º</td><td>Cálculo hasta 999.999 y decimales · multiplicar por 2 cifras, ×10/100/1000 · divisiones con resto y prueba · series geométricas · fracciones (equivalentes, suma, simplificar, decimal, %) · decimales · ángulos, triángulos, círculo · áreas de rectángulo, triángulo, paralelogramo y figuras compuestas.</td></tr></table>
+  <p><b>Tiempo:</b> en 1.º–2.º y 3.º–4.º cada pregunta tiene un máximo de 1 minuto (barra visible); si se agota cuenta como fallo y se muestra la pista. En 5.º–6.º no hay límite. Estos dos primeros ciclos también tienen más corazones y una subida de dificultad más suave.</p><p>Las preguntas se generan al vuelo (decenas de miles de combinaciones) y no se repiten dentro de una sesión. Ante un fallo se muestra una pista con el cálculo resuelto. No se recogen datos personales: solo se guardan en este navegador las puntuaciones y las criaturas domadas.</p>
+  <button class="btn" data-first data-nav data-act="closemodal">Cerrar</button>`);
+}
+
+/* ---------- música ---------- */
+let curTrack = '';
+function musicFor(track) { if (curTrack === track + P.world) return; curTrack = track + P.world; if (UI.audioOn) AU.startMusic(track, P.world); }
+
+/* ---------- navegación por teclado/Makey ---------- */
+function moveFocus(dir, root) {
+  const items = [...(root || app).querySelectorAll('[data-nav]')].filter(e => !e.disabled && e.offsetParent !== null);
+  if (!items.length) return;
+  const cur = items.includes(document.activeElement) ? document.activeElement : null;
+  if (!cur) { items[0].focus(); return; }
+  const cr = cur.getBoundingClientRect(), cx = cr.left + cr.width / 2, cy = cr.top + cr.height / 2;
+  let best = null, bd = 1e9;
+  for (const it of items) {
+    if (it === cur) continue; const r = it.getBoundingClientRect(), x = r.left + r.width / 2 - cx, y = r.top + r.height / 2 - cy;
+    const ok = dir === 'left' ? x < -4 : dir === 'right' ? x > 4 : dir === 'up' ? y < -4 : y > 4; if (!ok) continue;
+    const h = dir === 'left' || dir === 'right', d = (h ? Math.abs(x) : Math.abs(y)) + (h ? Math.abs(y) : Math.abs(x)) * 2.2; if (d < bd) { bd = d; best = it; }
+  }
+  if (!best) { const idx = items.indexOf(cur); best = (dir === 'left' || dir === 'up') ? items[(idx - 1 + items.length) % items.length] : items[(idx + 1) % items.length]; }
+  best.focus({ preventScroll: false }); sfx('move');
+}
+const KEYMAP = { ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', Space: 'ok', Enter: 'ok', NumpadEnter: 'ok', Escape: 'pause', KeyP: 'pause', KeyM: 'mute', Digit1: 'n1', Digit2: 'n2', Digit3: 'n3', Digit4: 'n4', Numpad1: 'n1', Numpad2: 'n2', Numpad3: 'n3', Numpad4: 'n4' };
+const down = new Set();
+function startAudio() { if (!UI.audioOn) { UI.audioOn = true; AU.init(); curTrack = ''; musicFor(UI.screen === 'battle' ? 'battle' : 'menu'); } }
+window.addEventListener('keydown', e => {
+  const a = KEYMAP[e.code]; if (!a || e.ctrlKey || e.metaKey || e.altKey) return;
+  e.preventDefault(); if (e.repeat || down.has(e.code)) return; down.add(e.code);
+  startAudio(); onAct(a);
+});
+window.addEventListener('keyup', e => down.delete(e.code));
+window.addEventListener('blur', () => down.clear());
+window.addEventListener('pointerdown', startAudio, { passive: true });
+
+function onAct(a) {
+  if (a === 'mute') { toggleMute(); return; }
+  if (UI.busy) return;
+  if (modalOpen()) {
+    const m = document.getElementById('modal');
+    if (a === 'pause') { if (S && S.paused && UI.screen === 'battle') act('resume'); else closeModal(); return; }
+    if (a === 'ok') { const f = document.activeElement; if (f && m.contains(f) && f.tagName === 'BUTTON') f.click(); return; }
+    if (['up', 'down', 'left', 'right'].includes(a)) moveFocus(a, m); return;
+  }
+  if (UI.screen === 'battle') return battleKey(a);
+  if (a === 'pause') { if (UI.back) act('back'); return; }
+  if (a === 'ok') { const f = document.activeElement; if (f && app.contains(f) && f.tagName === 'BUTTON') { f.classList.add('press'); setTimeout(() => f.classList.remove('press'), 120); f.click(); } else { const b = app.querySelector('[data-nav]'); if (b) b.focus(); } return; }
+  if (['up', 'down', 'left', 'right'].includes(a)) moveFocus(a);
+}
+app.addEventListener('focusin', e => { const w = e.target.dataset && e.target.dataset.world; if (w && w !== P.world) { P.world = w; FX.setWorld(w); } });
+app.addEventListener('pointerover', e => { const b = e.target.closest && e.target.closest('[data-world]'); if (b && b.dataset.world !== P.world) { P.world = b.dataset.world; FX.setWorld(P.world); } });
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b || UI.busy) return;
+  startAudio(); if (b.dataset.act !== 'ans') sfx('click'); act(b.dataset.act, b.dataset.v, b);
+});
+function toggleMute() { const v = !AU.isMuted(); AU.setMuted(v); const m = document.getElementById('bmute'); if (m) { m.innerHTML = v ? I.muteOff : I.mute; m.setAttribute('aria-pressed', v); } }
+
+function act(a, v, el) {
+  switch (a) {
+    case 'play': levelScreen(); break;
+    case 'level': P.cycle = +v; SAVE.last.cycle = P.cycle; save(); worldScreen(); break;
+    case 'world': P.world = v; SAVE.last.world = v; save(); FX.setWorld(v); curTrack = ''; musicFor('menu'); eggScreen(); break;
+    case 'egg': hatch(+v); break;
+    case 'reroll': eggScreen(); break;
+    case 'accept': sfx('select'); modeScreen(); break;
+    case 'story': startRun('story', null); break;
+    case 'single': startRun('single', v); break;
+    case 'dex': dexScreen(); break;
+    case 'help': helpModal(); break;
+    case 'teacher': teacherModal(); break;
+    case 'closemodal': closeModal(); break;
+    case 'back': if (UI.back === 'title') titleScreen(); else if (UI.back === 'level') levelScreen(); else if (UI.back === 'world') worldScreen(); else if (UI.back === 'egg') eggScreen(); else titleScreen(); break;
+    case 'pause': pauseGame(); break;
+    case 'resume': resumeGame(); break;
+    case 'quit': quitRun(); break;
+    case 'again': startRun(S.mode, S.cat); break;
+    case 'menu': tok++; S = null; modeScreen(); musicFor('menu'); break;
+    case 'home': tok++; S = null; titleScreen(); break;
+    case 'full': toggleFull(); break;
+    case 'ans': if (el) answer(+el.dataset.i); break;
+    case 'cont': if (S && S.resume) S.resume(); break;
+  }
+}
+function toggleFull() { try { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); } catch (e) {} }
+
+/* ---------- partida ---------- */
+const BOSS_FINAL = 'Gran Maestro Calculón';
+function buildPlan(mode, cat, cycle) {
+  const els = WORLDS[P.world].els, mk = () => C.make(Math.floor(Math.random() * 1e7) + 7, els);
+  const plan = [];
+  if (mode === 'single') {
+    plan.push({ kind: 'wild', cat, need: 4, foe: mk() }, { kind: 'wild', cat, need: 4, foe: mk() }, { kind: 'boss', cat, need: 5, foe: mk(), title: Q.info(cat, cycle).boss });
+  } else {
+    const order = R.shuffle(Q.cats(cycle));
+    order.forEach((c, i) => {
+      plan.push({ kind: 'wild', cat: c, need: 3, foe: mk() });
+      if ((i + 1) % 3 === 0 && i < order.length - 1) plan.push({ kind: 'mini', cat: 'mix', mix: order.slice(0, i + 1), need: 5, foe: mk(), title: Q.info(c, cycle).boss });
+    });
+    plan.push({ kind: 'final', cat: 'mix', mix: order, need: 8, foe: mk(), title: BOSS_FINAL });
+  }
+  return plan;
+}
+function startRun(mode, cat) {
+  tok++; closeModal();
+  const maxL = P.cycle === 1 ? 7 : P.cycle === 2 ? 6 : 5, plan = buildPlan(mode, cat, P.cycle);
+  S = { mode, cat, cycle: P.cycle, me: mkCr(P.cr), lives: maxL, maxLives: maxL, score: 0, streak: 0, best: 0, correct: 0, wrong: 0, answered: 0, stage: 1, plan, pi: -1, tamed: [], dyn: 0, bonus: { enc: 0, boss: 0 }, locked: true, paused: false, totalNeed: plan.reduce((s, e) => s + e.need, 0), limit: P.cycle <= 2 ? 60 : 0, evo2: mode === 'story' ? 9 : 5, evo3: mode === 'story' ? 24 : 11, lastCat: '', stats: {} };
+  curTrack = ''; UI.audioOn && musicFor('battle');
+  renderBattle();
+  run().catch(e => { if (e !== CANCEL) { console.error(e); } });
+}
+function renderBattle() {
+  UI.screen = 'battle'; UI.back = null; UI.busy = false;
+  app.innerHTML = `<div class="screen battle" data-screen="battle" style="padding:0;gap:0;justify-content:flex-start;align-items:stretch;overflow:hidden;animation:none">
+  <div class="hud"><div class="hl"><div class="hearts" id="hearts" role="img"></div><span class="hpill" id="encInfo"></span></div><div class="hr"><span class="hpill streak" id="streak"></span><span class="score" id="score">0</span></div></div>
+  <div class="arena" id="arena"><div class="plate fplate" id="fplate"></div><div class="sprite foe" id="foe"><div class="shadow"></div><div class="inner bob"></div></div>
+  <div class="plate mplate" id="mplate"></div><div class="sprite me" id="me"><div class="shadow"></div><div class="inner bob"></div></div></div>
+  <div class="qpanel" id="qpanel"></div><div class="banner" id="banner"></div></div>`;
+  const tc = document.getElementById('topctl'); tc.dataset.mode = 'battle';
+  setHearts(); setMe(); setHud();
+}
+const $ = id => document.getElementById(id);
+function setHearts(lost) {
+  $('hearts').innerHTML = Array.from({ length: S.maxLives }, (_, i) => HEART.replace('<svg', `<svg class="${i >= S.lives ? 'lost' : ''}${lost === i ? ' pop' : ''}"`)).join('');
+  $('hearts').setAttribute('aria-label', `Vidas: ${S.lives} de ${S.maxLives}`);
+}
+function setHud() {
+  const e = S.plan[Math.max(0, S.pi)];
+  $('encInfo').textContent = S.mode === 'story' ? `Combate ${Math.max(1, S.pi + 1)}/${S.plan.length}` : `Duelo ${Math.max(1, S.pi + 1)}/${S.plan.length}`;
+  $('score').textContent = S.score.toLocaleString('es-ES');
+  const m = mult();
+  $('streak').textContent = S.streak >= 2 ? `RACHA ×${m}` : ''; $('streak').style.display = S.streak >= 2 ? '' : 'none'; $('streak').classList.toggle('hot', m >= 3);
+}
+const mult = () => 1 + Math.min(4, Math.floor(S.streak / 3));
+function setMe(mood) {
+  const inner = $('me').querySelector('.inner'); inner.className = 'inner bob';
+  $('me').style.height = ({ 1: '72%', 2: '80%', 3: '88%' })[S.stage] || '';
+  inner.innerHTML = C.svg(S.me, { mood: mood || 'idle', stage: S.stage, uid: 'me' });
+  $('mplate').innerHTML = `<div class="pn"><span>${S.me.name}</span><span class="pe">Nv ${S.stage}</span></div><div class="hp" style="height:.55rem"><i style="width:${Math.min(100, (S.correct / S.totalNeed) * 100)}%;background:linear-gradient(180deg,#8be9ff,#2d9bff)"></i></div>`;
+}
+function setFoe(mood) {
+  const e = S.enc, foe = $('foe'), inner = foe.querySelector('.inner');
+  foe.classList.toggle('boss', !!e.title); inner.className = 'inner bob';
+  foe.style.height = e.title ? '78%' : ''; foe.style.top = e.title ? '0' : '';
+  inner.innerHTML = `<div style="width:100%;height:100%;transform:scaleX(-1)">${C.svg(e.foe, { mood: mood || 'idle', boss: e.kind === 'final' ? 'final' : e.title ? 'mini' : false, stage: e.title ? 2 : 1, uid: 'fo' })}</div>`;
+  const nm = e.title ? `<span class="bossTag">JEFE</span>${e.title}` : e.foe.name;
+  $('fplate').innerHTML = `<div class="pn"><span>${nm}</span><span class="pe">${e.foe.label}</span></div><div class="hp ${e.title ? 'boss' : ''}" id="hpbar"><i style="width:${(S.hp / e.need) * 100}%"></i></div>`;
+}
+function setHp() { const b = $('hpbar'); if (!b) return; const p = S.hp / S.enc.need; b.firstElementChild.style.width = Math.max(0, p * 100) + '%'; b.classList.toggle('low', p <= .34 && !S.enc.title); }
+function anim(el, cls, ms) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(() => el.classList.remove(cls), ms); }
+function banner(t, s, boss, ms) {
+  const b = $('banner'); if (!b) return; b.className = 'banner' + (boss ? ' boss' : ''); b.innerHTML = `<span class="bt">${t}</span>${s ? `<span class="bs">${s}</span>` : ''}`;
+  clearTimeout(banner.t); banner.t = setTimeout(() => { if (b) b.innerHTML = ''; }, ms || 1700);
+}
+function center(el) { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height * .45]; }
+function floatText(txt, el, col) {
+  const [x, y] = center(el), f = document.createElement('div'); f.className = 'flt'; f.textContent = txt; f.style.left = x + 'px'; f.style.top = y + 'px'; if (col) f.style.color = col;
+  document.getElementById('app').appendChild(f); setTimeout(() => f.remove(), 1200);
+}
+function orb(from, to, color, ms) {
+  const a = center(from), b = center(to), o = document.createElement('div'); o.className = 'orb'; o.style.setProperty('--oc', color); o.style.background = `radial-gradient(circle at 35% 30%,#fff,${color})`;
+  o.style.left = a[0] - 19 + 'px'; o.style.top = a[1] - 19 + 'px'; document.getElementById('app').appendChild(o);
+  const an = o.animate([{ transform: 'translate(0,0) scale(.6)' }, { transform: `translate(${(b[0] - a[0]) / 2}px,${(b[1] - a[1]) / 2 - 30}px) scale(1.4)` }, { transform: `translate(${b[0] - a[0]}px,${b[1] - a[1]}px) scale(1)` }], { duration: ms || 380, easing: 'ease-in' });
+  return new Promise(r => { an.onfinish = () => { o.remove(); r(b); }; });
+}
+function shakeScreen() { const a = document.getElementById('app'); a.classList.remove('shk'); void a.offsetWidth; a.classList.add('shk'); setTimeout(() => a.classList.remove('shk'), 450); }
+
+async function run() {
+  while (true) {
+    S.pi++;
+    if (S.pi >= S.plan.length) return finish(true);
+    const e = S.plan[S.pi]; S.enc = e; S.hp = e.need; S.locked = true;
+    $('qpanel').innerHTML = ''; setFoe(); setHud();
+    const boss = !!e.title;
+    if (boss) { const f = document.createElement('div'); f.className = 'bossflash'; document.body.appendChild(f); setTimeout(() => f.remove(), 2300); sfx('boss'); curTrack = ''; musicFor(e.kind === 'final' ? 'final' : 'boss'); shakeScreen(); }
+    else { sfx('whoosh'); if (S.pi > 0) { curTrack = ''; musicFor('battle'); } }
+    anim($('foe'), 'enter-r', 800);
+    const info = e.cat === 'mix' ? null : Q.info(e.cat, S.cycle);
+    banner(boss ? `¡${e.title}!` : `¡Aparece ${e.foe.name}!`, boss ? (e.kind === 'final' ? '¡El combate definitivo!' : 'Un jefe bloquea el camino') : info.name, boss, boss ? 2300 : 1500);
+    live(boss ? 'Jefe: ' + e.title : 'Aparece ' + e.foe.name);
+    await sleep(boss ? 2300 : 1500);
+    while (S.hp > 0) {
+      await ask();
+      if (S.lives <= 0) return finish(false);
+    }
+    await won();
+  }
+}
+function pickCat() {
+  const e = S.enc; if (e.cat !== 'mix') return e.cat;
+  const pool = e.mix.filter(c => c !== S.lastCat); return R.pick(pool.length ? pool : e.mix);
+}
+function diff() {
+  const done = S.correct / S.totalNeed, base = .04 + .96 * done, boss = S.enc.title ? .12 : 0;
+  const f = S.cycle === 1 ? .5 : S.cycle === 2 ? .78 : 1;
+  return Math.max(0, Math.min(1, (base + S.dyn + boss + (Math.random() - .5) * .08) * f));
+}
+function ask() {
+  return new Promise(async res => {
+    const cat = pickCat(); S.lastCat = cat; const q = Q.generate(cat, S.cycle, diff()); S.q = q; S.tq = performance.now();
+    renderQuestion(q); S.locked = false; S.resolveAsk = res; startTimer(q);
+    live(strip(q.text) + (q.visual ? ' ' + strip(q.visual) : ''));
+  });
+}
+let timerId = 0;
+function startTimer(q) {
+  clearInterval(timerId); if (!S || !S.limit) return;
+  S.tLeft = S.limit * 1000; const my = tok;
+  timerId = setInterval(() => {
+    if (!S || my !== tok || S.q !== q || S.locked) { clearInterval(timerId); return; }
+    if (S.paused) return;
+    S.tLeft -= 100; const bar = document.querySelector('.tbar'), left = Math.max(0, S.tLeft / 1000);
+    if (bar) { bar.firstElementChild.style.width = (S.tLeft / (S.limit * 1000) * 100) + '%'; bar.classList.toggle('low', left <= 10); bar.querySelector('b').textContent = Math.ceil(left) + ' s'; }
+    if (left <= 10 && Math.ceil(left) !== S.lastTick) { S.lastTick = Math.ceil(left); if (left <= 5) sfx('move'); }
+    if (S.tLeft <= 0) { clearInterval(timerId); lastAnsAt = 0; S.timedOut = true; answer(-1); }
+  }, 100);
+}
+function dirsFor(n) { return n === 4 ? ['up', 'left', 'right', 'down'] : n === 3 ? ['left', 'up', 'right'] : ['left', 'right']; }
+function renderQuestion(q) {
+  const info = Q.info(q.cat, S.cycle), dirs = dirsFor(q.answers.length), plain = strip(q.text);
+  const cls = plain.length <= 20 && /[0-9?]/.test(plain) ? 'eq' : plain.length > 70 ? 'long' : '';
+  const btns = q.answers.map((a, i) => `<button class="ans${!a.includes('<') && a.length > 11 ? ' long' : ''}" data-dir="${dirs[i]}" data-i="${i}" data-act="ans" aria-label="${dirs[i] === 'up' ? 'Arriba' : dirs[i] === 'down' ? 'Abajo' : dirs[i] === 'left' ? 'Izquierda' : 'Derecha'}: ${strip(a).replace(/"/g, '')}">${ARROW(dirs[i])}<span class="av">${a}</span></button>`).join('');
+  const p = $('qpanel'); p.style.display = ''; p.innerHTML = `<div class="qcard" id="qcard" style="--c:${info.color}"><span class="qcat">${info.name}</span>${S.limit ? '<div class="tbar"><i></i><b>' + S.limit + ' s</b></div>' : ''}<div class="qtext ${cls}">${q.text}</div><div class="qvis">${q.visual}</div></div>${btns}`;
+}
+function battleKey(a) {
+  if (a === 'pause') { if (S && S.paused) resumeGame(); else pauseGame(); return; }
+  if (!S || S.paused) { if (a === 'ok' && S && S.paused) resumeGame(); return; }
+  if (a === 'ok') { if (S.resume && performance.now() - S.hintAt > 500) S.resume(); return; }
+  const dirs = S.q ? dirsFor(S.q.answers.length) : [];
+  let i = dirs.indexOf(a); if (i < 0 && /^n[1-4]$/.test(a)) i = +a[1] - 1;
+  if (i >= 0 && S.q && i < S.q.answers.length) answer(i);
+}
+let lastAnsAt = 0;
+async function answer(i) {
+  if (!S || S.locked || S.paused || !S.q) return;
+  const now = performance.now(); if (now - lastAnsAt < 250) return; lastAnsAt = now;
+  clearInterval(timerId); S.locked = true; const q = S.q, ok = i === q.correct, btns = [...document.querySelectorAll('.ans')];
+  const secs = (now - S.tq) / 1000; S.answered++;
+  const st = S.stats[q.cat] = S.stats[q.cat] || { c: 0, w: 0 }; ok ? st.c++ : st.w++;
+  const my = tok;
+  try {
+    if (ok) {
+      S.streak++; S.best = Math.max(S.best, S.streak); S.correct++; S.dyn = Math.min(.2, S.dyn + .03);
+      const m = mult(), turbo = Math.max(0, Math.round(60 - secs * 6)), pts = Math.round((100 * m + turbo) * (S.enc.title ? 1.5 : 1));
+      S.score += pts; btns.forEach((b, j) => b.classList.add(j === i ? 'ok' : 'dim'));
+      sfx(S.streak % 3 === 0 ? 'combo' : 'correct'); setHud();
+      anim($('me'), 'lunger', 560); setMe('happy'); anim($('me').querySelector('.inner'), 'hop', 600);
+      await sleepSafe(180);
+      const ac = C.ELEM[S.me.element].acc, to = await orb($('me'), $('foe'), ac, 340);
+      sfx('hit'); FX.burst(to[0], to[1], [ac, '#fff', '#ffd23f'], 26, 8); S.hp--; setHp(); setFoe('hurt');
+      anim($('foe').querySelector('.inner'), 'shake', 500); anim($('foe'), 'flash', 400);
+      floatText('+' + pts + (turbo > 40 ? ' ¡TURBO!' : ''), $('foe'));
+      if (S.streak >= 3 && S.streak % 3 === 0) { banner(`¡RACHA ×${m}!`, '', false, 1000); }
+      await sleep(520);
+      if (S.hp > 0) setFoe();
+      if (S.stage === 1 && S.correct >= S.evo2) await evolve(2); else if (S.stage === 2 && S.correct >= S.evo3) await evolve(3);
+      if (S.hp > 0) setMe();
+      await sleep(180);
+    } else {
+      S.streak = 0; S.wrong++; S.dyn = Math.max(-.2, S.dyn - .07); S.lives--;
+      btns.forEach((b, j) => b.classList.add(j === i ? 'bad' : j === q.correct ? 'ok' : 'dim'));
+      sfx('wrong'); setHud(); try { navigator.vibrate && navigator.vibrate(120); } catch (e) {}
+      await sleep(420);
+      anim($('foe'), 'lungel', 560); await sleep(220);
+      const to = await orb($('foe'), $('me'), '#ff3d6a', 300); sfx('heart'); shakeScreen(); FX.burst(to[0], to[1], ['#ff3d6a', '#fff', '#ffd23f'], 18, 7);
+      setMe('hurt'); anim($('me').querySelector('.inner'), 'shake', 500); setHearts(S.lives); floatText('−1', $('me'), '#ff6a8a'); setHud();
+      if (S.lives <= 0) {
+        setMe('faint'); $('me').querySelector('.inner').classList.remove('bob'); anim($('me').querySelector('.inner'), 'faint', 1100); sfx('lose');
+        banner('¡Sin vidas!', 'Tu criatura necesita descansar', false, 1700); await sleep(1900); S.q = null; return S.resolveAsk();
+      }
+      setMe();
+      // pista
+      const card = $('qcard');
+      card.innerHTML = `<div class="hintcard"><span class="oops">${S.timedOut ? '¡Se acabó el tiempo!' : '¡Casi!'} La respuesta era ${strip(q.answers[q.correct]) || '…'}</span><div class="ht">${q.hint}</div><span class="go">Pulsa <b>ESPACIO</b> o toca para seguir</span></div>`;
+      if (!strip(q.answers[q.correct])) card.querySelector('.oops').textContent = '¡Casi! Fíjate bien en la figura correcta';
+      S.hintAt = performance.now(); S.timedOut = false;
+      await new Promise(r => { let t; S.resume = () => { clearTimeout(t); S.resume = null; r(); }; t = setTimeout(() => { if (S && S.resume) S.resume(); }, 7000); card.onclick = () => { if (performance.now() - S.hintAt > 400 && S.resume) S.resume(); }; });
+    }
+    S.q = null; S.resolveAsk && S.resolveAsk();
+  } catch (e) { if (e !== CANCEL) throw e; }
+}
+async function sleepSafe(ms) { return sleep(ms); }
+async function evolve(n) {
+  S.stage = n; const wo = document.createElement('div'); wo.className = 'whiteout'; document.body.appendChild(wo); setTimeout(() => wo.remove(), 950);
+  sfx('evolve'); setMe('happy'); anim($('me'), 'popin', 700); const c = center($('me')); FX.burst(c[0], c[1], ['#fff', '#ffd23f', '#ff3d9a', '#2de2ff'], 70, 11); FX.confetti(30);
+  banner('¡EVOLUCIÓN!', `${S.me.name} sube al nivel ${n}`, false, 1700); live(S.me.name + ' evoluciona'); await sleep(1500);
+}
+async function won() {
+  const e = S.enc, boss = !!e.title, my = tok;
+  setFoe('faint'); const inner = $('foe').querySelector('.inner'); inner.classList.remove('bob');
+  await sleep(450);
+  if (!boss) {
+    anim(inner, 'spinout', 1000); sfx('capture'); const c = center($('foe')); FX.burst(c[0], c[1], ['#fff', '#b6ff3b', '#ffd23f', '#2de2ff'], 50, 10);
+    const isNew = !SAVE.dex.some(d => d.s === e.foe.seed); S.tamed.push({ cr: e.foe, isNew });
+    if (isNew) { SAVE.dex.push({ s: e.foe.seed, e: e.foe.element }); if (SAVE.dex.length > 80) SAVE.dex.shift(); save(); }
+    S.score += 200; S.bonus.enc += 200; setHud();
+    banner(`¡${e.foe.name} domado!`, isNew ? 'Nueva criatura en tu colección' : '', false, 1500); floatText('+200', $('foe'), '#ffd23f'); await sleep(1500);
+  } else {
+    anim(inner, 'spinout', 1200); sfx('win'); FX.confetti(120); const c = center($('foe')); FX.burst(c[0], c[1], ['#fff', '#ffd23f', '#ff3d9a'], 90, 13);
+    S.score += 500; S.bonus.boss += 500; const heal = S.lives < S.maxLives; if (heal) { S.lives++; setHearts(); }
+    const isNew = !SAVE.dex.some(d => d.s === e.foe.seed); S.tamed.push({ cr: e.foe, isNew });
+    if (isNew) { SAVE.dex.push({ s: e.foe.seed, e: e.foe.element }); if (SAVE.dex.length > 80) SAVE.dex.shift(); save(); }
+    setHud(); banner('¡JEFE DERROTADO!', '+500 puntos' + (heal ? ' · ¡+1 corazón!' : ''), true, 2300); floatText('+500', $('foe'), '#ffd23f'); if (heal) setTimeout(() => sfx('heal'), 500); await sleep(2400);
+  }
+}
+function pauseGame() {
+  if (!S || S.paused || UI.screen !== 'battle') return;
+  S.paused = true; modal(`<h3>Pausa</h3><p>Puntos: ${S.score.toLocaleString('es-ES')} · Vidas: ${S.lives}/${S.maxLives}</p><div class="row"><button class="btn" data-nav data-first data-act="resume">Continuar</button><button class="btn ghost" data-nav data-act="quit">Salir al menú</button></div>`);
+}
+function resumeGame() { if (S) S.paused = false; closeModal(); }
+function quitRun() { clearInterval(timerId); tok++; S = null; closeModal(); document.getElementById('topctl').dataset.mode = ''; modeScreen(); curTrack = ''; musicFor('menu'); }
+
+/* ---------- resultados ---------- */
+function rate(done) {
+  const acc = S.correct / Math.max(1, S.answered);
+  if (done) { if (acc >= .95 && S.lives >= S.maxLives - 1) return ['S', 5, '¡Leyenda de la Liga!']; if (acc >= .85) return ['A', 4, 'Domador Estrella']; if (acc >= .7) return ['B', 3, 'Entrenador Valiente']; return ['C', 2, 'Aprendiz en Camino']; }
+  return S.correct / S.totalNeed >= .6 ? ['C', 2, 'Aprendiz en Camino'] : ['D', 1, 'Cría con Mucho Futuro'];
+}
+function finish(done) {
+  tok++; const my = tok; AU.stopMusic(); curTrack = '';
+  const [letter, stars, title] = rate(done), livesB = done ? S.lives * 300 : 0, compB = done ? 1000 : 0, total = S.score + livesB + compB;
+  const key = S.cycle + '|' + (S.mode === 'story' ? 'story' : S.cat), prev = SAVE.best[key], isBest = !prev || total > prev.score;
+  if (isBest) SAVE.best[key] = { score: total, letter }; save();
+  const acc = Math.round(100 * S.correct / Math.max(1, S.answered));
+  if (done) { sfx('win'); FX.confetti(160); } else sfx('lose');
+  document.getElementById('topctl').dataset.mode = '';
+  const name = S.mode === 'story' ? 'Modo historia' : Q.info(S.cat, S.cycle).name;
+  const st = Object.keys(S.stats).map(c => { const s = S.stats[c], t = s.c + s.w; return `<div><span>${Q.info(c, S.cycle).name}</span><b>${s.c}/${t}</b></div>`; }).join('');
+  show('results', `<div class="rating"><span class="chip">${done ? '¡Misión cumplida!' : 'Entrenamiento terminado'} · ${name}</span><div class="letter">${letter}</div><div class="stars">${Array.from({ length: 5 }, (_, i) => i < stars ? STAR : STAR_OFF).join('')}</div><div class="rtitle">${title}</div></div>
+  <div class="stats"><div><span>Aciertos</span><b>${S.correct}/${S.answered}</b></div><div><span>Precisión</span><b>${acc}%</b></div><div><span>Mejor racha</span><b>${S.best}</b></div><div><span>Vidas</span><b>${S.lives}/${S.maxLives}</b></div><div><span>Puntos de combate</span><b>${(S.score - S.bonus.enc - S.bonus.boss).toLocaleString('es-ES')}</b></div><div><span>Criaturas y jefes</span><b>+${S.bonus.enc + S.bonus.boss}</b></div>${done ? `<div><span>Corazones</span><b>+${livesB}</b></div><div><span>Misión</span><b>+${compB}</b></div>` : ''}<div class="tot"><span>TOTAL ${isBest ? '<span class="newb">¡RÉCORD!</span>' : ''}</span><b>${total.toLocaleString('es-ES')}</b></div></div>
+  ${S.tamed.length ? `<div class="minipets">${S.tamed.map((t, i) => `<div title="${t.cr.name}">${C.svg(t.cr, { mood: 'happy', uid: 'r' + i })}</div>`).join('')}</div>` : ''}
+  <div class="row"><button class="btn" data-nav data-first data-act="again">Jugar otra vez</button><button class="btn cyan" data-nav data-act="menu">Cambiar modo</button><button class="btn ghost" data-nav data-act="home">Inicio</button></div>`, { noFocus: false });
+  live(`Calificación ${letter}. ${title}. ${S.correct} aciertos de ${S.answered}. Total ${total} puntos`);
+  window.__last = { letter, total, acc, done, stats: S.stats };
+  setTimeout(() => { UI.audioOn && AU.startMusic('menu', P.world); curTrack = 'menu' + P.world; }, 2600);
+  S.ended = true;
+}
+
+/* ---------- arranque ---------- */
+function boot() {
+  FX.init(); FX.setWorld(P.world);
+  const tc = document.getElementById('topctl');
+  tc.innerHTML = `<button class="ib" id="bpause" aria-label="Pausa" data-act="pause" style="display:none">${I.pause}</button><button class="ib" id="bmute" aria-label="Sonido" aria-pressed="${AU.isMuted()}" onclick="void 0">${AU.isMuted() ? I.muteOff : I.mute}</button><button class="ib" aria-label="Pantalla completa" data-act="full">${I.full}</button>`;
+  document.getElementById('bmute').addEventListener('click', toggleMute);
+  new MutationObserver(() => { document.getElementById('bpause').style.display = tc.dataset.mode === 'battle' ? '' : 'none'; }).observe(tc, { attributes: true });
+  titleScreen();
+}
+window.MM = { showQ: q => { if (S) { S.q = q; renderQuestion(q); } }, act, P, get S() { return S; }, Q, SAVE };
+boot();
+})();
+</script>
+</body>
+</html>
