@@ -257,3 +257,7 @@ kbd{display:inline-block;min-width:1.6em;padding:.1em .45em;border:.12rem solid 
 .qvis .duo svg{height:100%!important;width:auto;max-width:48%}
 .qvis .seq{max-height:100%}
 .qtext{margin-top:1.35rem}
+
+.hitplate{animation:shk2 .45s}.hitplate .hp i{box-shadow:0 0 .8rem #fff}
+.hp i{transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.fplate .hp{height:1.05rem}

@@ -292,15 +292,16 @@ function setMe(mood) {
   inner.innerHTML = C.svg(S.me, { mood: mood || 'idle', stage: S.stage, uid: 'me' });
   $('mplate').innerHTML = `<div class="pn"><span>${S.me.name}</span><span class="pe">Nv ${S.stage}</span></div><div class="hp" style="height:.55rem"><i style="width:${Math.min(100, (S.correct / S.totalNeed) * 100)}%;background:linear-gradient(180deg,#8be9ff,#2d9bff)"></i></div>`;
 }
-function setFoe(mood) {
+function setFoe(mood, plate) {
   const e = S.enc, foe = $('foe'), inner = foe.querySelector('.inner');
   foe.classList.toggle('boss', !!e.title); inner.className = 'inner bob';
   foe.style.height = e.title ? '78%' : ''; foe.style.top = e.title ? '0' : '';
   inner.innerHTML = `<div style="width:100%;height:100%;transform:scaleX(-1)">${C.svg(e.foe, { mood: mood || 'idle', boss: e.kind === 'final' ? 'final' : e.title ? 'mini' : false, stage: e.title ? 2 : 1, uid: 'fo' })}</div>`;
+  if (!plate) return;
   const nm = e.title ? `<span class="bossTag">JEFE</span>${e.title}` : e.foe.name;
   $('fplate').innerHTML = `<div class="pn"><span>${nm}</span><span class="pe">${e.foe.label}</span></div><div class="hp ${e.title ? 'boss' : ''}" id="hpbar"><i style="width:${(S.hp / e.need) * 100}%"></i></div>`;
 }
-function setHp() { const b = $('hpbar'); if (!b) return; const p = S.hp / S.enc.need; b.firstElementChild.style.width = Math.max(0, p * 100) + '%'; b.classList.toggle('low', p <= .34 && !S.enc.title); }
+function setHp() { const b = $('hpbar'); if (!b) return; const p = S.hp / S.enc.need; b.firstElementChild.style.width = Math.max(0, p * 100) + '%'; b.classList.toggle('low', p <= .34 && !S.enc.title); anim($('fplate'), 'hitplate', 500); }
 function anim(el, cls, ms) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(() => el.classList.remove(cls), ms); }
 function banner(t, s, boss, ms) {
   const b = $('banner'); if (!b) return; b.className = 'banner' + (boss ? ' boss' : ''); b.innerHTML = `<span class="bt">${t}</span>${s ? `<span class="bs">${s}</span>` : ''}`;
@@ -324,7 +325,7 @@ async function run() {
     S.pi++;
     if (S.pi >= S.plan.length) return finish(true);
     const e = S.plan[S.pi]; S.enc = e; S.hp = e.need; S.locked = true;
-    $('qpanel').innerHTML = ''; setFoe(); setHud();
+    $('qpanel').innerHTML = ''; setFoe(null, true); setHud();
     const boss = !!e.title;
     if (boss) { const f = document.createElement('div'); f.className = 'bossflash'; document.body.appendChild(f); setTimeout(() => f.remove(), 2300); sfx('boss'); curTrack = ''; musicFor(e.kind === 'final' ? 'final' : 'boss'); shakeScreen(); }
     else { sfx('whoosh'); if (S.pi > 0) { curTrack = ''; musicFor('battle'); } }
