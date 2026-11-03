@@ -37,7 +37,7 @@ function build(o) {
     if (opts.length >= max) break;
   }
   if (opts.length < min) return null;
-  const order = o.keepOrder ? opts : R.shuffle(opts);
+  const order = o.order ? o.order.filter(x => opts.includes(x)) : o.keepOrder ? opts : R.shuffle(opts);
   return { cat: o.cat, text: o.text, visual: o.visual || '', answers: order, correct: order.indexOf(o.correct), hint: o.hint || '', key: o.key || (o.cat + '|' + o.text + '|' + o.correct), big: !!o.big };
 }
 
@@ -358,7 +358,7 @@ function comparar(c, d) {
     else { let delta = R.int(1, Math.max(2, Math.floor(c === 1 ? 6 : mx / 10))); delta = Math.min(delta, Math.max(1, Math.floor(lv / 2))); rv = rel === '<' ? lv + delta : Math.max(0, lv - delta); if (rv === lv) return null; Rr = N(rv); }
   }
   const real = lv < rv ? '<' : lv > rv ? '>' : '=';
-  return build({ cat: 'comparar', text: `${L} ${BLANK} ${Rr}`, correct: real, wrong: ['<', '>', '='].filter(x => x !== real), n: 3, hint: `${N(lv)} ${real} ${N(rv)}`, keepOrder: false, big: true, key: 'sym|' + L + '|' + Rr });
+  return build({ cat: 'comparar', text: `${L} ${BLANK} ${Rr}`, correct: real, wrong: ['<', '>', '='].filter(x => x !== real), n: 3, order: ['<', '=', '>'], hint: `${N(lv)} ${real} ${N(rv)}`, big: true, key: 'sym|' + L + '|' + Rr });
 }
 
 /* ---------- FRACCIONES ---------- */
@@ -399,7 +399,7 @@ function fracciones(c, d) {
   if (form === 'cmp1') {
     const a = R.pick([2, 3, 4, 5, 6, 8]), b = R.pick([2, 3, 4, 5, 6, 8].filter(x => x !== a));
     const big = a < b ? a : b; // 1/menor denominador es mayor
-    return build({ cat: 'fracciones', text: '¿Qué fracción es MAYOR?', visual: `<div class="duo">${pie(a, 1)}${pie(b, 1)}</div>`, correct: F(1, big), wrong: [F(1, big === a ? b : a)], n: 2, min: 2, hint: `Cuantas más partes, más pequeñas: 1/${big} es mayor que 1/${big === a ? b : a}`, key: 'fc1|' + a + b });
+    return build({ cat: 'fracciones', text: '¿Qué fracción es MAYOR?', visual: `<div class="duo">${pie(a, 1)}${pie(b, 1)}</div>`, correct: F(1, big), wrong: [F(1, big === a ? b : a)], n: 2, min: 2, order: [F(1, a), F(1, b)], hint: `Cuantas más partes, más pequeñas: 1/${big} es mayor que 1/${big === a ? b : a}`, key: 'fc1|' + a + b });
   }
   if (form === 'equiv') {
     const base = R.pick([[1, 2], [1, 3], [1, 4], [2, 3], [3, 4], [2, 5]]), m = R.int(2, c === 2 ? 4 : 6), n2 = base[1] * m, k2 = base[0] * m;
@@ -428,7 +428,7 @@ function fracciones(c, d) {
   const a = R.pick([[1, 2], [2, 3], [3, 4], [3, 5], [2, 5], [5, 6], [3, 8], [7, 10]]), b = R.pick([[1, 2], [2, 3], [3, 4], [3, 5], [2, 5], [5, 6], [3, 8], [7, 10]]);
   if (a[0] * b[1] === b[0] * a[1]) return null;
   const left = a[0] * b[1] > b[0] * a[1];
-  return build({ cat: 'fracciones', text: '¿Cuál es MAYOR?', visual: `<div class="duo">${pie(a[1], a[0], '#ff3d9a')}${pie(b[1], b[0], '#2de2ff')}</div>`, correct: F(...(left ? a : b)), wrong: [F(...(left ? b : a))], n: 2, min: 2, hint: `${a[0]}/${a[1]} = ${(a[0] / a[1]).toFixed(2).replace('.', ',')} y ${b[0]}/${b[1]} = ${(b[0] / b[1]).toFixed(2).replace('.', ',')}`, key: 'fcv|' + a + b, big: true });
+  return build({ cat: 'fracciones', text: '¿Cuál es MAYOR?', visual: `<div class="duo">${pie(a[1], a[0], '#ff3d9a')}${pie(b[1], b[0], '#2de2ff')}</div>`, correct: F(...(left ? a : b)), wrong: [F(...(left ? b : a))], n: 2, min: 2, order: [F(...a), F(...b)], hint: `${a[0]}/${a[1]} = ${(a[0] / a[1]).toFixed(2).replace('.', ',')} y ${b[0]}/${b[1]} = ${(b[0] / b[1]).toFixed(2).replace('.', ',')}`, key: 'fcv|' + a + b, big: true });
 }
 
 /* ---------- GEOMETRÍA ---------- */
@@ -515,7 +515,7 @@ function areas(c, d) {
       const ka = R.int(3, 9); let kb = R.int(3, 9); const A = mk(ka), B = mk(kb);
       const v = `<div class="duo">${cellsSvg(cols, rows, (r, c0) => A.has(r * cols + c0), '#ff3d9a')}${cellsSvg(cols, rows, (r, c0) => B.has(r * cols + c0), '#2de2ff')}</div>`;
       const real = ka > kb ? 'La rosa' : ka < kb ? 'La azul' : 'Igual';
-      return build({ cat: 'areas', text: '¿Qué figura tiene MÁS cuadraditos pintados?', visual: v, correct: real, wrong: ['La rosa', 'La azul', 'Igual'].filter(x => x !== real), n: 3, hint: `Rosa: ${ka} cuadraditos · Azul: ${kb} cuadraditos`, key: 'a1c|' + [...A] + '|' + [...B], big: true });
+      return build({ cat: 'areas', text: '¿Qué figura tiene MÁS cuadraditos pintados?', visual: v, correct: real, wrong: ['La rosa', 'La azul', 'Igual'].filter(x => x !== real), n: 3, order: ['La rosa', 'Igual', 'La azul'], hint: `Rosa (izquierda): ${ka} cuadraditos · Azul (derecha): ${kb} cuadraditos`, key: 'a1c|' + [...A] + '|' + [...B], big: true });
     }
     const cols = R.int(3, d < .4 ? 4 : 6), rows = R.int(2, d < .4 ? 3 : 4), k = R.int(3, Math.min(rows * cols - 1, Math.round(5 + d * 9)));
     const set = new Set(); while (set.size < k) set.add(R.int(0, rows * cols - 1));
@@ -810,7 +810,7 @@ function relQ() {
 function sym1Q() {
   const L = [['cuadrado', `<rect x="22" y="22" width="76" height="76" rx="3"/>`, 'Sí'], ['círculo', `<circle cx="60" cy="60" r="42"/>`, 'Sí'], ['triángulo', `<polygon points="60,16 104,100 16,100"/>`, 'Sí'], ['rectángulo', `<rect x="18" y="34" width="84" height="52" rx="3"/>`, 'Sí'], ['triángulo con ángulo recto', `<polygon points="22,100 98,100 22,20"/>`, 'No'], ['forma en L', `<polygon points="25,20 55,20 55,72 95,72 95,100 25,100"/>`, 'No'], ['flecha torcida', `<polygon points="30,20 80,20 100,60 50,100 30,60"/>`, 'No']];
   const f = R.pick(L), v = svg('0 0 120 120', `<g fill="${R.pick(TCOL)}" ${ST}>${f[1]}</g><line x1="60" y1="6" x2="60" y2="114" stroke="#fff" stroke-width="3.5" stroke-dasharray="7 6"/>`, 'fig');
-  return build({ cat: 'geometria', text: 'Si doblas por la línea, ¿las dos partes coinciden?', visual: v, correct: f[2], wrong: [f[2] === 'Sí' ? 'No' : 'Sí'], n: 2, min: 2, hint: f[2] === 'Sí' ? 'Las dos mitades son iguales: hay simetría' : 'Las dos mitades no son iguales: no hay simetría', key: 'x|s1' + f[0] + Math.random() });
+  return build({ cat: 'geometria', text: 'Si doblas por la línea, ¿las dos partes coinciden?', visual: v, correct: f[2], wrong: [f[2] === 'Sí' ? 'No' : 'Sí'], n: 2, min: 2, order: ['Sí', 'No'], hint: f[2] === 'Sí' ? 'Las dos mitades son iguales: hay simetría' : 'Las dos mitades no son iguales: no hay simetría', key: 'x|s1' + f[0] + Math.random() });
 }
 function linesQ() {
   const k = R.pick(['paralelas', 'perpendiculares', 'oblicuas']), a = k === 'paralelas' ? [[15, 40, 105, 40], [15, 80, 105, 80]] : k === 'perpendiculares' ? [[15, 60, 105, 60], [60, 12, 60, 108]] : [[15, 95, 100, 25], [25, 25, 100, 90]];
@@ -872,7 +872,7 @@ const EXTRA = {
   },
   comparar(c) {
     if (c === 3) { const set = new Set(); while (set.size < 4) set.add(R.int(-9, 9)); const arr = [...set], isMax = R.chance(.5), ans = isMax ? Math.max(...arr) : Math.min(...arr); return build({ cat: 'comparar', text: `¿Cuál es el número ${isMax ? 'MAYOR' : 'MENOR'}?`, correct: Z(ans), wrong: arr.filter(x => x !== ans).map(Z), hint: 'En los números negativos, cuanto más lejos del cero, menor es: −8 < −2 < 0 < 5', key: 'x|cn' + arr.sort() + isMax }); }
-    const a = R.int(10, 99), b = R.int(10, 99); if (a === b) return null; return build({ cat: 'comparar', text: `${a} ${BLANK} ${b}`, correct: a > b ? '>' : '<', wrong: ['<', '>', '='].filter(x => x !== (a > b ? '>' : '<')), n: 3, big: true, hint: `${a} ${a > b ? '>' : '<'} ${b}`, key: 'x|cs' + a + b });
+    const a = R.int(10, 99), b = R.int(10, 99); if (a === b) return null; return build({ cat: 'comparar', text: `${a} ${BLANK} ${b}`, correct: a > b ? '>' : '<', wrong: ['<', '>', '='].filter(x => x !== (a > b ? '>' : '<')), n: 3, order: ['<', '=', '>'], big: true, hint: `${a} ${a > b ? '>' : '<'} ${b}`, key: 'x|cs' + a + b });
   },
   medida(c) {
     if (c === 1) { const k = R.pick(['est', 'est', 'week']); if (k === 'est') { const e = R.pick(EST.filter(x => ['m', 'cm', 'kg', 'g', 'l', 'min'].includes(x[1]))); const fam = { m: ['cm', 'kg', 'l'], cm: ['m', 'kg', 'g'], kg: ['g', 'm', 'l'], g: ['kg', 'cm', 'l'], l: ['kg', 'm', 'cm'], min: ['m', 'kg', 'l'] }; return build({ cat: 'medida', text: `¿En qué unidad medirías ${e[0]}?`, correct: e[1], wrong: fam[e[1]], hint: `Para ${e[0]} lo más cómodo es ${e[1]}`, key: 'x|e1' + e[0] }); } const Q1 = R.pick([['¿Cuántos días tiene una semana?', 7], ['¿Cuántos meses tiene un año?', 12], ['¿Cuántas horas tiene un día?', 24], ['¿Cuántos minutos tiene una hora?', 60]]); return build({ cat: 'medida', text: Q1[0], correct: String(Q1[1]), wrong: numWrong(Q1[1], [Q1[1] + 2, Q1[1] * 2]), hint: `${Q1[0].replace('¿', '').replace('?', '')}: ${Q1[1]}`, key: 'x|wk' + Q1[1] }); }
