@@ -331,19 +331,27 @@ sup{font-size:.6em;line-height:0}
 .pw.sin .pchip{background:#3b2a8c}
 @media (max-aspect-ratio:1/1){.pw{flex-direction:column;align-items:stretch}.pbar{flex:1}}
 
-/* ---- respuestas: cuatro cuadrados iguales en una fila; pantallas bajas sin cortes ---- */
-:root{--sq:min(clamp(4.8rem,18vh,11rem),calc((100vw - 4.2rem)/4))}
+/* ---- respuestas: cuatro cuadrados iguales en cruz alrededor de la pregunta ---- */
+:root{--sq:clamp(4rem,13.5vh,8rem)}
 #app{height:100%}
 @supports (height:100dvh){#app{height:100dvh;bottom:auto}}
-.qpanel{display:flex;flex-direction:column;gap:.55rem;padding:.3rem .7rem .6rem;width:min(70rem,100%)}
-.qcard{grid-area:auto;flex:1 1 0;min-height:0;width:100%}
-.answers{flex:none;display:flex;justify-content:center;gap:.7rem}
-.ans{grid-area:auto!important;flex:none;flex-direction:column;gap:.15rem;width:var(--sq);height:var(--sq);min-height:0;padding:.25rem;font-size:clamp(1.05rem,calc(var(--sq)*.27),2.3rem)}
+.arena{flex-basis:40%}.qpanel{flex-basis:60%}
+.qpanel{display:grid;grid-template-columns:var(--sq) minmax(0,1fr) var(--sq);grid-template-rows:var(--sq) minmax(0,1fr) var(--sq);grid-template-areas:". up ." "left q right" ". down .";gap:.5rem;padding:.3rem .7rem .6rem;width:min(70rem,100%)}
+.answers{display:contents}
+.qcard{grid-area:q;width:auto;min-height:0;flex:none}
+.ans{flex:none;flex-direction:column;gap:.15rem;width:var(--sq);height:var(--sq);min-height:0;padding:.25rem;font-size:clamp(1rem,calc(var(--sq)*.27),2.1rem)}
 .ans.long{font-size:clamp(.72rem,calc(var(--sq)*.155),1.2rem)}
 .ans svg.a{width:.8em;height:.8em}
 .ans .av svg{height:calc(var(--sq)*.46);width:auto}
-.ans[data-dir=left]{order:1}.ans[data-dir=up]{order:2}.ans[data-dir=down]{order:3}.ans[data-dir=right]{order:4}
-@media (max-aspect-ratio:1/1){.qpanel{padding-bottom:.5rem}.answers{gap:.5rem}}
+.ans[data-dir=up]{grid-area:up;justify-self:center}.ans[data-dir=down]{grid-area:down;justify-self:center}
+.ans[data-dir=left]{grid-area:left;align-self:center}.ans[data-dir=right]{grid-area:right;align-self:center}
+@media (max-aspect-ratio:1/1){
+  :root{--sq:min(calc((100vw - 3.4rem)/2),clamp(4.2rem,13vh,8rem))}
+  .arena{flex-basis:34%}.qpanel{flex-basis:66%}
+  .qpanel{grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,1fr) var(--sq) var(--sq);grid-template-areas:"q q" "up left" "right down";justify-items:center;padding-bottom:.5rem}
+  .qcard{width:100%;justify-self:stretch}
+  .ans[data-dir=up],.ans[data-dir=down],.ans[data-dir=left],.ans[data-dir=right]{align-self:auto;justify-self:center}
+}
 /* si el contenido no cabe, se puede desplazar en vez de cortarse */
 .screen:not(.battle){justify-content:flex-start}
 .screen:not(.battle)>:first-child{margin-top:auto}.screen:not(.battle)>:last-child{margin-bottom:auto}
@@ -354,6 +362,11 @@ sup{font-size:.6em;line-height:0}
 .ans.l1{font-size:clamp(.9rem,calc(var(--sq)*.2),1.9rem)}
 .ans.l2{font-size:clamp(.78rem,calc(var(--sq)*.155),1.5rem)}
 .ans.l3{font-size:clamp(.7rem,calc(var(--sq)*.125),1.25rem)}
+.ans{font-size:clamp(.8rem,calc(var(--sq)*.27),2.1rem)}
+.ans.l1{font-size:clamp(.6rem,calc(var(--sq)*.19),1.9rem)}
+.ans.l2{font-size:clamp(.55rem,calc(var(--sq)*.145),1.5rem)}
+.ans.l3{font-size:clamp(.5rem,calc(var(--sq)*.115),1.25rem)}
+.ans.long{font-size:clamp(.5rem,calc(var(--sq)*.14),1.2rem)}
 </style>
 </head>
 <body>
