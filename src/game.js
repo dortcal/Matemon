@@ -157,6 +157,107 @@ function paperModal() {
   <div class="row"><button class="btn" data-first data-nav data-act="gostory">¡Ya tengo papel y boli!</button><button class="btn ghost" data-nav data-act="closemodal">Volver</button></div>`);
 }
 
+/* ---------- INFORME DEL ALUMNADO (vista y PDF) ---------- */
+function plainText(h) {
+  return String(h == null ? '' : h).replace(/<span class="fr"><i>(.*?)<\/i><i>(.*?)<\/i><\/span>/g, '$1/$2').replace(/<sup>(.*?)<\/sup>/g, '^$1').replace(/<svg[\s\S]*?<\/svg>/g, '[figura]').replace(/<span class="blank">.*?<\/span>/g, '__').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+const fmtS = s => (s < 10 ? s.toFixed(1) : String(Math.round(s))).replace('.', ',');
+function reportData() {
+  const L = S.log || [], n = L.length, okN = L.filter(x => x.ok).length, byCat = {};
+  L.forEach(x => { const c = byCat[x.cat] = byCat[x.cat] || { c: 0, t: 0, s: 0 }; c.t++; if (x.ok) c.c++; c.s += x.secs; });
+  const pct = cats => { let c = 0, t = 0; cats.forEach(k => { if (byCat[k]) { c += byCat[k].c; t += byCat[k].t; } }); return { n: t, p: t ? Math.round(100 * c / t) : 0, c }; };
+  const lvl = x => x.n < 3 ? ['sin', 'Sin datos suficientes'] : x.p >= 80 ? ['top', 'Logrado con solidez'] : x.p >= 60 ? ['mid', 'En progreso'] : ['low', 'A reforzar'];
+  const all = { n, p: n ? Math.round(100 * okN / n) : 0, c: okN };
+  const rec = (S.aw || 0) >= 2 ? { n: S.aw, p: Math.round(100 * (S.rc || 0) / S.aw), c: S.rc || 0 } : { n: 0, p: 0, c: 0 };
+  const sens = [['Sentido numérico (Bloque I)', pct(['sumres', 'tablas', 'divisiones', 'fracciones', 'comparar'])], ['Sentido de la medida (Bloque II)', pct(['medida', 'areas'])], ['Sentido espacial (Bloque III)', pct(['geometria'])], ['Sentido algebraico y pensamiento computacional (Bloque IV)', pct(['secuencias'])], ['Sentido estocástico: datos y azar (Bloque V)', pct(['datos'])]];
+  const crit = [['Criterio 2.1 · Elegir estrategias para resolver problemas aritméticos, geométricos, lógicos y de patrones', all], ['Criterio 2.2 · Elegir y usar las operaciones adecuadas en problemas', pct(['sumres', 'tablas', 'divisiones', 'fracciones'])], ['Criterios 4.1 y 4.2 · Patrones, secuencias y algoritmos', pct(['secuencias'])], ['Criterio 7.1 · El error como oportunidad: seguir intentándolo tras equivocarse', rec]];
+  const cats = Object.keys(byCat).map(k => ({ name: Q.info(k, S.cycle).name, c: byCat[k].c, t: byCat[k].t, p: Math.round(100 * byCat[k].c / byCat[k].t), avg: Math.round(10 * byCat[k].s / byCat[k].t) / 10 }));
+  const weak = Object.keys(byCat).filter(k => byCat[k].t >= 3 && byCat[k].c / byCat[k].t < .7).map(k => Q.info(k, S.cycle).name);
+  const errors = L.filter(x => !x.ok);
+  const secs = L.length ? Math.round(10 * L.reduce((a, b) => a + b.secs, 0) / L.length) / 10 : 0;
+  const mins = Math.max(1, Math.round(((S.t1 || Date.now()) - (S.t0 || Date.now())) / 60000));
+  const total = S.final ? S.final.total : S.score, letter = S.final ? S.final.letter : '', title = S.final ? S.final.title : '', done = S.final ? S.final.done : false;
+  return { date: new Date().toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' }), level: LEVELS[S.cycle].name + ' (' + LEVELS[S.cycle].grades + ')', mode: S.mode === 'story' ? 'Modo historia' : 'Duelo rápido: ' + Q.info(S.cat, S.cycle).name, world: WORLDS[P.world].name, result: done ? 'Misión cumplida' : 'Entrenamiento terminado (sin vidas)', letter, title, total, n, okN, acc: all.p, best: S.best, lives: S.lives + '/' + S.maxLives, tamed: S.tamed.length, mins, secs, timeouts: L.filter(x => x.timeout).length, powUsed: S.powUsed || 0, feel: { 1: 'Con confianza', 2: 'Más o menos', 3: 'Con dudas' }[S.feel] || 'No indicada', limit: S.limit, sens: sens.map(a => ({ name: a[0], x: a[1], l: lvl(a[1]) })), crit: crit.map(a => ({ name: a[0], x: a[1], l: lvl(a[1]) })), cats, weak, errors, evo: S.stage };
+}
+function reportModal() {
+  if (!S || !S.log) return;
+  const r = reportData(), bar = (x, l) => `<span class="pbar"><i style="width:${x.n ? x.p : 0}%"></i></span><span class="pchip">${l[1]}${x.n ? ` · ${x.p}% (${x.c}/${x.n})` : ''}</span>`;
+  const row = (a) => `<div class="pw ${a.l[0]}"><div class="pwt">${a.name}</div><div class="pwv">${bar(a.x, a.l)}</div></div>`;
+  const kv = [['Nivel', r.level], ['Modo', r.mode], ['Mundo', r.world], ['Resultado', r.result + (r.letter ? ' · calificación ' + r.letter + ' (' + r.title + ')' : '')], ['Puntuación total', r.total.toLocaleString('es-ES')], ['Aciertos', `${r.okN}/${r.n} (${r.acc} %)`], ['Mejor racha', r.best], ['Vidas al terminar', r.lives], ['Criaturas domadas', r.tamed], ['Duración', r.mins + ' min'], ['Tiempo medio por respuesta', fmtS(r.secs) + ' s (límite ' + r.limit + ' s)'], ['Tiempos agotados', r.timeouts], ['Poderes usados', r.powUsed], ['Autoevaluación', r.feel]];
+  modal(`<h3>Informe del alumnado</h3><p><small>${r.date} · MateMonstruos · Liga del Teide</small></p>
+  <div class="kv">${kv.map(a => `<div><span>${a[0]}</span><b>${a[1]}</b></div>`).join('')}</div>
+  <h4>Sentidos matemáticos</h4>${r.sens.map(row).join('')}
+  <h4>Criterios de evaluación (orientativo)</h4>${r.crit.map(row).join('')}
+  <h4>Por actividad</h4><table class="tt"><tr><th>Actividad</th><th>Aciertos</th><th>%</th><th>Tiempo medio</th></tr>${r.cats.map(c => `<tr><td>${c.name}</td><td>${c.c}/${c.t}</td><td>${c.p} %</td><td>${fmtS(c.avg)} s</td></tr>`).join('')}</table>
+  <h4>Errores y su explicación (${r.errors.length})</h4>${r.errors.length ? `<ol class="errs">${r.errors.slice(0, 40).map(e => `<li><b>${e.text}</b><br>Respondió: <u>${e.chosen}</u> · Correcta: <b>${e.correct}</b><br><small>${e.hint}</small></li>`).join('')}</ol>${r.errors.length > 40 ? `<p><small>…y ${r.errors.length - 40} más.</small></p>` : ''}` : '<p>No ha habido errores en esta partida.</p>'}
+  ${r.weak.length ? `<p><b>Para reforzar:</b> ${r.weak.join(', ')}.</p>` : ''}
+  <p><small>Informe orientativo, basado solo en esta partida. Criterios del Decreto 211/2022 (Canarias). La evaluación corresponde al docente. No contiene datos personales.</small></p>
+  <div class="row"><button class="btn violet" data-first data-nav data-act="pdf">Descargar PDF</button><button class="btn" data-nav data-act="closemodal">Cerrar</button></div>`);
+  const mb = document.querySelector('#modal .mbox'); if (mb) mb.classList.add('wide');
+}
+
+/* PDF sin librerías: texto, rectángulos y líneas con Helvetica */
+function buildPDF(r) {
+  const W = 595, H = 842, M = 42, CW = W - 2 * M, pages = []; let ops = null, y = 0;
+  const SP = { '−': 45, '–': 150, '—': 151, '€': 128, '’': 39, '‘': 39, '“': 34, '”': 34, '≈': 126, '≤': 60, '≥': 62, 'π': 112, '→': 62 };
+  const enc = s => { let o = ''; for (const ch of String(s).replace(/²/g, '^2').replace(/³/g, '^3')) { let c = SP[ch] || ch.charCodeAt(0); if (c > 255) c = 63; if (c === 40 || c === 41 || c === 92) o += '\\' + String.fromCharCode(c); else if (c < 32 || c > 126) o += '\\' + c.toString(8).padStart(3, '0'); else o += String.fromCharCode(c); } return o; };
+  const wd = (s, sz, b) => { let w = 0; for (const ch of String(s)) w += /[iljI.,:;'!|]/.test(ch) ? .27 : /[ftr\s()\[\]\/-]/.test(ch) ? .33 : /[mwMW@]/.test(ch) ? .86 : /[A-Z0-9ÁÉÍÓÚÑ]/.test(ch) ? .64 : .53; return w * sz * (b ? 1.07 : 1); };
+  const wrap = (s, sz, mw, b) => { const out = []; let line = ''; String(s).split(/\s+/).forEach(w => { const t = line ? line + ' ' + w : w; if (wd(t, sz, b) > mw && line) { out.push(line); line = w; } else line = t; }); if (line) out.push(line); return out; };
+  const rgb = c => c.map(v => (v / 255).toFixed(3)).join(' ');
+  const txt = (x, yy, s, sz, b, col) => ops.push(`BT /${b ? 'F2' : 'F1'} ${sz} Tf ${rgb(col || [27, 17, 64])} rg ${x.toFixed(1)} ${yy.toFixed(1)} Td (${enc(s)}) Tj ET`);
+  const rect = (x, yy, w, h, col) => ops.push(`${rgb(col)} rg ${x.toFixed(1)} ${yy.toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)} re f`);
+  const hline = (yy, col) => ops.push(`${rgb(col || [200, 195, 225])} RG 0.6 w ${M} ${yy.toFixed(1)} m ${W - M} ${yy.toFixed(1)} l S`);
+  const newPage = () => { ops = []; pages.push(ops); y = H - M; };
+  const need = h => { if (y - h < M + 24) newPage(); };
+  const INK = [27, 17, 64], GREY = [96, 88, 130], COL = { top: [31, 138, 58], mid: [190, 140, 0], low: [200, 80, 20], sin: [130, 124, 160] };
+  const h2 = s => { need(44); y -= 20; txt(M, y, s.toUpperCase(), 11, true, [20, 110, 160]); y -= 5; hline(y, [20, 110, 160]); y -= 8; };
+  const para = (s, sz, col, b, ind) => { wrap(s, sz, CW - (ind || 0), b).forEach(l => { need(sz + 4); y -= sz + 3; txt(M + (ind || 0), y, l, sz, b, col); }); };
+  newPage();
+  rect(0, H - 86, W, 86, INK); txt(M, H - 40, 'MateMonstruos · Liga del Teide', 20, true, [255, 255, 255]); txt(M, H - 62, 'Informe de actuación del alumnado', 13, false, [182, 255, 59]); txt(W - M - wd(r.date, 9, false), H - 62, r.date, 9, false, [255, 255, 255]);
+  y = H - 86 - 14; txt(M, y - 8, 'Alumno/a: ________________________________   Grupo: ____________   Docente: ____________________', 9, false, GREY); y -= 22;
+  // resumen en dos columnas
+  h2('Resumen de la partida');
+  const kv = [['Nivel', r.level], ['Modo', r.mode], ['Mundo', r.world], ['Resultado', r.result], ['Calificación', r.letter ? r.letter + ' · ' + r.title : '-'], ['Puntuación total', String(r.total)], ['Aciertos', `${r.okN}/${r.n} (${r.acc} %)`], ['Mejor racha', String(r.best)], ['Vidas al terminar', r.lives], ['Criaturas domadas', String(r.tamed)], ['Duración', r.mins + ' min'], ['Tiempo medio por respuesta', fmtS(r.secs) + ' s (límite ' + r.limit + ' s)'], ['Tiempos agotados', String(r.timeouts)], ['Poderes usados', String(r.powUsed)], ['Autoevaluación', r.feel]];
+  for (let i = 0; i < kv.length; i += 2) { need(18); y -= 14; [kv[i], kv[i + 1]].forEach((a, k) => { if (!a) return; const x = M + k * (CW / 2); txt(x, y, a[0] + ':', 8.5, false, GREY); const lw = wd(a[0] + ': ', 8.5, false); const v = wrap(a[1], 9.5, CW / 2 - lw - 8, true)[0] || ''; txt(x + lw + 2, y, v, 9.5, true); }); }
+  y -= 4;
+  const bars = list => list.forEach(a => {
+    const lines = wrap(a.name, 9, 330, false); need(lines.length * 12 + 8); y -= 13; lines.forEach((l, i) => { txt(M, y - i * 11, l, 9, false); }); const top = y; if (lines.length > 1) y -= (lines.length - 1) * 11;
+    const bx = M + 340, bw = 86; rect(bx, top - 1, bw, 8, [225, 222, 240]); if (a.x.n) rect(bx, top - 1, bw * a.x.p / 100, 8, COL[a.l[0]]); const tx = a.x.n ? `${a.x.p} % (${a.x.c}/${a.x.n})` : 'sin datos'; txt(bx + bw + 6, top, tx, 8, true, COL[a.l[0]]);
+    y -= 11; txt(bx, y + 1, a.l[1], 7.5, false, GREY); y -= 2;
+  });
+  h2('Sentidos matemáticos'); bars(r.sens);
+  h2('Criterios de evaluación (orientativo)'); bars(r.crit);
+  h2('Resultados por actividad');
+  need(20); y -= 12; ['Actividad', 'Aciertos', '%', 'Tiempo medio'].forEach((t, i) => txt(M + [0, 230, 300, 360][i], y, t, 8.5, true, GREY)); y -= 3; hline(y);
+  r.cats.forEach(c => { need(15); y -= 12; txt(M, y, c.name, 9.5, false); txt(M + 230, y, `${c.c}/${c.t}`, 9.5, true); txt(M + 300, y, c.p + ' %', 9.5, true, c.p >= 80 ? COL.top : c.p >= 60 ? COL.mid : COL.low); txt(M + 360, y, fmtS(c.avg) + ' s', 9.5, false); });
+  h2(`Errores y su explicación (${r.errors.length})`);
+  if (!r.errors.length) para('No ha habido errores en esta partida.', 10);
+  r.errors.slice(0, 40).forEach((e, i) => {
+    const q = wrap(`${i + 1}. [${e.cat ? Q.info(e.cat, S.cycle).name : ''}] ${e.text}`, 9.5, CW, true), a = wrap(`Respondió: ${e.chosen}   ·   Correcta: ${e.correct}`, 9, CW - 10, false), hnt = wrap('Explicación: ' + e.hint, 8.5, CW - 10, false);
+    need((q.length + a.length + hnt.length) * 12 + 8); q.forEach(l => { y -= 12; txt(M, y, l, 9.5, true); }); a.forEach(l => { y -= 11.5; txt(M + 10, y, l, 9, false, [160, 50, 30]); }); hnt.forEach(l => { y -= 11; txt(M + 10, y, l, 8.5, false, GREY); }); y -= 5;
+  });
+  if (r.errors.length > 40) para(`…y ${r.errors.length - 40} errores más.`, 9, GREY);
+  if (r.weak.length) { h2('Sugerencias de repaso'); para('Conviene reforzar: ' + r.weak.join(', ') + '. Se recomienda un duelo rápido de cada una de estas actividades.', 10); }
+  need(60); y -= 14; hline(y); para('Informe orientativo, basado solo en esta partida y en los criterios 2.1, 2.2, 4.1, 4.2 y 7.1 del Decreto 211/2022 (currículo de Educación Primaria de Canarias). La evaluación del alumnado corresponde al docente. No contiene datos personales: el nombre se escribe a mano.', 8.5, GREY);
+  // pies de página y ensamblado
+  const total = pages.length; pages.forEach((p, i) => { ops = p; txt(M, 24, 'MateMonstruos · Diseñado por David OZC · © David 2026 · CC BY-NC-ND 4.0 · Uso gratuito en centros educativos', 7, false, GREY); const t = `Página ${i + 1} de ${total}`; txt(W - M - wd(t, 7, false), 24, t, 7, false, GREY); });
+  const objs = ['<< /Type /Catalog /Pages 2 0 R >>', null, '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>', '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>'];
+  const kids = []; pages.forEach((p, i) => { const pid = 5 + i * 2, cid = 6 + i * 2; kids.push(pid + ' 0 R'); const stream = p.join('\n'); objs[pid - 1] = `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${cid} 0 R >>`; objs[cid - 1] = `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`; });
+  objs[1] = `<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${pages.length} >>`;
+  let pdf = '%PDF-1.4\n', offs = []; objs.forEach((o, i) => { offs.push(pdf.length); pdf += `${i + 1} 0 obj\n${o}\nendobj\n`; });
+  const xr = pdf.length; pdf += `xref\n0 ${objs.length + 1}\n0000000000 65535 f \n` + offs.map(o => String(o).padStart(10, '0') + ' 00000 n \n').join('') + `trailer\n<< /Size ${objs.length + 1} /Root 1 0 R >>\nstartxref\n${xr}\n%%EOF`;
+  return pdf;
+}
+function downloadPDF() {
+  if (!S || !S.log) return;
+  try {
+    const pdf = buildPDF(reportData()), bytes = new Uint8Array(pdf.length); for (let i = 0; i < pdf.length; i++) bytes[i] = pdf.charCodeAt(i) & 255;
+    const d = new Date(), pad = n => String(n).padStart(2, '0'), name = `informe-matemonstruos-${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.pdf`;
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+    live('Informe descargado');
+  } catch (e) { console.error(e); live('No se pudo generar el PDF'); }
+}
+
 function powersModal() {
   if (!S) return;
   const st = S.stats || {}, pct = (cats) => { let c = 0, t = 0; cats.forEach(k => { if (st[k]) { c += st[k].c; t += st[k].c + st[k].w; } }); return { n: t, p: t ? Math.round(100 * c / t) : 0 }; };
@@ -196,7 +297,7 @@ function teacherModal() {
   <p><b>Alcance:</b> es un recurso de práctica que trabaja una selección de los saberes. No sustituye la manipulación de materiales, el uso de la calculadora ni las investigaciones estadísticas propias del aula. Algunos saberes se tratan a un nivel inferior al del anexo (por ejemplo, decimales hasta las centésimas y sumas y restas hasta 100 en 1.º–2.º).</p>
   <p><b>Tiempo:</b> cada pregunta tiene un tiempo máximo (barra visible): 1 minuto en 1.º–2.º, 2 minutos en 3.º–4.º y 3 minutos en 5.º–6.º. Si se agota cuenta como fallo y se muestra la pista.</p>
   <p><b>Papel y boli:</b> al empezar el modo historia en 3.º–4.º y 5.º–6.º aparece un aviso que recomienda jugar con papel y bolígrafo. En esos ciclos se mezclan además preguntas muy fáciles (aprox. 1 de cada 3).</p>
-  <p><b>Superpoderes:</b> al terminar (o en game over) el botón «¡Descubre tus superpoderes!» muestra, con los datos de la partida, los sentidos y los criterios 2.1, 2.2, 4.1, 4.2 y 7.1 en los que va mejor y los que debe entrenar. Es orientativo y solo de esa partida: no sustituye la evaluación docente.</p><p><b>Poder:</b> la barra PODER se carga con los aciertos y elimina dos respuestas incorrectas, una vez por carga.</p>
+  <p><b>Superpoderes:</b> al terminar (o en game over) el botón «¡Descubre tus superpoderes!» muestra, con los datos de la partida, los sentidos y los criterios 2.1, 2.2, 4.1, 4.2 y 7.1 en los que va mejor y los que debe entrenar. Es orientativo y solo de esa partida: no sustituye la evaluación docente.</p><p><b>Informe del alumnado:</b> al terminar (o en game over) el botón «Informe del alumnado» muestra y permite <b>descargar en PDF</b> un informe de la partida: resumen, sentidos y criterios (orientativos), resultados y tiempo medio por actividad, y la lista de errores con su explicación. Incluye espacio para escribir a mano el nombre; el juego no guarda ni envía datos personales. El PDF se genera en el propio dispositivo.</p><p><b>Poder:</b> la barra PODER se carga con los aciertos y elimina dos respuestas incorrectas, una vez por carga.</p>
   <p>Las preguntas se generan al vuelo (decenas de miles de combinaciones) y no se repiten dentro de una sesión. No se recogen datos personales: solo se guardan en este navegador las puntuaciones y las criaturas domadas.</p>
   <button class="btn" data-first data-nav data-act="closemodal">Cerrar</button>`);
   const mb = document.querySelector('#modal .mbox'); if (mb) mb.classList.add('wide');
@@ -268,6 +369,8 @@ function act(a, v, el) {
     case 'story': if (P.cycle >= 2) paperModal(); else startRun('story', null); break;
     case 'feel': feel(+v); break;
     case 'powers': powersModal(); break;
+    case 'report': reportModal(); break;
+    case 'pdf': downloadPDF(); break;
     case 'gostory': closeModal(); startRun('story', null); break;
     case 'single': startRun('single', v); break;
     case 'dex': dexScreen(); break;
@@ -316,7 +419,7 @@ function buildPlan(mode, cat, cycle) {
 function startRun(mode, cat) {
   tok++; closeModal();
   const maxL = P.cycle === 1 ? 7 : P.cycle === 2 ? 6 : 5, plan = buildPlan(mode, cat, P.cycle);
-  S = { mode, cat, cycle: P.cycle, me: mkCr(P.cr), lives: maxL, maxLives: maxL, score: 0, streak: 0, best: 0, correct: 0, wrong: 0, answered: 0, stage: 1, plan, pi: -1, tamed: [], dyn: 0, bonus: { enc: 0, boss: 0 }, locked: true, paused: false, totalNeed: plan.reduce((s, e) => s + e.need, 0), limit: P.cycle === 1 ? 60 : P.cycle === 2 ? 120 : 180, pow: 0, powNeed: P.cycle === 3 ? 5 : 4, removed: new Set(), evo2: mode === 'story' ? 9 : 5, evo3: mode === 'story' ? 24 : 11, lastCat: '', stats: {} };
+  S = { mode, cat, cycle: P.cycle, me: mkCr(P.cr), lives: maxL, maxLives: maxL, score: 0, streak: 0, best: 0, correct: 0, wrong: 0, answered: 0, stage: 1, plan, pi: -1, tamed: [], dyn: 0, bonus: { enc: 0, boss: 0 }, locked: true, paused: false, totalNeed: plan.reduce((s, e) => s + e.need, 0), limit: P.cycle === 1 ? 60 : P.cycle === 2 ? 120 : 180, log: [], powUsed: 0, t0: Date.now(), pow: 0, powNeed: P.cycle === 3 ? 5 : 4, removed: new Set(), evo2: mode === 'story' ? 9 : 5, evo3: mode === 'story' ? 24 : 11, lastCat: '', stats: {} };
   curTrack = ''; UI.audioOn && musicFor('battle');
   renderBattle();
   run().catch(e => { if (e !== CANCEL) { console.error(e); } });
@@ -357,7 +460,7 @@ function usePower() {
   const wrong = S.q.answers.map((_, i) => i).filter(i => i !== S.q.correct), n = Math.min(2, S.q.answers.length - 2);
   R.shuffle(wrong).slice(0, n).forEach(i => S.removed.add(i));
   document.querySelectorAll('.ans').forEach(b => { if (S.removed.has(+b.dataset.i)) { b.classList.add('gone'); b.disabled = true; const r = b.getBoundingClientRect(); FX.burst(r.left + r.width / 2, r.top + r.height / 2, ['#fff', '#2de2ff', '#b6ff3b'], 22, 7); } });
-  S.pow = 0; sfx('evolve'); floatText('¡Dos fuera!', $('qcard'), '#2de2ff'); live('Se han eliminado dos respuestas'); setPower();
+  S.pow = 0; S.powUsed++; sfx('evolve'); floatText('¡Dos fuera!', $('qcard'), '#2de2ff'); live('Se han eliminado dos respuestas'); setPower();
 }
 const mult = () => 1 + Math.min(4, Math.floor(S.streak / 3));
 function setMe(mood) {
@@ -477,6 +580,7 @@ async function answer(i) {
   const now = performance.now(); if (now - lastAnsAt < 250) return; lastAnsAt = now;
   clearInterval(timerId); S.locked = true; setPower(); const q = S.q, ok = i === q.correct, btns = [...document.querySelectorAll('.ans')];
   const secs = (now - S.tq) / 1000; S.answered++;
+  S.log.push({ cat: q.cat, ok, secs: Math.min(secs, 600), timeout: i < 0, text: plainText(q.text) + (q.visual && !/seq|duo/.test(q.visual) ? ' [figura]' : q.visual ? ' [ver figura]' : ''), chosen: i >= 0 ? plainText(q.answers[i]) : '(tiempo agotado)', correct: plainText(q.answers[q.correct]), hint: plainText(q.hint) });
   if (S.lastWrong) { S.aw = (S.aw || 0) + 1; if (ok) S.rc = (S.rc || 0) + 1; } S.lastWrong = !ok;
   const st = S.stats[q.cat] = S.stats[q.cat] || { c: 0, w: 0 }; ok ? st.c++ : st.w++;
   const my = tok;
@@ -562,7 +666,7 @@ function rate(done) {
   return S.correct / S.totalNeed >= .6 ? ['C', 2, 'Aprendiz en Camino'] : ['D', 1, 'Cría con Mucho Futuro'];
 }
 function finish(done) {
-  tok++; const my = tok; AU.stopMusic(); curTrack = '';
+  tok++; const my = tok; AU.stopMusic(); curTrack = ''; S.t1 = Date.now();
   const [letter, stars, title] = rate(done), livesB = done ? S.lives * 300 : 0, compB = done ? 1000 : 0, total = S.score + livesB + compB;
   const key = S.cycle + '|' + (S.mode === 'story' ? 'story' : S.cat), prev = SAVE.best[key], isBest = !prev || total > prev.score;
   if (isBest) SAVE.best[key] = { score: total, letter }; save();
@@ -575,8 +679,9 @@ function finish(done) {
   <div class="stats"><div><span>Aciertos</span><b>${S.correct}/${S.answered}</b></div><div><span>Precisión</span><b>${acc}%</b></div><div><span>Mejor racha</span><b>${S.best}</b></div><div><span>Vidas</span><b>${S.lives}/${S.maxLives}</b></div><div><span>Puntos de combate</span><b>${(S.score - S.bonus.enc - S.bonus.boss).toLocaleString('es-ES')}</b></div><div><span>Criaturas y jefes</span><b>+${S.bonus.enc + S.bonus.boss}</b></div>${done ? `<div><span>Corazones</span><b>+${livesB}</b></div><div><span>Misión</span><b>+${compB}</b></div>` : ''}<div class="tot"><span>TOTAL ${isBest ? '<span class="newb">¡RÉCORD!</span>' : ''}</span><b>${total.toLocaleString('es-ES')}</b></div></div>
   ${S.tamed.length ? `<div class="minipets">${S.tamed.map((t, i) => `<div title="${t.cr.name}">${C.svg(t.cr, { mood: 'happy', uid: 'r' + i })}</div>`).join('')}</div>` : ''}
   <div class="feelbox"><span class="chip">¿Cómo te has sentido con los retos?</span><div class="row">${[['Con confianza', 1, '#b6ff3b', 'M26 34q10 10 20 0'], ['Más o menos', 2, '#ffd23f', 'M26 38h20'], ['Con dudas', 3, '#ff9f43', 'M26 40q10-9 20 0']].map(f => `<button class="face" data-nav data-act="feel" data-v="${f[1]}" aria-label="${f[0]}"><svg viewBox="0 0 72 72"><circle cx="36" cy="36" r="30" fill="${f[2]}" stroke="#1b1140" stroke-width="4"/><circle cx="26" cy="29" r="4" fill="#1b1140"/><circle cx="46" cy="29" r="4" fill="#1b1140"/><path d="${f[3]}" fill="none" stroke="#1b1140" stroke-width="4" stroke-linecap="round"/></svg><span>${f[0]}</span></button>`).join('')}</div><p class="s" id="feelmsg" aria-live="polite"></p></div>
-  <div class="row"><button class="btn" data-nav data-first data-act="again">Jugar otra vez</button><button class="btn pink" data-nav data-act="powers">¡Descubre tus superpoderes!</button><button class="btn cyan" data-nav data-act="menu">Cambiar modo</button><button class="btn ghost" data-nav data-act="home">Inicio</button></div>`, { noFocus: false });
+  <div class="row"><button class="btn sm" data-nav data-first data-act="again">Jugar otra vez</button><button class="btn pink sm" data-nav data-act="powers">¡Descubre tus superpoderes!</button><button class="btn violet sm" data-nav data-act="report">Informe del alumnado</button><button class="btn cyan sm" data-nav data-act="menu">Cambiar modo</button><button class="btn ghost sm" data-nav data-act="home">Inicio</button></div>`, { noFocus: false });
   live(`Calificación ${letter}. ${title}. ${S.correct} aciertos de ${S.answered}. Total ${total} puntos`);
+  S.final = { letter, total, title, done };
   window.__last = { letter, total, acc, done, stats: S.stats };
   setTimeout(() => { UI.audioOn && AU.startMusic('menu', P.world); curTrack = 'menu' + P.world; }, 2600);
   S.ended = true;
