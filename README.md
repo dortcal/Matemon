@@ -2,7 +2,7 @@
 
 Juego educativo de matemáticas para Primaria. Se juega en el navegador (sin instalación ni conexión) con **teclado, pantalla táctil o Makey Makey**. Ambientado en un universo de criaturas originales: elige tu huevo, doma criaturas, vence a los jefes y consigue la mejor calificación.
 
-▶ **Jugar:** abre `index.html` o la página de GitHub Pages del repositorio (`https://dortcal.github.io/matemon/`, una vez activada en Settings → Pages).
+▶ **Jugar:** abre `index.html` o la página de GitHub Pages del repositorio (`https://dortcal.github.io/Matemon/`, una vez activada en Settings → Pages).
 
 ## Contenidos por nivel
 | Nivel | Curso | Contenidos |
