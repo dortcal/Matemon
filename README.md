@@ -11,7 +11,9 @@ Juego educativo de matemáticas para Primaria. Se juega en el navegador (sin ins
 | Domador Rayo | 3.º–4.º | Tablas, divisiones, fracciones sencillas, polígonos, áreas en cuadrícula y perímetro |
 | Maestro Volcán | 5.º–6.º | Decimales, fracciones, ángulos, triángulos, áreas de triángulo y figuras compuestas |
 
-Tiempo máximo por pregunta: **1 minuto** en 1.º–2.º y 3.º–4.º y **2 minutos** en 5.º–6.º. Los dos primeros ciclos tienen además más corazones y dificultad más suave. Modos: **Historia** (todos los retos, 2 jefes y jefe final) y **Duelo rápido** por categoría. Las preguntas se generan al vuelo y no se repiten en la sesión. La vinculación con el currículo de Canarias es una propuesta pendiente de contrastar.
+Tiempo máximo por pregunta: **1 minuto** en 1.º–2.º y 3.º–4.º y **3 minutos** en 5.º–6.º. Los dos primeros ciclos tienen además más corazones y dificultad más suave. Modos: **Historia** (todos los retos, 2 jefes y jefe final) y **Duelo rápido** por categoría. Las preguntas se generan al vuelo y no se repiten en la sesión. La vinculación con el currículo de Canarias es una propuesta pendiente de contrastar.
+
+**Papel y boli:** al empezar el modo historia en 3.º–4.º y 5.º–6.º aparece un aviso divertido que recomienda jugar con papel y bolígrafo. En esos ciclos se mezclan además preguntas muy fáciles (aprox. 1 de cada 3) para que casi todo el alumnado pueda acertarlas.
 
 **Poder:** cada acierto carga la barra PODER; cuando está llena, **Espacio** elimina dos respuestas incorrectas (una vez por carga, no en todas las preguntas).
 

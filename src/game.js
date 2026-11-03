@@ -146,13 +146,20 @@ function helpModal() {
   <p><b>Makey Makey:</b> conecta ↑ ← → ↓ y ESPACIO a cinco objetos conductores (plastilina, fruta, papel de aluminio…) y la tierra a tu mano. También sirve tocar la pantalla.</p>
   <button class="btn" data-first data-nav data-act="closemodal">¡Entendido!</button>`);
 }
+function paperModal() {
+  modal(`<h3>¡Alto ahí, entrenador!</h3>
+  <p>Los monstruos de la Liga son muy listos, pero tienen un punto débil: <b>¡no soportan que hagas las cuentas con calma!</b></p>
+  <p>Así que te recomendamos jugar con <b>un papel y un bolígrafo (o un lápiz, que también vale)</b> para hacer las operaciones antes de contestar. Tu cerebro lo agradecerá, los números grandes dejarán de ponerse nerviosos y tus criaturas presumirán de ti.</p>
+  <p>Eso sí: el papel no hace magia solo, ¡la magia eres tú!</p>
+  <div class="row"><button class="btn" data-first data-nav data-act="gostory">¡Ya tengo papel y boli!</button><button class="btn ghost" data-nav data-act="closemodal">Volver</button></div>`);
+}
 function teacherModal() {
   modal(`<h3>Para docentes</h3><p>Contenidos por nivel (propuesta del juego, <b>pendiente de contrastar con el currículo oficial de Canarias</b> de cada centro):</p>
   <table><tr><th>Nivel</th><th>Contenidos</th></tr>
   <tr><td>Cría Chispa<br>1.º–2.º</td><td>Sumas y restas (hasta 100), huecos y problemas · secuencias de figuras y de 1 en 1, 2, 5, 10 · mayor/menor y signos &lt; &gt; = (hasta 999) · figuras planas y cuerpos geométricos · contar cuadraditos de superficie. <b>Sin tablas, divisiones ni fracciones.</b></td></tr>
   <tr><td>Domador Rayo<br>3.º–4.º</td><td>Sumas y restas hasta 9.999 y problemas · tablas del 2 al 10 · divisiones exactas y con resto · secuencias · fracciones sencillas (leer, fracción de una cantidad, comparar) · comparar números y operaciones · polígonos, cuerpos, ángulos rectos, paralelas · áreas en cuadrícula y perímetro.</td></tr>
   <tr><td>Maestro Volcán<br>5.º–6.º</td><td>Cálculo hasta 999.999 y decimales · multiplicar por 2 cifras, ×10/100/1000 · divisiones con resto y prueba · series geométricas · fracciones (equivalentes, suma, simplificar, decimal, %) · decimales · ángulos, triángulos, círculo · áreas de rectángulo, triángulo, paralelogramo y figuras compuestas.</td></tr></table>
-  <p><b>Tiempo:</b> en 1.º–2.º y 3.º–4.º cada pregunta tiene un máximo de 1 minuto y en 5.º–6.º de 2 minutos (barra visible); si se agota cuenta como fallo y se muestra la pista. Estos dos primeros ciclos también tienen más corazones y una subida de dificultad más suave.</p><p><b>Poder:</b> la barra PODER se carga con los aciertos (4 en 1.º–4.º, 5 en 5.º–6.º) y permite eliminar dos respuestas incorrectas en una pregunta, una vez por carga.</p><p>Las preguntas se generan al vuelo (decenas de miles de combinaciones) y no se repiten dentro de una sesión. Ante un fallo se muestra una pista con el cálculo resuelto. No se recogen datos personales: solo se guardan en este navegador las puntuaciones y las criaturas domadas.</p>
+  <p><b>Tiempo:</b> en 1.º–2.º y 3.º–4.º cada pregunta tiene un máximo de 1 minuto y en 5.º–6.º de 3 minutos (barra visible); si se agota cuenta como fallo y se muestra la pista. Estos dos primeros ciclos también tienen más corazones y una subida de dificultad más suave.</p><p><b>Poder:</b> la barra PODER se carga con los aciertos (4 en 1.º–4.º, 5 en 5.º–6.º) y permite eliminar dos respuestas incorrectas en una pregunta, una vez por carga.</p><p><b>Papel y boli:</b> al empezar el modo historia en 3.º–4.º y 5.º–6.º aparece un aviso divertido que recomienda jugar con papel y bolígrafo para hacer las operaciones. En esos dos ciclos se mezclan además preguntas muy fáciles (aprox. una de cada tres) para que casi todo el alumnado pueda acertarlas.</p><p>Las preguntas se generan al vuelo (decenas de miles de combinaciones) y no se repiten dentro de una sesión. Ante un fallo se muestra una pista con el cálculo resuelto. No se recogen datos personales: solo se guardan en este navegador las puntuaciones y las criaturas domadas.</p>
   <button class="btn" data-first data-nav data-act="closemodal">Cerrar</button>`);
 }
 
@@ -219,7 +226,8 @@ function act(a, v, el) {
     case 'egg': hatch(+v); break;
     case 'reroll': eggScreen(); break;
     case 'accept': sfx('select'); modeScreen(); break;
-    case 'story': startRun('story', null); break;
+    case 'story': if (P.cycle >= 2) paperModal(); else startRun('story', null); break;
+    case 'gostory': closeModal(); startRun('story', null); break;
     case 'single': startRun('single', v); break;
     case 'dex': dexScreen(); break;
     case 'help': helpModal(); break;
@@ -260,7 +268,7 @@ function buildPlan(mode, cat, cycle) {
 function startRun(mode, cat) {
   tok++; closeModal();
   const maxL = P.cycle === 1 ? 7 : P.cycle === 2 ? 6 : 5, plan = buildPlan(mode, cat, P.cycle);
-  S = { mode, cat, cycle: P.cycle, me: mkCr(P.cr), lives: maxL, maxLives: maxL, score: 0, streak: 0, best: 0, correct: 0, wrong: 0, answered: 0, stage: 1, plan, pi: -1, tamed: [], dyn: 0, bonus: { enc: 0, boss: 0 }, locked: true, paused: false, totalNeed: plan.reduce((s, e) => s + e.need, 0), limit: P.cycle <= 2 ? 60 : 120, pow: 0, powNeed: P.cycle === 3 ? 5 : 4, removed: new Set(), evo2: mode === 'story' ? 9 : 5, evo3: mode === 'story' ? 24 : 11, lastCat: '', stats: {} };
+  S = { mode, cat, cycle: P.cycle, me: mkCr(P.cr), lives: maxL, maxLives: maxL, score: 0, streak: 0, best: 0, correct: 0, wrong: 0, answered: 0, stage: 1, plan, pi: -1, tamed: [], dyn: 0, bonus: { enc: 0, boss: 0 }, locked: true, paused: false, totalNeed: plan.reduce((s, e) => s + e.need, 0), limit: P.cycle <= 2 ? 60 : 180, pow: 0, powNeed: P.cycle === 3 ? 5 : 4, removed: new Set(), evo2: mode === 'story' ? 9 : 5, evo3: mode === 'story' ? 24 : 11, lastCat: '', stats: {} };
   curTrack = ''; UI.audioOn && musicFor('battle');
   renderBattle();
   run().catch(e => { if (e !== CANCEL) { console.error(e); } });

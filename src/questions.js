@@ -446,7 +446,7 @@ function geometria(c, d) {
     if (form === 'name2d') { const i = R.int(0, 3); return build({ cat: 'geometria', text: '¿Cómo se llama esta figura?', visual: shape2d(k2[i]), correct: n2[i], wrong: n2.filter((_, j) => j !== i), hint: `Es un ${n2[i]}`, key: 'g1n|' + i + Math.random(), big: false }); }
     if (form === 'sides') { const i = R.int(0, 3), lados = [0, 4, 3, 4][i]; return build({ cat: 'geometria', text: '¿Cuántos lados tiene?', visual: shape2d(k2[i]), correct: String(lados), wrong: ['0', '1', '2', '3', '4', '5'], hint: `El ${n2[i]} ${lados ? 'tiene ' + lados + ' lados' : 'no tiene lados rectos'}`, key: 'g1s|' + i + Math.random() }); }
     if (form === 'name3d') { const i = R.int(0, 3); return build({ cat: 'geometria', text: '¿Qué cuerpo geométrico es?', visual: solid(n3[i]), correct: n3[i], wrong: n3.filter((_, j) => j !== i), hint: `Es ${i === 1 ? 'un' : i === 0 ? 'una' : 'un'} ${n3[i]}`, key: 'g1c|' + i + Math.random() }); }
-    if (form === 'real') { const t = R.pick([['una pelota', 'esfera'], ['un dado', 'cubo'], ['un cucurucho de helado', 'cono'], ['una lata de atún', 'cilindro'], ['una caja de zapatos', 'cubo'], ['un gorro de cumpleaños', 'cono']]); return build({ cat: 'geometria', text: `¿Qué cuerpo geométrico se parece a ${t[0]}?`, correct: t[1], wrong: n3.filter(x => x !== t[1]), hint: `${t[0]} se parece a un ${t[1]}`, key: 'g1r|' + t[0] }); }
+    if (form === 'real') { const t = R.pick([['una pelota', 'esfera'], ['un dado', 'cubo'], ['un cucurucho de helado', 'cono'], ['una lata de atún', 'cilindro'], ['una caja de zapatos', 'cubo'], ['un gorro de cumpleaños', 'cono']]); return build({ cat: 'geometria', text: `¿Qué cuerpo geométrico se parece a ${t[0]}?`, correct: t[1], wrong: n3.filter(x => x !== t[1]), hint: `${t[0]} se parece a ${t[1] === 'esfera' ? 'una' : 'un'} ${t[1]}`, key: 'g1r|' + t[0] }); }
     if (form === 'find2d') { const i = R.int(0, 3), cols = R.shuffle(TCOL); return build({ cat: 'geometria', text: `Busca el ${n2[i].toUpperCase()}`, correct: shape2d(k2[i], cols[0]), wrong: k2.filter((_, j) => j !== i).map((k, j) => shape2d(k, cols[j + 1])), hint: `El ${n2[i]} es la figura correcta`, big: true, key: 'g1f|' + i + Math.random() }); }
     const i = R.int(0, 3); return build({ cat: 'geometria', text: `Busca ${i === 0 ? 'la' : 'el'} ${n3[i].toUpperCase()}`, correct: solid(n3[i]), wrong: n3.filter((_, j) => j !== i).map(solid), hint: `${i === 0 ? 'La' : 'El'} ${n3[i]} es la correcta`, big: true, key: 'g1f3|' + i + Math.random() });
   }
@@ -575,13 +575,66 @@ const INFO = {
   geometria: { name: 'Geometría', color: '#4d8dff', boss: 'Arquitecto Prisma' },
   areas: { name: 'Áreas', color: '#ff8fb8', boss: 'Gigante Cuadrícula' }
 };
+
+/* ---------- PREGUNTAS MUY FÁCILES (ciclos 2 y 3): se mezclan para que casi todo el alumnado pueda acertarlas ---------- */
+const EASY_P = 0.34;
+const EASY = {
+  sumres(c) {
+    const k = R.pick(['tens', 'small', 'dbl', 'sub', 'miss']);
+    let a, b, ans, text, hint;
+    if (k === 'tens') { const m = c === 2 ? 10 : 100; a = R.int(1, 9) * m; b = R.int(1, 9) * m; ans = a + b; text = `${N(a)} + ${N(b)} = ?`; hint = `${a / m} + ${b / m} = ${ans / m}, así que ${N(a)} + ${N(b)} = ${N(ans)}`; }
+    else if (k === 'small') { if (c === 2) { a = R.int(1, 8) * 10 + R.int(0, 5); b = R.int(1, 9 - (a % 10)); } else { a = R.int(2, 9) * 100 + R.int(1, 5) * 10; b = R.int(1, 4) * 10; } ans = a + b; text = `${N(a)} + ${N(b)} = ?`; hint = `${N(a)} + ${N(b)} = ${N(ans)}`; }
+    else if (k === 'dbl') { a = c === 2 ? R.int(2, 25) : R.int(10, 250); ans = a * 2; text = `¿Cuál es el doble de ${N(a)}?`; hint = `${N(a)} + ${N(a)} = ${N(ans)}`; }
+    else if (k === 'sub') { if (c === 2) { a = R.int(2, 9) * 10 + R.int(5, 9); b = R.int(1, 5); } else { a = R.int(3, 10) * 100; b = R.int(1, a / 100 - 1) * 100; } ans = a - b; text = `${N(a)} − ${N(b)} = ?`; hint = `${N(a)} − ${N(b)} = ${N(ans)}`; }
+    else { const m = c === 2 ? 10 : 100; a = R.int(1, 8) * m; b = R.int(1, 9 - a / m) * m; ans = b; text = `${N(a)} + ${BLANK} = ${N(a + b)}`; hint = `Lo que falta: ${N(a + b)} − ${N(a)} = ${N(b)}`; }
+    return build({ cat: 'sumres', text, correct: N(ans), wrong: numWrong(ans, [ans + 10, ans - 10]), hint, key: 'e|' + text });
+  },
+  tablas(c) {
+    const t = R.pick(c === 2 ? [1, 2, 5, 10, 10] : [10, 100, 2, 5]), a = R.int(2, c === 2 ? 10 : 12), p = a * t;
+    if (t <= 10 && R.chance(.4)) return build({ cat: 'tablas', text: `${a} × ${BLANK} = ${N(p)}`, correct: N(t), wrong: numWrong(t, [a, p / 10 | 0]), hint: `${N(p)} ÷ ${a} = ${t}`, key: 'e|tm' + a + 'x' + t });
+    return build({ cat: 'tablas', text: `${a} × ${N(t)} = ?`, correct: N(p), wrong: numWrong(p, [a + t, a * (t + 1)]), hint: t === 10 || t === 100 ? `Por ${t}: añade ${t === 10 ? 'un cero' : 'dos ceros'} → ${N(p)}` : t === 1 ? `Por 1 el número no cambia: ${p}` : `${a} × ${t} = ${p}`, key: 'e|t' + a + 'x' + t });
+  },
+  divisiones(c) {
+    const d = R.pick(c === 2 ? [1, 2, 5, 10] : [2, 5, 10]), q = R.int(2, c === 2 ? 10 : 20), n = d * q;
+    if (R.chance(.4)) return build({ cat: 'divisiones', text: `${BLANK} ÷ ${d} = ${q}`, correct: N(n), wrong: numWrong(n, [q + d, d * (q + 1)]), hint: `${q} × ${d} = ${n}`, key: 'e|dm' + n + 'd' + d });
+    return build({ cat: 'divisiones', text: `${n} ÷ ${d} = ?`, correct: N(q), wrong: numWrong(q, [d, q + d]), hint: `${d} × ${q} = ${n}, así que ${n} ÷ ${d} = ${q}`, key: 'e|d' + n + 'd' + d });
+  },
+  secuencias(c) {
+    if (R.chance(.4)) { const q = seqShape(1, 0); if (q) { q.key = 'e|' + q.key; return q; } }
+    const st = R.pick(c === 2 ? [1, 2, 10] : [5, 10, 100, 2]), s = R.int(0, 6) * (st >= 10 ? 1 : 1), seq = []; const start = c === 2 ? R.int(0, 20) : R.int(0, 9) * st;
+    for (let i = 0; i < 5; i++) seq.push(start + st * i);
+    const bi = R.int(1, 4), ans = seq[bi];
+    return build({ cat: 'secuencias', text: '¿Qué número falta en la secuencia?', visual: seqBox(seq, bi), correct: N(ans), wrong: numWrong(ans, [ans + st, ans - st, ans + 2 * st]), hint: `Cada número sube de ${N(st)} en ${N(st)}`, key: 'e|s' + seq.join(',') + bi });
+  },
+  comparar(c) {
+    const isMax = R.chance(.5), lens = c === 2 ? [[1, 9], [10, 99], [100, 999], [1000, 9999]] : [[100, 999], [1000, 9999], [10000, 99999], [100000, 999999]];
+    const arr = lens.map(l => R.int(l[0], l[1])), ans = isMax ? Math.max(...arr) : Math.min(...arr);
+    return build({ cat: 'comparar', text: `¿Cuál es el número ${isMax ? 'MAYOR' : 'MENOR'}?`, correct: N(ans), wrong: arr.filter(v => v !== ans).map(N), hint: `Cuantas más cifras tiene un número, mayor es. ${isMax ? 'Mayor' : 'Menor'}: ${N(ans)}`, key: 'e|c' + arr.join(',') + isMax });
+  },
+  fracciones(c) {
+    const k = R.pick(['read', 'half', 'quarter', 'tenth']);
+    if (k === 'read') { const n = R.pick([2, 3, 4]), kk = n === 2 ? 1 : R.pick(n === 3 ? [1, 2] : [1, 2, 3]); const v = R.pick([pie, bar]); return build({ cat: 'fracciones', text: '¿Qué fracción está pintada?', visual: v(n, kk), correct: F(kk, n), wrong: [F(n - kk, n), F(kk, n + 1), F(kk + 1, n), F(n, kk)], hint: `Hay ${n} partes iguales y ${kk} están pintadas: ${kk}/${n}`, big: true, key: 'e|fr' + n + kk + (v === pie ? 'p' : 'b') }); }
+    const q = k === 'half' ? 2 : k === 'quarter' ? 4 : 10, u = R.int(2, c === 2 ? 5 : 12), tot = q * u;
+    return build({ cat: 'fracciones', text: `¿Cuánto es ${F(1, q)} de ${tot}?`, correct: N(u), wrong: numWrong(u, [tot - u, tot / 2 | 0]), hint: `Divide entre ${q}: ${tot} ÷ ${q} = ${u}`, key: 'e|fo' + q + tot });
+  },
+  geometria(c) {
+    if (c === 3 && R.chance(.5)) { const deg = R.pick([90, 30, 45, 60, 120, 180]), type = deg < 90 ? 'agudo' : deg === 90 ? 'recto' : deg < 180 ? 'obtuso' : 'llano'; return build({ cat: 'geometria', text: `Este ángulo mide ${deg}°. ¿Qué tipo de ángulo es?`, visual: deg === 180 ? svg('0 0 120 110', `<line x1="14" y1="80" x2="106" y2="80" ${STW}/><circle cx="60" cy="80" r="4" fill="#ff3d9a"/>`, 'fig') : angleSvg(deg), correct: type, wrong: ['agudo', 'recto', 'obtuso', 'llano'].filter(x => x !== type), hint: 'Agudo < 90°, recto = 90°, obtuso entre 90° y 180°, llano = 180°', key: 'e|g3a' + deg }); }
+    const q = geometria(1, R.pick([0, .2, .4])); if (q) q.key = 'e|' + q.key; return q;
+  },
+  areas(c) {
+    if (c === 2) { const q = areas(1, R.pick([0, .1, .3])); if (q) q.key = 'e|' + q.key; return q; }
+    const l = R.int(2, 6), w = R.int(2, 6), sq = R.chance(.4);
+    return build({ cat: 'areas', text: sq ? `Un cuadrado tiene lados de ${l} cm. ¿Cuál es su área?` : `Un rectángulo mide ${l} cm de largo y ${w} cm de ancho. ¿Cuál es su área?`, correct: `${sq ? l * l : l * w} cm²`, wrong: [sq ? 4 * l : 2 * (l + w), sq ? 2 * l : l + w, (sq ? l * l : l * w) + 2, (sq ? l * l : l * w) - 2, (sq ? l * l : l * w) + l].filter(x => x > 0 && x !== (sq ? l * l : l * w)).map(x => x + ' cm²'), hint: sq ? `Área = lado × lado = ${l} × ${l} = ${l * l} cm²` : `Área = largo × ancho = ${l} × ${w} = ${l * w} cm²`, key: 'e|a3' + sq + l + w });
+  }
+};
+
 const seen = new Set();
 function generate(cat, cycle, d) {
   d = Math.max(0, Math.min(1, d));
   let last = null;
   for (let i = 0; i < 60; i++) {
     let q = null;
-    try { q = GEN[cat](cycle, d); } catch (e) { q = null; }
+    try { q = (cycle >= 2 && Math.random() < EASY_P) ? EASY[cat](cycle) : GEN[cat](cycle, d); } catch (e) { q = null; }
     if (!q) continue;
     last = q;
     if (!seen.has(q.key)) { seen.add(q.key); return q; }
@@ -592,6 +645,6 @@ G.Q = {
   generate, resetSeen: () => seen.clear(),
   cats: c => BYCYCLE[c].slice(),
   info: (cat, cycle) => { const o = Object.assign({}, INFO[cat]); if (cat === 'areas' && cycle === 1) { o.name = 'Cuadraditos'; o.boss = 'Gigante Cuadrícula'; } return o; },
-  _R: R
+  _R: R, _EASY: EASY
 };
 })(typeof window !== 'undefined' ? window : globalThis);
