@@ -364,7 +364,7 @@ function setMe(mood) {
   const inner = $('me').querySelector('.inner'); inner.className = 'inner bob';
   $('me').style.height = ({ 1: '72%', 2: '80%', 3: '88%' })[S.stage] || '';
   inner.innerHTML = C.svg(S.me, { mood: mood || 'idle', stage: S.stage, uid: 'me' });
-  $('mplate').innerHTML = `<div class="pn"><span>${S.me.name}</span><span class="pe">Nv ${S.stage}</span></div><div class="hp" style="height:.55rem"><i style="width:${Math.min(100, (S.correct / S.totalNeed) * 100)}%;background:linear-gradient(180deg,#8be9ff,#2d9bff)"></i></div>`;
+  $('mplate').innerHTML = `<div class="pn"><span>${S.me.name}</span><span class="pe">Nv ${S.stage}</span></div>`;
 }
 function setFoe(mood, plate) {
   const e = S.enc, foe = $('foe'), inner = foe.querySelector('.inner');

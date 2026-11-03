@@ -384,6 +384,20 @@ sup{font-size:.6em;line-height:0}
 @media (max-aspect-ratio:1/1){:root{--sq:min(calc((100vw - 3.4rem)/2),clamp(4.6rem,15vh,9rem))}.arena{flex:0 0 34%}.qpanel{flex:1 1 0;margin-top:0}}
 @media (max-height:560px){.arena{flex:0 0 31%}}
 @media (max-aspect-ratio:1/1){:root{--sq:min(calc((100vw - 3.4rem)/2),clamp(4.6rem,13vh,8.5rem))}.arena{flex:0 0 28%}}
+
+/* ---- cada placa junto a su criatura: la del rival a su lado (derecha), la mía al mío (izquierda) ---- */
+.arena{container-type:size}
+.me{left:2%}.foe{right:2%}
+.fplate{left:auto;right:24%;top:5%;bottom:auto;width:min(15rem,24%)}
+.mplate{right:auto;left:24%;bottom:14%;top:auto;width:min(15rem,24%)}
+.fplate{right:calc(2% + 78cqh + .6rem)}
+.mplate{left:calc(2% + 88cqh + .6rem)}
+@media (max-aspect-ratio:1/1){
+  .fplate{left:auto;right:2%;top:61%;bottom:auto;width:48%}
+  .mplate{right:auto;left:2%;bottom:3%;top:auto;width:48%}
+  .foe{top:2%!important;bottom:auto;right:3%;height:56%!important}
+  .me{left:3%;top:6%;bottom:auto;height:56%!important}
+}
 </style>
 </head>
 <body>
@@ -2153,7 +2167,7 @@ function setMe(mood) {
   const inner = $('me').querySelector('.inner'); inner.className = 'inner bob';
   $('me').style.height = ({ 1: '72%', 2: '80%', 3: '88%' })[S.stage] || '';
   inner.innerHTML = C.svg(S.me, { mood: mood || 'idle', stage: S.stage, uid: 'me' });
-  $('mplate').innerHTML = `<div class="pn"><span>${S.me.name}</span><span class="pe">Nv ${S.stage}</span></div><div class="hp" style="height:.55rem"><i style="width:${Math.min(100, (S.correct / S.totalNeed) * 100)}%;background:linear-gradient(180deg,#8be9ff,#2d9bff)"></i></div>`;
+  $('mplate').innerHTML = `<div class="pn"><span>${S.me.name}</span><span class="pe">Nv ${S.stage}</span></div>`;
 }
 function setFoe(mood, plate) {
   const e = S.enc, foe = $('foe'), inner = foe.querySelector('.inner');
