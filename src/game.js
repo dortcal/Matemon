@@ -139,7 +139,8 @@ function modal(html) {
   closeModal();
   const m = document.createElement('div'); m.className = 'modal'; m.id = 'modal'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true');
   m.innerHTML = `<div class="mbox">${html}</div>`; document.getElementById('app').appendChild(m);
-  const f = m.querySelector('[data-first]'); if (f) f.focus();
+  const f = m.querySelector('[data-first]'); if (f) f.focus({ preventScroll: true });
+  const mb = m.querySelector('.mbox'); if (mb) mb.scrollTop = 0;
 }
 function closeModal() { const m = document.getElementById('modal'); if (m) m.remove(); }
 const modalOpen = () => !!document.getElementById('modal');
@@ -159,21 +160,22 @@ function paperModal() {
 }
 function teacherModal() {
   modal(`<h3>Para docentes</h3>
-  <p>El juego trabaja los <b>seis sentidos matemáticos</b> del currículo LOMLOE (estructura de saberes básicos de Matemáticas en Primaria):</p>
-  <table><tr><th>Sentido</th><th>Dónde se trabaja en el juego</th></tr>
-  <tr><td>Numérico</td><td>Sumas y restas (con problemas de la vida diaria), tablas, divisiones, fracciones, mayor y menor, decimales y porcentajes en 5.º–6.º.</td></tr>
-  <tr><td>De la medida</td><td>Medidas (reloj y horas, comparar longitud, peso, capacidad y tiempo, euros, unidades y conversiones, estimar la unidad adecuada, volumen en 5.º–6.º) y Áreas (superficie y perímetro).</td></tr>
-  <tr><td>Espacial</td><td>Geometría: figuras planas y cuerpos, polígonos, ángulos, ejes de simetría, giros y localización en cuadrículas y coordenadas.</td></tr>
-  <tr><td>Algebraico y pensamiento computacional</td><td>Secuencias y algoritmos: patrones, series, ecuaciones sencillas, máquinas de números, condicionales («si… entonces»), robot que sigue flechas y bucles («repite»).</td></tr>
-  <tr><td>Estocástico</td><td>Datos y azar: pictogramas, gráficos de barras, moda, media, seguro/posible/imposible y probabilidad.</td></tr>
-  <tr><td>Socioafectivo</td><td>Mensajes de ánimo ante el error, pistas que explican (no solo «mal»), tiempo amplio y poder de ayuda, autoevaluación emocional al final, <b>Modo equipo</b> con roles que rotan, nombres y personajes diversos y lenguaje inclusivo.</td></tr></table>
-  <p><b>Por ciclos:</b> 1.º–2.º sin tablas, divisiones ni fracciones; 3.º–4.º añade tablas, divisiones, fracciones sencillas y áreas en cuadrícula; 5.º–6.º, decimales, ángulos, áreas de triángulo, probabilidad y volumen.</p>
+  <p><b>Adaptado al currículo oficial de Canarias.</b> Los contenidos están seleccionados y secuenciados según los saberes básicos de Matemáticas de Educación Primaria del <b>Decreto 211/2022, de 10 de noviembre</b> (BOC n.º 231, de 23/11/2022; anexo del área de Matemáticas), organizados en sus <b>seis sentidos</b>: numérico, de la medida, espacial, algebraico (y pensamiento computacional), estocástico y socioafectivo. Se citan entre paréntesis las referencias del anexo (p. ej. I.2.13 = sentido numérico, bloque 2, saber 13).</p>
+  <table class="tt"><tr><th>Sentido</th><th>1.º–2.º</th><th>3.º–4.º</th><th>5.º–6.º</th></tr>
+  <tr><td>I. Numérico</td><td>Sumas y restas (I.2.2, I.2.7; en el juego hasta 100), dobles y mitades de decenas (I.2.13–2.14), comparar y ordenar (I.3.2), monedas y billetes en euros (I.4.1). <b>Sin tablas, divisiones ni fracciones.</b></td><td>Decimales (I.1.6), fracciones hasta denominador 12 y su suma y resta con igual denominador (I.1.7, I.2.14), porcentajes 50, 25 y 75 % (I.2.15), tablas, múltiplos y división (I.2.5–2.7, I.2.12), ×10 y ×100 (I.2.10.1), euros y céntimos (I.4.1).</td><td>Números negativos (I.1.6), fracciones impropias, equivalentes y suma con denominadores múltiplos (I.1.8, I.2.8–2.9), fracción-decimal-porcentaje (I.1.7), potencias (I.1.9), ×0,5 y ÷0,5 (I.2.2.3, I.2.4), mcm, mcd, divisibilidad y primos (I.3.6–3.8), proporcionalidad (I.4.2) y descuentos (I.5.2).</td></tr>
+  <tr><td>II. Medida</td><td>Comparar longitud, masa, capacidad y tiempo; unidades cm, m, g, kg, l; reloj y unidades de tiempo (II.1.1–1.3, II.2.2–2.3).</td><td>Unidades km a mm, kg, g, l, ml, cm², m²; reloj analógico y digital; segundos; elegir unidad e instrumento; áreas de rectángulos y triángulos; ángulos rectos, agudos y obtusos (II.1.2–1.3, II.2.2, II.2.4–2.5, II.2.8–2.10).</td><td>cl, dl, dm², cm³ y tiempo de siglos a segundos; ángulos; áreas y volumen; relación área-perímetro (II.1.2, II.2.7, II.2.9–2.10).</td></tr>
+  <tr><td>III. Espacial</td><td>Figuras y cuerpos con vértice, lado, arista y cara; arriba, abajo, entre, derecha, izquierda; giros; simetría en dibujos (III.1.1, 1.3, III.2.1–2.2, III.3.1).</td><td>Polígonos hasta 10 lados y cuerpos; paralelo, perpendicular y oblicuo; itinerarios en cuadrícula; simetrías; perímetros (III.1.1, III.2.1, 2.3, III.3.1, III.4.1).</td><td>Radio, diámetro y π; puntos cardinales; coordenadas; giros y simetrías; polígonos y cuerpos (III.1.3, 1.5, III.2.1–2.2, III.3.1).</td></tr>
+  <tr><td>IV. Algebraico y pensamiento computacional</td><td>Patrones numéricos y de figuras; símbolo desconocido; algoritmos sencillos con un robot de flechas (IV.1.1, IV.3.2, IV.4.1–4.2).</td><td>Patrones; incógnitas, igualdad y signos mayor y menor; bucles y robot con flechas; máquinas de números (IV.1.1, IV.3.2–3.3, IV.4.1).</td><td>Patrones; ecuaciones sencillas; bucles y condicionales; «ir hacia atrás» como estrategia (IV.1.1, IV.2.4, IV.3.2, IV.4.1).</td></tr>
+  <tr><td>V. Estocástico</td><td>Pictogramas y barras; seguro, posible e imposible (V.1.1, V.2.1–2.2).</td><td>Barras y pictogramas; moda y media; probabilidad comparada con bolas (V.1.1, V.1.4, V.2.2–2.3).</td><td>Media, mediana, moda y rango; variables cualitativas y cuantitativas; probabilidad con fracciones y % (V.1.3, V.1.6–1.7, V.2.1, V.2.3).</td></tr>
+  <tr><td>VI. Socioafectivo</td><td colspan="3">Mensajes de ánimo y pistas ante el error, tiempo amplio, poder de ayuda, autoevaluación emocional al terminar y <b>Modo equipo</b> con roles rotatorios; nombres, personajes y lenguaje inclusivos (VI.1.1–1.2, VI.2.1–2.2).</td></tr></table>
+  <p><b>Criterios de evaluación con los que se relaciona</b> (la evaluación corresponde al docente; el juego solo ofrece práctica y retroalimentación): 2.2 y 2.3 (operaciones en problemas y validez de la solución, mediante las pistas), 4.1 y 4.2 (pensamiento computacional), 7.1 (emociones y error como oportunidad) y 8.1 (trabajo en equipo).</p>
+  <p><b>Alcance:</b> es un recurso de práctica que trabaja una selección de los saberes. No sustituye la manipulación de materiales, el uso de la calculadora ni las investigaciones estadísticas propias del aula. Algunos saberes se tratan a un nivel inferior al del anexo (por ejemplo, decimales hasta las centésimas y sumas y restas hasta 100 en 1.º–2.º).</p>
   <p><b>Tiempo:</b> cada pregunta tiene un tiempo máximo (barra visible): 1 minuto en 1.º–2.º, 2 minutos en 3.º–4.º y 3 minutos en 5.º–6.º. Si se agota cuenta como fallo y se muestra la pista.</p>
   <p><b>Papel y boli:</b> al empezar el modo historia en 3.º–4.º y 5.º–6.º aparece un aviso que recomienda jugar con papel y bolígrafo. En esos ciclos se mezclan además preguntas muy fáciles (aprox. 1 de cada 3).</p>
   <p><b>Poder:</b> la barra PODER se carga con los aciertos y elimina dos respuestas incorrectas, una vez por carga.</p>
-  <p><b>Aviso curricular:</b> la organización por sentidos sigue la estructura LOMLOE. La concreción por ciclo (saberes y criterios de evaluación) del currículo de Canarias, Decreto 211/2022, anexo de Matemáticas, no se ha podido contrastar literalmente: conviene revisarla antes de citarla en documentos de centro.</p>
   <p>Las preguntas se generan al vuelo (decenas de miles de combinaciones) y no se repiten dentro de una sesión. No se recogen datos personales: solo se guardan en este navegador las puntuaciones y las criaturas domadas.</p>
   <button class="btn" data-first data-nav data-act="closemodal">Cerrar</button>`);
+  const mb = document.querySelector('#modal .mbox'); if (mb) mb.classList.add('wide');
 }
 
 /* ---------- música ---------- */

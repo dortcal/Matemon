@@ -288,3 +288,7 @@ kbd{display:inline-block;min-width:1.6em;padding:.1em .45em;border:.12rem solid 
 [data-screen=results] .stats{padding:.5rem 1rem}
 [data-screen=results] .minipets div{width:2.6rem;height:2.6rem}
 [data-screen=results] .stars svg{width:1.7rem;height:1.7rem}
+
+.mbox.wide{width:min(70rem,100%)}
+.tt{font-size:.78rem}.tt td,.tt th{padding:.3rem .4rem}.tt td:first-child{font-weight:900;color:var(--yellow);white-space:nowrap}
+sup{font-size:.6em;line-height:0}

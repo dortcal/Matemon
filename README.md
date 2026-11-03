@@ -27,7 +27,7 @@ Tiempo máximo por pregunta: **1 minuto** en 1.º–2.º, **2 minutos** en 3.º�
 | Estocástico | **Datos y azar**: pictogramas, gráficos de barras, moda, media, seguro/posible/imposible, probabilidad |
 | Socioafectivo | Mensajes de ánimo ante el error, pistas que explican, tiempo amplio, **autoevaluación emocional**, **Modo equipo** con roles rotatorios, nombres y personajes diversos, lenguaje inclusivo |
 
-> **Nota curricular:** la organización por sentidos sigue la estructura LOMLOE. La concreción por ciclo (saberes básicos y criterios de evaluación) del currículo de Canarias (Decreto 211/2022, anexo de Matemáticas) no se ha contrastado literalmente con el texto oficial; conviene revisarla antes de citarla en documentos de centro.
+> **Adaptación curricular:** contenidos seleccionados y secuenciados según los saberes básicos de Matemáticas de Educación Primaria del **Decreto 211/2022, de 10 de noviembre** (BOC n.º 231, de 23/11/2022), organizados en sus seis sentidos. La ventana «Para docentes» del juego detalla, por ciclo y sentido, las referencias del anexo. El juego es un recurso de práctica: trabaja una selección de saberes y no sustituye la programación del área.
 
 ## Controles (Makey Makey)
 ↑ ← → ↓ para elegir respuesta, **Espacio** para aceptar, continuar y usar el PODER (en la Makey Makey no hace falta el clic), `Esc` pausa, `M` silencio. También W A S D y 1–4.
