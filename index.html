@@ -366,6 +366,24 @@ sup{font-size:.6em;line-height:0}
 .ans.l2{font-size:clamp(.55rem,calc(var(--sq)*.145),1.5rem)}
 .ans.l3{font-size:clamp(.5rem,calc(var(--sq)*.115),1.25rem)}
 .ans.long{font-size:clamp(.5rem,calc(var(--sq)*.14),1.2rem)}
+
+:root{--sq:clamp(4.6rem,16vh,9.5rem)}
+.arena{flex-basis:37%}.qpanel{flex-basis:63%}
+.ans .av{width:100%;line-height:1.05}
+.ans{font-size:clamp(1rem,calc(var(--sq)*.28),2.5rem)}
+.ans.l1{font-size:clamp(.8rem,calc(var(--sq)*.22),2rem)}
+.ans.l2{font-size:clamp(.7rem,calc(var(--sq)*.17),1.6rem)}
+.ans.l3{font-size:clamp(.65rem,calc(var(--sq)*.14),1.3rem)}
+@media (max-aspect-ratio:1/1){:root{--sq:min(calc((100vw - 3.4rem)/2),clamp(4.6rem,15vh,9rem))}.arena{flex-basis:34%}.qpanel{flex-basis:66%}}
+/* ---- más espacio: la fila superior de la cruz se sitúa en el hueco central entre las criaturas ---- */
+:root{--sq:clamp(5rem,18vh,10.5rem)}
+.arena{flex:0 0 31%}
+.qpanel{flex:1 1 0;margin-top:calc(var(--sq)*-1)}
+.qvis>svg.fig,.qvis>svg.grid{max-height:24rem}
+.qvis .duo{max-height:24rem}
+@media (max-aspect-ratio:1/1){:root{--sq:min(calc((100vw - 3.4rem)/2),clamp(4.6rem,15vh,9rem))}.arena{flex:0 0 34%}.qpanel{flex:1 1 0;margin-top:0}}
+@media (max-height:560px){.arena{flex:0 0 31%}}
+@media (max-aspect-ratio:1/1){:root{--sq:min(calc((100vw - 3.4rem)/2),clamp(4.6rem,13vh,8.5rem))}.arena{flex:0 0 28%}}
 </style>
 </head>
 <body>
@@ -2216,12 +2234,23 @@ function startTimer(q) {
   }, 100);
 }
 function dirsFor(n) { return n === 4 ? ['up', 'left', 'right', 'down'] : n === 3 ? ['left', 'up', 'right'] : ['left', 'right']; }
+function fitAnswers() {
+  document.querySelectorAll('.ans').forEach(b => {
+    const av = b.querySelector('.av'); if (!av || av.querySelector('svg')) return;
+    b.style.fontSize = ''; let fs = parseFloat(getComputedStyle(b).fontSize), guard = 0;
+    const arrow = b.querySelector('svg.a'), maxW = b.clientWidth - 10, maxH = b.clientHeight - (arrow ? arrow.getBoundingClientRect().height : 0) - 10;
+    const over = () => { const r = document.createRange(); r.selectNodeContents(av); const q = r.getBoundingClientRect(); return q.width > maxW || q.height > maxH; };
+    while (over() && fs > 7 && guard++ < 60) { fs -= 0.5; b.style.fontSize = fs + 'px'; }
+  });
+}
+window.addEventListener('resize', () => { try { fitAnswers(); } catch (e) {} });
 function renderQuestion(q) {
   const info = Q.info(q.cat, S.cycle), dirs = dirsFor(q.answers.length), plain = strip(q.text);
   const cls = plain.length <= 20 && /[0-9?]/.test(plain) ? 'eq' : plain.length > 70 ? 'long' : '';
   const btns = q.answers.map((a, i) => `<button class="ans${a.includes('<') ? '' : a.length > 10 ? ' l3' : a.length > 7 ? ' l2' : a.length > 5 ? ' l1' : ''}" data-dir="${dirs[i]}" data-i="${i}" data-act="ans" aria-label="${dirs[i] === 'up' ? 'Arriba' : dirs[i] === 'down' ? 'Abajo' : dirs[i] === 'left' ? 'Izquierda' : 'Derecha'}: ${strip(a).replace(/"/g, '')}">${ARROW(dirs[i])}<span class="av">${a}</span></button>`).join('');
   S.removed = new Set(); setPower();
   const p = $('qpanel'); p.style.display = ''; p.innerHTML = `<div class="qcard" id="qcard" style="--c:${info.color}"><span class="qcat">${info.name}</span>${S.limit ? '<div class="tbar"><i></i><b>' + S.limit + ' s</b></div>' : ''}<div class="qtext ${cls}">${q.text}</div><div class="qvis">${q.visual}</div></div><div class="answers">${btns}</div>`;
+  fitAnswers();
 }
 function battleKey(a) {
   if (a === 'pause') { if (S && S.paused) resumeGame(); else pauseGame(); return; }

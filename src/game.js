@@ -445,12 +445,23 @@ function startTimer(q) {
   }, 100);
 }
 function dirsFor(n) { return n === 4 ? ['up', 'left', 'right', 'down'] : n === 3 ? ['left', 'up', 'right'] : ['left', 'right']; }
+function fitAnswers() {
+  document.querySelectorAll('.ans').forEach(b => {
+    const av = b.querySelector('.av'); if (!av || av.querySelector('svg')) return;
+    b.style.fontSize = ''; let fs = parseFloat(getComputedStyle(b).fontSize), guard = 0;
+    const arrow = b.querySelector('svg.a'), maxW = b.clientWidth - 10, maxH = b.clientHeight - (arrow ? arrow.getBoundingClientRect().height : 0) - 10;
+    const over = () => { const r = document.createRange(); r.selectNodeContents(av); const q = r.getBoundingClientRect(); return q.width > maxW || q.height > maxH; };
+    while (over() && fs > 7 && guard++ < 60) { fs -= 0.5; b.style.fontSize = fs + 'px'; }
+  });
+}
+window.addEventListener('resize', () => { try { fitAnswers(); } catch (e) {} });
 function renderQuestion(q) {
   const info = Q.info(q.cat, S.cycle), dirs = dirsFor(q.answers.length), plain = strip(q.text);
   const cls = plain.length <= 20 && /[0-9?]/.test(plain) ? 'eq' : plain.length > 70 ? 'long' : '';
   const btns = q.answers.map((a, i) => `<button class="ans${a.includes('<') ? '' : a.length > 10 ? ' l3' : a.length > 7 ? ' l2' : a.length > 5 ? ' l1' : ''}" data-dir="${dirs[i]}" data-i="${i}" data-act="ans" aria-label="${dirs[i] === 'up' ? 'Arriba' : dirs[i] === 'down' ? 'Abajo' : dirs[i] === 'left' ? 'Izquierda' : 'Derecha'}: ${strip(a).replace(/"/g, '')}">${ARROW(dirs[i])}<span class="av">${a}</span></button>`).join('');
   S.removed = new Set(); setPower();
   const p = $('qpanel'); p.style.display = ''; p.innerHTML = `<div class="qcard" id="qcard" style="--c:${info.color}"><span class="qcat">${info.name}</span>${S.limit ? '<div class="tbar"><i></i><b>' + S.limit + ' s</b></div>' : ''}<div class="qtext ${cls}">${q.text}</div><div class="qvis">${q.visual}</div></div><div class="answers">${btns}</div>`;
+  fitAnswers();
 }
 function battleKey(a) {
   if (a === 'pause') { if (S && S.paused) resumeGame(); else pauseGame(); return; }

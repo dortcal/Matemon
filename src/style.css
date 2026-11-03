@@ -340,3 +340,21 @@ sup{font-size:.6em;line-height:0}
 .ans.l2{font-size:clamp(.55rem,calc(var(--sq)*.145),1.5rem)}
 .ans.l3{font-size:clamp(.5rem,calc(var(--sq)*.115),1.25rem)}
 .ans.long{font-size:clamp(.5rem,calc(var(--sq)*.14),1.2rem)}
+
+:root{--sq:clamp(4.6rem,16vh,9.5rem)}
+.arena{flex-basis:37%}.qpanel{flex-basis:63%}
+.ans .av{width:100%;line-height:1.05}
+.ans{font-size:clamp(1rem,calc(var(--sq)*.28),2.5rem)}
+.ans.l1{font-size:clamp(.8rem,calc(var(--sq)*.22),2rem)}
+.ans.l2{font-size:clamp(.7rem,calc(var(--sq)*.17),1.6rem)}
+.ans.l3{font-size:clamp(.65rem,calc(var(--sq)*.14),1.3rem)}
+@media (max-aspect-ratio:1/1){:root{--sq:min(calc((100vw - 3.4rem)/2),clamp(4.6rem,15vh,9rem))}.arena{flex-basis:34%}.qpanel{flex-basis:66%}}
+/* ---- más espacio: la fila superior de la cruz se sitúa en el hueco central entre las criaturas ---- */
+:root{--sq:clamp(5rem,18vh,10.5rem)}
+.arena{flex:0 0 31%}
+.qpanel{flex:1 1 0;margin-top:calc(var(--sq)*-1)}
+.qvis>svg.fig,.qvis>svg.grid{max-height:24rem}
+.qvis .duo{max-height:24rem}
+@media (max-aspect-ratio:1/1){:root{--sq:min(calc((100vw - 3.4rem)/2),clamp(4.6rem,15vh,9rem))}.arena{flex:0 0 34%}.qpanel{flex:1 1 0;margin-top:0}}
+@media (max-height:560px){.arena{flex:0 0 31%}}
+@media (max-aspect-ratio:1/1){:root{--sq:min(calc((100vw - 3.4rem)/2),clamp(4.6rem,13vh,8.5rem))}.arena{flex:0 0 28%}}
