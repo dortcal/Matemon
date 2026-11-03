@@ -96,7 +96,6 @@ function worldScreen() {
   <div class="row">${Object.keys(WORLDS).map(k => { const W = WORLDS[k]; return `<button class="card" style="--c:${W.color}" data-nav data-world="${k}" ${k === P.world ? 'data-first' : ''} data-act="world" data-v="${k}"><div class="minis" style="display:flex;gap:.2rem;height:4rem">${W.els.map((e, i) => `<div style="width:4rem">${C.svg(C.make(k.length * 17 + i * 5, [e]), { uid: k + i })}</div>`).join('')}</div><span class="nm">${W.name}</span><span class="ds">${W.desc}</span></button>`; }).join('')}</div>`, { back: 'level', backBtn: true });
 }
 let eggSeeds = [];
-P.team = !!SAVE.last.team;
 function eggScreen() {
   const els = WORLDS[P.world].els;
   eggSeeds = [0, 1, 2].map(i => ({ seed: Math.floor(Math.random() * 1e6) + 1, el: els[i % els.length] }));
@@ -125,8 +124,7 @@ function modeScreen() {
   show('mode', `<div style="display:flex;align-items:center;gap:1rem"><div style="width:clamp(4rem,12vmin,7rem)">${C.svg(cr, { mood: 'happy', uid: 'md' })}</div><div><h2 class="t" style="text-align:left">¿A qué jugamos?</h2><p class="s" style="text-align:left">${cr.name} · ${LEVELS[P.cycle].name}</p></div></div>
   <button class="card wide" style="--c:var(--yellow)" data-nav data-first data-act="story">${bk('story')}<div class="ic" style="color:var(--yellow)"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 5l5.500 12 13 1.500-9.700 9 2.800 12.800L24 33l-11.600 7.300 2.800-12.800-9.700-9 13-1.500z"/></svg></div><div><span class="nm">Modo historia</span><br><span class="ds">Recorre la liga mezclando todos los retos, con 2 jefes y el JEFE FINAL</span></div></button>
   <div class="cards-grid">${cats.map(c => { const I2 = Q.info(c, P.cycle); return `<button class="card" style="--c:${I2.color}" data-nav data-act="single" data-v="${c}">${bk(c)}<div class="ic" style="color:${I2.color}">${catIcon(c)}</div><span class="nm">${I2.name}</span></button>`; }).join('')}</div>
-  <div class="row"><button class="btn ${P.team ? 'cyan' : 'ghost'}" data-nav data-act="team">Modo equipo: ${P.team ? 'SÍ' : 'NO'}</button></div>
-  <p class="keys">Duelo rápido: 2 combates + jefe de la categoría · Modo equipo: roles que rotan para jugar en grupo</p>`, { back: 'egg', backBtn: true });
+  <p class="keys">Duelo rápido: 2 combates + jefe de la categoría</p>`, { back: 'egg', backBtn: true });
 }
 function dexScreen() {
   const n = SAVE.dex.length;
@@ -148,7 +146,7 @@ function helpModal() {
   modal(`<h3>Cómo se juega</h3><p>Tu criatura se enfrenta a otras. <b>Resuelve bien el reto</b> para atacar. Si fallas, pierdes un corazón. ¡Vence a los jefes y consigue la mejor calificación!</p>
   <div class="ctl"><span><kbd>↑</kbd><kbd>←</kbd><kbd>→</kbd><kbd>↓</kbd></span><span>Elegir respuesta (la flecha de cada botón)</span><span><kbd>Espacio</kbd></span><span>Aceptar, continuar y usar el PODER (el botón ESPACIO de la Makey Makey)</span><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> · <kbd>1</kbd>–<kbd>4</kbd></span><span>Alternativas de teclado</span><span><kbd>Esc</kbd> · <kbd>M</kbd></span><span>Pausa · Silenciar</span></div>
   <p><b>Poder:</b> cada acierto carga la barra PODER. Cuando está llena, pulsa <kbd>Espacio</kbd> (o el botón) en una pregunta para eliminar dos respuestas incorrectas. Solo se puede usar una vez por carga. En la Makey Makey basta con ESPACIO; no hace falta el clic.</p>
-  <p><b>Makey Makey:</b> conecta ↑ ← → ↓ y ESPACIO a cinco objetos conductores (plastilina, fruta, papel de aluminio…) y la tierra a tu mano. También sirve tocar la pantalla.</p>
+  <p><b>Makey Makey:</b> conecta ↑ ← → ↓ y ESPACIO a cinco objetos conductores (plastilina, fruta, papel de aluminio…) y la tierra a tu mano. También sirve tocar la pantalla. Pueden jugar varias personas a la vez: una sujeta la tierra y otra toca el cable de la respuesta.</p>
   <button class="btn" data-first data-nav data-act="closemodal">¡Entendido!</button>`);
 }
 function paperModal() {
@@ -178,10 +176,9 @@ function powersModal() {
   ${row('Elegir y usar las operaciones adecuadas en los problemas', 'Criterio 2.2', ops)}
   ${row('Reconocer patrones y resolver retos con secuencias y algoritmos', 'Criterios 4.1 y 4.2', alg)}
   ${row('Ver el error como una oportunidad: seguir intentándolo tras equivocarte', 'Criterio 7.1', rec, feelTxt || (rec.n ? '' : 'Haría falta equivocarse al menos 2 veces para medirlo'))}
-  <div class="pw ${S.team ? 'top' : 'sin'}"><div class="pwt"><b>Trabajar en equipo con respeto y escucha</b> <span class="ref">Criterio 8.1</span></div><div class="pwv"><span class="pchip">${S.team ? '¡Has jugado en equipo!' : 'Prueba el Modo equipo'}</span></div></div>
   ${weak.length ? `<p><b>Retos secretos para entrenar:</b> ${weak.join(', ')}. ¡Prueba un duelo rápido de cada uno!</p>` : (all.n >= 3 ? '<p><b>¡Todo lo que has practicado lo dominas muy bien!</b> Sube de nivel o prueba otras categorías.</p>' : '')}
   ${S.mode !== 'story' ? '<p><small>Has jugado una sola categoría: juega el modo historia para ver todos tus superpoderes.</small></p>' : ''}
-  <p><small>Resultado orientativo, solo de esta partida y de los criterios 2.1, 2.2, 4.1, 4.2, 7.1 y 8.1 del Decreto 211/2022. La evaluación la hace tu docente.</small></p>
+  <p><small>Resultado orientativo, solo de esta partida y de los criterios 2.1, 2.2, 4.1, 4.2 y 7.1 del Decreto 211/2022. La evaluación la hace tu docente.</small></p>
   <button class="btn" data-first data-nav data-act="closemodal">¡Entendido!</button>`);
   const mb = document.querySelector('#modal .mbox'); if (mb) mb.classList.add('wide');
 }
@@ -194,12 +191,12 @@ function teacherModal() {
   <tr><td>III. Espacial</td><td>Figuras y cuerpos con vértice, lado, arista y cara; arriba, abajo, entre, derecha, izquierda; giros; simetría en dibujos (III.1.1, 1.3, III.2.1–2.2, III.3.1).</td><td>Polígonos hasta 10 lados y cuerpos; paralelo, perpendicular y oblicuo; itinerarios en cuadrícula; simetrías; perímetros (III.1.1, III.2.1, 2.3, III.3.1, III.4.1).</td><td>Radio, diámetro y π; puntos cardinales; coordenadas; giros y simetrías; polígonos y cuerpos (III.1.3, 1.5, III.2.1–2.2, III.3.1).</td></tr>
   <tr><td>IV. Algebraico y pensamiento computacional</td><td>Patrones numéricos y de figuras; símbolo desconocido; algoritmos sencillos con un robot de flechas (IV.1.1, IV.3.2, IV.4.1–4.2).</td><td>Patrones; incógnitas, igualdad y signos mayor y menor; bucles y robot con flechas; máquinas de números (IV.1.1, IV.3.2–3.3, IV.4.1).</td><td>Patrones; ecuaciones sencillas; bucles y condicionales; «ir hacia atrás» como estrategia (IV.1.1, IV.2.4, IV.3.2, IV.4.1).</td></tr>
   <tr><td>V. Estocástico</td><td>Pictogramas y barras; seguro, posible e imposible (V.1.1, V.2.1–2.2).</td><td>Barras y pictogramas; moda y media; probabilidad comparada con bolas (V.1.1, V.1.4, V.2.2–2.3).</td><td>Media, mediana, moda y rango; variables cualitativas y cuantitativas; probabilidad con fracciones y % (V.1.3, V.1.6–1.7, V.2.1, V.2.3).</td></tr>
-  <tr><td>VI. Socioafectivo</td><td colspan="3">Mensajes de ánimo y pistas ante el error, tiempo amplio, poder de ayuda, autoevaluación emocional al terminar y <b>Modo equipo</b> con roles rotatorios; nombres, personajes y lenguaje inclusivos (VI.1.1–1.2, VI.2.1–2.2).</td></tr></table>
-  <p><b>Criterios de evaluación con los que se relaciona</b> (la evaluación corresponde al docente; el juego solo ofrece práctica y retroalimentación): 2.2 y 2.3 (operaciones en problemas y validez de la solución, mediante las pistas), 4.1 y 4.2 (pensamiento computacional), 7.1 (emociones y error como oportunidad) y 8.1 (trabajo en equipo).</p>
+  <tr><td>VI. Socioafectivo</td><td colspan="3">Mensajes de ánimo y pistas ante el error, tiempo amplio, poder de ayuda, autoevaluación emocional al terminar, nombres, personajes y lenguaje inclusivos (VI.1.1–1.2, VI.2.1). El trabajo en grupo se organiza en el aula: por ejemplo, varias personas ante la Makey Makey, una con la tierra y otra tocando la respuesta (VI.2.2).</td></tr></table>
+  <p><b>Criterios de evaluación con los que se relaciona</b> (la evaluación corresponde al docente; el juego solo ofrece práctica y retroalimentación): 2.2 y 2.3 (operaciones en problemas y validez de la solución, mediante las pistas), 4.1 y 4.2 (pensamiento computacional), y 7.1 (emociones y error como oportunidad).</p>
   <p><b>Alcance:</b> es un recurso de práctica que trabaja una selección de los saberes. No sustituye la manipulación de materiales, el uso de la calculadora ni las investigaciones estadísticas propias del aula. Algunos saberes se tratan a un nivel inferior al del anexo (por ejemplo, decimales hasta las centésimas y sumas y restas hasta 100 en 1.º–2.º).</p>
   <p><b>Tiempo:</b> cada pregunta tiene un tiempo máximo (barra visible): 1 minuto en 1.º–2.º, 2 minutos en 3.º–4.º y 3 minutos en 5.º–6.º. Si se agota cuenta como fallo y se muestra la pista.</p>
   <p><b>Papel y boli:</b> al empezar el modo historia en 3.º–4.º y 5.º–6.º aparece un aviso que recomienda jugar con papel y bolígrafo. En esos ciclos se mezclan además preguntas muy fáciles (aprox. 1 de cada 3).</p>
-  <p><b>Superpoderes:</b> al terminar (o en game over) el botón «¡Descubre tus superpoderes!» muestra, con los datos de la partida, los sentidos y los criterios 2.1, 2.2, 4.1, 4.2, 7.1 y 8.1 en los que va mejor y los que debe entrenar. Es orientativo y solo de esa partida: no sustituye la evaluación docente.</p><p><b>Poder:</b> la barra PODER se carga con los aciertos y elimina dos respuestas incorrectas, una vez por carga.</p>
+  <p><b>Superpoderes:</b> al terminar (o en game over) el botón «¡Descubre tus superpoderes!» muestra, con los datos de la partida, los sentidos y los criterios 2.1, 2.2, 4.1, 4.2 y 7.1 en los que va mejor y los que debe entrenar. Es orientativo y solo de esa partida: no sustituye la evaluación docente.</p><p><b>Poder:</b> la barra PODER se carga con los aciertos y elimina dos respuestas incorrectas, una vez por carga.</p>
   <p>Las preguntas se generan al vuelo (decenas de miles de combinaciones) y no se repiten dentro de una sesión. No se recogen datos personales: solo se guardan en este navegador las puntuaciones y las criaturas domadas.</p>
   <button class="btn" data-first data-nav data-act="closemodal">Cerrar</button>`);
   const mb = document.querySelector('#modal .mbox'); if (mb) mb.classList.add('wide');
@@ -269,7 +266,6 @@ function act(a, v, el) {
     case 'reroll': eggScreen(); break;
     case 'accept': sfx('select'); modeScreen(); break;
     case 'story': if (P.cycle >= 2) paperModal(); else startRun('story', null); break;
-    case 'team': P.team = !P.team; SAVE.last.team = P.team; save(); modeScreen(); break;
     case 'feel': feel(+v); break;
     case 'powers': powersModal(); break;
     case 'gostory': closeModal(); startRun('story', null); break;
@@ -301,7 +297,6 @@ function toggleFull() { try { if (!document.fullscreenElement) document.document
 /* ---------- partida ---------- */
 const ENC = ['¡Casi!', 'Equivocarse también es aprender.', 'No pasa nada, ¡a por la siguiente!', 'Los errores nos ayudan a crecer.', '¡Buen intento!', 'Respira y mira la pista con calma.'];
 const PRAISE = ['¡Correcto!', '¡Muy bien!', '¡Bien pensado!', '¡Eso es!'];
-const ROLES = ['Lee la pregunta en voz alta', 'Calcula con papel y boli', 'Propone la respuesta', 'Revisa y pulsa'];
 const BOSS_FINAL = 'Gran Maestro Calculón';
 function buildPlan(mode, cat, cycle) {
   const els = WORLDS[P.world].els, mk = () => C.make(Math.floor(Math.random() * 1e7) + 7, els);
@@ -321,7 +316,7 @@ function buildPlan(mode, cat, cycle) {
 function startRun(mode, cat) {
   tok++; closeModal();
   const maxL = P.cycle === 1 ? 7 : P.cycle === 2 ? 6 : 5, plan = buildPlan(mode, cat, P.cycle);
-  S = { mode, cat, cycle: P.cycle, me: mkCr(P.cr), lives: maxL, maxLives: maxL, score: 0, streak: 0, best: 0, correct: 0, wrong: 0, answered: 0, stage: 1, plan, pi: -1, tamed: [], dyn: 0, bonus: { enc: 0, boss: 0 }, locked: true, paused: false, totalNeed: plan.reduce((s, e) => s + e.need, 0), team: P.team, qn: 0, limit: P.cycle === 1 ? 60 : P.cycle === 2 ? 120 : 180, pow: 0, powNeed: P.cycle === 3 ? 5 : 4, removed: new Set(), evo2: mode === 'story' ? 9 : 5, evo3: mode === 'story' ? 24 : 11, lastCat: '', stats: {} };
+  S = { mode, cat, cycle: P.cycle, me: mkCr(P.cr), lives: maxL, maxLives: maxL, score: 0, streak: 0, best: 0, correct: 0, wrong: 0, answered: 0, stage: 1, plan, pi: -1, tamed: [], dyn: 0, bonus: { enc: 0, boss: 0 }, locked: true, paused: false, totalNeed: plan.reduce((s, e) => s + e.need, 0), limit: P.cycle === 1 ? 60 : P.cycle === 2 ? 120 : 180, pow: 0, powNeed: P.cycle === 3 ? 5 : 4, removed: new Set(), evo2: mode === 'story' ? 9 : 5, evo3: mode === 'story' ? 24 : 11, lastCat: '', stats: {} };
   curTrack = ''; UI.audioOn && musicFor('battle');
   renderBattle();
   run().catch(e => { if (e !== CANCEL) { console.error(e); } });
@@ -455,8 +450,7 @@ function renderQuestion(q) {
   const cls = plain.length <= 20 && /[0-9?]/.test(plain) ? 'eq' : plain.length > 70 ? 'long' : '';
   const btns = q.answers.map((a, i) => `<button class="ans${a.includes('<') ? '' : a.length > 10 ? ' l3' : a.length > 7 ? ' l2' : a.length > 5 ? ' l1' : ''}" data-dir="${dirs[i]}" data-i="${i}" data-act="ans" aria-label="${dirs[i] === 'up' ? 'Arriba' : dirs[i] === 'down' ? 'Abajo' : dirs[i] === 'left' ? 'Izquierda' : 'Derecha'}: ${strip(a).replace(/"/g, '')}">${ARROW(dirs[i])}<span class="av">${a}</span></button>`).join('');
   S.removed = new Set(); setPower();
-  const rl = S.team ? (S.qn++ % 4) : -1;
-  const p = $('qpanel'); p.style.display = ''; p.innerHTML = `<div class="qcard" id="qcard" style="--c:${info.color}"><span class="qcat">${info.name}</span>${S.team ? '<div class="role">Persona ' + (rl + 1) + ': ' + ROLES[rl] + '</div>' : ''}${S.limit ? '<div class="tbar"><i></i><b>' + S.limit + ' s</b></div>' : ''}<div class="qtext ${cls}">${q.text}</div><div class="qvis">${q.visual}</div></div><div class="answers">${btns}</div>`;
+  const p = $('qpanel'); p.style.display = ''; p.innerHTML = `<div class="qcard" id="qcard" style="--c:${info.color}"><span class="qcat">${info.name}</span>${S.limit ? '<div class="tbar"><i></i><b>' + S.limit + ' s</b></div>' : ''}<div class="qtext ${cls}">${q.text}</div><div class="qvis">${q.visual}</div></div><div class="answers">${btns}</div>`;
 }
 function battleKey(a) {
   if (a === 'pause') { if (S && S.paused) resumeGame(); else pauseGame(); return; }

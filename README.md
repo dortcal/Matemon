@@ -15,7 +15,7 @@ Tiempo máximo por pregunta: **1 minuto** en 1.º–2.º, **2 minutos** en 3.º�
 
 **Papel y boli:** al empezar el modo historia en 3.º–4.º y 5.º–6.º aparece un aviso divertido que recomienda jugar con papel y bolígrafo. En esos ciclos se mezclan además preguntas muy fáciles (aprox. 1 de cada 3) para que casi todo el alumnado pueda acertarlas.
 
-**Superpoderes:** el botón «¡Descubre tus superpoderes!» de la pantalla final (también en game over) muestra por sentidos y por criterios de evaluación (2.1, 2.2, 4.1, 4.2, 7.1 y 8.1) lo que mejor domina el alumnado y lo que debe entrenar. Es orientativo y no sustituye la evaluación docente.
+**Superpoderes:** el botón «¡Descubre tus superpoderes!» de la pantalla final (también en game over) muestra por sentidos y por criterios de evaluación (2.1, 2.2, 4.1, 4.2 y 7.1) lo que mejor domina el alumnado y lo que debe entrenar. Es orientativo y no sustituye la evaluación docente.
 
 **Poder:** cada acierto carga la barra PODER; cuando está llena, **Espacio** elimina dos respuestas incorrectas (una vez por carga, no en todas las preguntas).
 
@@ -27,7 +27,7 @@ Tiempo máximo por pregunta: **1 minuto** en 1.º–2.º, **2 minutos** en 3.º�
 | Espacial | Geometría: figuras y cuerpos, polígonos, ángulos, **ejes de simetría, giros y localización en cuadrículas y coordenadas** |
 | Algebraico y pensamiento computacional | Secuencias y algoritmos: patrones, series, **ecuaciones sencillas, máquinas de números, condicionales, robot con flechas y bucles** |
 | Estocástico | **Datos y azar**: pictogramas, gráficos de barras, moda, media, seguro/posible/imposible, probabilidad |
-| Socioafectivo | Mensajes de ánimo ante el error, pistas que explican, tiempo amplio, **autoevaluación emocional**, **Modo equipo** con roles rotatorios, nombres y personajes diversos, lenguaje inclusivo |
+| Socioafectivo | Mensajes de ánimo ante el error, pistas que explican, tiempo amplio, **autoevaluación emocional**, nombres y personajes diversos, lenguaje inclusivo |
 
 > **Adaptación curricular:** contenidos seleccionados y secuenciados según los saberes básicos de Matemáticas de Educación Primaria del **Decreto 211/2022, de 10 de noviembre** (BOC n.º 231, de 23/11/2022), organizados en sus seis sentidos. La ventana «Para docentes» del juego detalla, por ciclo y sentido, las referencias del anexo. El juego es un recurso de práctica: trabaja una selección de saberes y no sustituye la programación del área.
 
