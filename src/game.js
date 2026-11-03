@@ -158,6 +158,33 @@ function paperModal() {
   <p>Eso sí: el papel no hace magia solo, ¡la magia eres tú!</p>
   <div class="row"><button class="btn" data-first data-nav data-act="gostory">¡Ya tengo papel y boli!</button><button class="btn ghost" data-nav data-act="closemodal">Volver</button></div>`);
 }
+
+function powersModal() {
+  if (!S) return;
+  const st = S.stats || {}, pct = (cats) => { let c = 0, t = 0; cats.forEach(k => { if (st[k]) { c += st[k].c; t += st[k].c + st[k].w; } }); return { n: t, p: t ? Math.round(100 * c / t) : 0 }; };
+  const lvl = x => x.n < 3 ? ['sin', 'Aún sin datos'] : x.p >= 80 ? ['top', '¡Superpoder!'] : x.p >= 60 ? ['mid', 'Casi lo tienes'] : ['low', 'A entrenar'];
+  const row = (name, ref, x, extra) => { const l = lvl(x); return `<div class="pw ${l[0]}"><div class="pwt"><b>${name}</b>${ref ? ` <span class="ref">${ref}</span>` : ''}${extra ? `<br><small>${extra}</small>` : ''}</div><div class="pwv"><span class="pbar"><i style="width:${x.n ? x.p : 0}%"></i></span><span class="pchip">${l[1]}${x.n ? ` · ${x.p}% (${Math.round(x.n * x.p / 100)}/${x.n})` : ''}</span></div></div>`; };
+  const all = { n: S.answered, p: S.answered ? Math.round(100 * S.correct / S.answered) : 0 };
+  const num = pct(['sumres', 'tablas', 'divisiones', 'fracciones', 'comparar']), med = pct(['medida', 'areas']), esp = pct(['geometria']), alg = pct(['secuencias']), est = pct(['datos']), ops = pct(['sumres', 'tablas', 'divisiones', 'fracciones']);
+  const rec = (S.aw || 0) >= 2 ? { n: S.aw, p: Math.round(100 * (S.rc || 0) / S.aw) } : { n: 0, p: 0 };
+  const feelTxt = { 1: 'Te has sentido con confianza.', 2: 'Te has sentido más o menos seguro o segura.', 3: 'Has tenido dudas, y está muy bien decirlo.' }[S.feel] || '';
+  const weak = [['sumres', 'sumres'], ['tablas', 'tablas'], ['divisiones', 'divisiones'], ['fracciones', 'fracciones'], ['comparar', 'comparar'], ['medida', 'medida'], ['areas', 'areas'], ['geometria', 'geometria'], ['secuencias', 'secuencias'], ['datos', 'datos']].map(a => a[0]).filter(k => st[k] && st[k].c + st[k].w >= 3 && st[k].c / (st[k].c + st[k].w) < .7).map(k => Q.info(k, S.cycle).name);
+  modal(`<h3>¡Tus superpoderes mates!</h3>
+  <p>Así te ha ido en esta partida. Los superpoderes son lo que mejor dominas; «A entrenar» son retos secretos que puedes conseguir con práctica.</p>
+  <h4>Tus sentidos matemáticos</h4>
+  ${row('Sentido numérico', 'Bloque I', num)}${row('Sentido de la medida', 'Bloque II', med)}${row('Sentido espacial', 'Bloque III', esp)}${row('Sentido algebraico y pensamiento computacional', 'Bloque IV', alg)}${row('Sentido estocástico (datos y azar)', 'Bloque V', est)}
+  <h4>Criterios de evaluación</h4>
+  ${row('Elegir una estrategia para resolver problemas aritméticos, geométricos, lógicos y de patrones', 'Criterio 2.1', all)}
+  ${row('Elegir y usar las operaciones adecuadas en los problemas', 'Criterio 2.2', ops)}
+  ${row('Reconocer patrones y resolver retos con secuencias y algoritmos', 'Criterios 4.1 y 4.2', alg)}
+  ${row('Ver el error como una oportunidad: seguir intentándolo tras equivocarte', 'Criterio 7.1', rec, feelTxt || (rec.n ? '' : 'Haría falta equivocarse al menos 2 veces para medirlo'))}
+  <div class="pw ${S.team ? 'top' : 'sin'}"><div class="pwt"><b>Trabajar en equipo con respeto y escucha</b> <span class="ref">Criterio 8.1</span></div><div class="pwv"><span class="pchip">${S.team ? '¡Has jugado en equipo!' : 'Prueba el Modo equipo'}</span></div></div>
+  ${weak.length ? `<p><b>Retos secretos para entrenar:</b> ${weak.join(', ')}. ¡Prueba un duelo rápido de cada uno!</p>` : (all.n >= 3 ? '<p><b>¡Todo lo que has practicado lo dominas muy bien!</b> Sube de nivel o prueba otras categorías.</p>' : '')}
+  ${S.mode !== 'story' ? '<p><small>Has jugado una sola categoría: juega el modo historia para ver todos tus superpoderes.</small></p>' : ''}
+  <p><small>Resultado orientativo, solo de esta partida y de los criterios 2.1, 2.2, 4.1, 4.2, 7.1 y 8.1 del Decreto 211/2022. La evaluación la hace tu docente.</small></p>
+  <button class="btn" data-first data-nav data-act="closemodal">¡Entendido!</button>`);
+  const mb = document.querySelector('#modal .mbox'); if (mb) mb.classList.add('wide');
+}
 function teacherModal() {
   modal(`<h3>Para docentes</h3>
   <p><b>Adaptado al currículo oficial de Canarias.</b> Los contenidos están seleccionados y secuenciados según los saberes básicos de Matemáticas de Educación Primaria del <b>Decreto 211/2022, de 10 de noviembre</b> (BOC n.º 231, de 23/11/2022; anexo del área de Matemáticas), organizados en sus <b>seis sentidos</b>: numérico, de la medida, espacial, algebraico (y pensamiento computacional), estocástico y socioafectivo. Se citan entre paréntesis las referencias del anexo (p. ej. I.2.13 = sentido numérico, bloque 2, saber 13).</p>
@@ -172,7 +199,7 @@ function teacherModal() {
   <p><b>Alcance:</b> es un recurso de práctica que trabaja una selección de los saberes. No sustituye la manipulación de materiales, el uso de la calculadora ni las investigaciones estadísticas propias del aula. Algunos saberes se tratan a un nivel inferior al del anexo (por ejemplo, decimales hasta las centésimas y sumas y restas hasta 100 en 1.º–2.º).</p>
   <p><b>Tiempo:</b> cada pregunta tiene un tiempo máximo (barra visible): 1 minuto en 1.º–2.º, 2 minutos en 3.º–4.º y 3 minutos en 5.º–6.º. Si se agota cuenta como fallo y se muestra la pista.</p>
   <p><b>Papel y boli:</b> al empezar el modo historia en 3.º–4.º y 5.º–6.º aparece un aviso que recomienda jugar con papel y bolígrafo. En esos ciclos se mezclan además preguntas muy fáciles (aprox. 1 de cada 3).</p>
-  <p><b>Poder:</b> la barra PODER se carga con los aciertos y elimina dos respuestas incorrectas, una vez por carga.</p>
+  <p><b>Superpoderes:</b> al terminar (o en game over) el botón «¡Descubre tus superpoderes!» muestra, con los datos de la partida, los sentidos y los criterios 2.1, 2.2, 4.1, 4.2, 7.1 y 8.1 en los que va mejor y los que debe entrenar. Es orientativo y solo de esa partida: no sustituye la evaluación docente.</p><p><b>Poder:</b> la barra PODER se carga con los aciertos y elimina dos respuestas incorrectas, una vez por carga.</p>
   <p>Las preguntas se generan al vuelo (decenas de miles de combinaciones) y no se repiten dentro de una sesión. No se recogen datos personales: solo se guardan en este navegador las puntuaciones y las criaturas domadas.</p>
   <button class="btn" data-first data-nav data-act="closemodal">Cerrar</button>`);
   const mb = document.querySelector('#modal .mbox'); if (mb) mb.classList.add('wide');
@@ -244,6 +271,7 @@ function act(a, v, el) {
     case 'story': if (P.cycle >= 2) paperModal(); else startRun('story', null); break;
     case 'team': P.team = !P.team; SAVE.last.team = P.team; save(); modeScreen(); break;
     case 'feel': feel(+v); break;
+    case 'powers': powersModal(); break;
     case 'gostory': closeModal(); startRun('story', null); break;
     case 'single': startRun('single', v); break;
     case 'dex': dexScreen(); break;
@@ -265,6 +293,7 @@ function act(a, v, el) {
 }
 function feel(v) {
   const m = { 1: '¡Genial! Esa confianza se ha ganado con esfuerzo. Puedes ayudar a quien esté al lado.', 2: 'Es normal: aprender lleva tiempo. Repasa las pistas y vuelve a intentarlo, cada vez sale mejor.', 3: 'Está bien tener dudas. Pide ayuda a tu equipo o a tu docente: nadie aprende solo y preguntar es de valientes.' }[v];
+  if (S) S.feel = v;
   const e = document.getElementById('feelmsg'); if (e) e.textContent = m; sfx(v === 1 ? 'heal' : 'select'); live(m);
 }
 function toggleFull() { try { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); } catch (e) {} }
@@ -443,6 +472,7 @@ async function answer(i) {
   const now = performance.now(); if (now - lastAnsAt < 250) return; lastAnsAt = now;
   clearInterval(timerId); S.locked = true; setPower(); const q = S.q, ok = i === q.correct, btns = [...document.querySelectorAll('.ans')];
   const secs = (now - S.tq) / 1000; S.answered++;
+  if (S.lastWrong) { S.aw = (S.aw || 0) + 1; if (ok) S.rc = (S.rc || 0) + 1; } S.lastWrong = !ok;
   const st = S.stats[q.cat] = S.stats[q.cat] || { c: 0, w: 0 }; ok ? st.c++ : st.w++;
   const my = tok;
   try {
@@ -540,7 +570,7 @@ function finish(done) {
   <div class="stats"><div><span>Aciertos</span><b>${S.correct}/${S.answered}</b></div><div><span>Precisión</span><b>${acc}%</b></div><div><span>Mejor racha</span><b>${S.best}</b></div><div><span>Vidas</span><b>${S.lives}/${S.maxLives}</b></div><div><span>Puntos de combate</span><b>${(S.score - S.bonus.enc - S.bonus.boss).toLocaleString('es-ES')}</b></div><div><span>Criaturas y jefes</span><b>+${S.bonus.enc + S.bonus.boss}</b></div>${done ? `<div><span>Corazones</span><b>+${livesB}</b></div><div><span>Misión</span><b>+${compB}</b></div>` : ''}<div class="tot"><span>TOTAL ${isBest ? '<span class="newb">¡RÉCORD!</span>' : ''}</span><b>${total.toLocaleString('es-ES')}</b></div></div>
   ${S.tamed.length ? `<div class="minipets">${S.tamed.map((t, i) => `<div title="${t.cr.name}">${C.svg(t.cr, { mood: 'happy', uid: 'r' + i })}</div>`).join('')}</div>` : ''}
   <div class="feelbox"><span class="chip">¿Cómo te has sentido con los retos?</span><div class="row">${[['Con confianza', 1, '#b6ff3b', 'M26 34q10 10 20 0'], ['Más o menos', 2, '#ffd23f', 'M26 38h20'], ['Con dudas', 3, '#ff9f43', 'M26 40q10-9 20 0']].map(f => `<button class="face" data-nav data-act="feel" data-v="${f[1]}" aria-label="${f[0]}"><svg viewBox="0 0 72 72"><circle cx="36" cy="36" r="30" fill="${f[2]}" stroke="#1b1140" stroke-width="4"/><circle cx="26" cy="29" r="4" fill="#1b1140"/><circle cx="46" cy="29" r="4" fill="#1b1140"/><path d="${f[3]}" fill="none" stroke="#1b1140" stroke-width="4" stroke-linecap="round"/></svg><span>${f[0]}</span></button>`).join('')}</div><p class="s" id="feelmsg" aria-live="polite"></p></div>
-  <div class="row"><button class="btn" data-nav data-first data-act="again">Jugar otra vez</button><button class="btn cyan" data-nav data-act="menu">Cambiar modo</button><button class="btn ghost" data-nav data-act="home">Inicio</button></div>`, { noFocus: false });
+  <div class="row"><button class="btn" data-nav data-first data-act="again">Jugar otra vez</button><button class="btn pink" data-nav data-act="powers">¡Descubre tus superpoderes!</button><button class="btn cyan" data-nav data-act="menu">Cambiar modo</button><button class="btn ghost" data-nav data-act="home">Inicio</button></div>`, { noFocus: false });
   live(`Calificación ${letter}. ${title}. ${S.correct} aciertos de ${S.answered}. Total ${total} puntos`);
   window.__last = { letter, total, acc, done, stats: S.stats };
   setTimeout(() => { UI.audioOn && AU.startMusic('menu', P.world); curTrack = 'menu' + P.world; }, 2600);

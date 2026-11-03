@@ -15,6 +15,8 @@ Tiempo máximo por pregunta: **1 minuto** en 1.º–2.º, **2 minutos** en 3.º�
 
 **Papel y boli:** al empezar el modo historia en 3.º–4.º y 5.º–6.º aparece un aviso divertido que recomienda jugar con papel y bolígrafo. En esos ciclos se mezclan además preguntas muy fáciles (aprox. 1 de cada 3) para que casi todo el alumnado pueda acertarlas.
 
+**Superpoderes:** el botón «¡Descubre tus superpoderes!» de la pantalla final (también en game over) muestra por sentidos y por criterios de evaluación (2.1, 2.2, 4.1, 4.2, 7.1 y 8.1) lo que mejor domina el alumnado y lo que debe entrenar. Es orientativo y no sustituye la evaluación docente.
+
 **Poder:** cada acierto carga la barra PODER; cuando está llena, **Espacio** elimina dos respuestas incorrectas (una vez por carga, no en todas las preguntas).
 
 ## Los seis sentidos matemáticos
