@@ -453,10 +453,10 @@ function dirsFor(n) { return n === 4 ? ['up', 'left', 'right', 'down'] : n === 3
 function renderQuestion(q) {
   const info = Q.info(q.cat, S.cycle), dirs = dirsFor(q.answers.length), plain = strip(q.text);
   const cls = plain.length <= 20 && /[0-9?]/.test(plain) ? 'eq' : plain.length > 70 ? 'long' : '';
-  const btns = q.answers.map((a, i) => `<button class="ans${!a.includes('<') && a.length > 11 ? ' long' : ''}" data-dir="${dirs[i]}" data-i="${i}" data-act="ans" aria-label="${dirs[i] === 'up' ? 'Arriba' : dirs[i] === 'down' ? 'Abajo' : dirs[i] === 'left' ? 'Izquierda' : 'Derecha'}: ${strip(a).replace(/"/g, '')}">${ARROW(dirs[i])}<span class="av">${a}</span></button>`).join('');
+  const btns = q.answers.map((a, i) => `<button class="ans${a.includes('<') ? '' : a.length > 10 ? ' l3' : a.length > 7 ? ' l2' : a.length > 5 ? ' l1' : ''}" data-dir="${dirs[i]}" data-i="${i}" data-act="ans" aria-label="${dirs[i] === 'up' ? 'Arriba' : dirs[i] === 'down' ? 'Abajo' : dirs[i] === 'left' ? 'Izquierda' : 'Derecha'}: ${strip(a).replace(/"/g, '')}">${ARROW(dirs[i])}<span class="av">${a}</span></button>`).join('');
   S.removed = new Set(); setPower();
   const rl = S.team ? (S.qn++ % 4) : -1;
-  const p = $('qpanel'); p.style.display = ''; p.innerHTML = `<div class="qcard" id="qcard" style="--c:${info.color}"><span class="qcat">${info.name}</span>${S.team ? '<div class="role">Persona ' + (rl + 1) + ': ' + ROLES[rl] + '</div>' : ''}${S.limit ? '<div class="tbar"><i></i><b>' + S.limit + ' s</b></div>' : ''}<div class="qtext ${cls}">${q.text}</div><div class="qvis">${q.visual}</div></div>${btns}`;
+  const p = $('qpanel'); p.style.display = ''; p.innerHTML = `<div class="qcard" id="qcard" style="--c:${info.color}"><span class="qcat">${info.name}</span>${S.team ? '<div class="role">Persona ' + (rl + 1) + ': ' + ROLES[rl] + '</div>' : ''}${S.limit ? '<div class="tbar"><i></i><b>' + S.limit + ' s</b></div>' : ''}<div class="qtext ${cls}">${q.text}</div><div class="qvis">${q.visual}</div></div><div class="answers">${btns}</div>`;
 }
 function battleKey(a) {
   if (a === 'pause') { if (S && S.paused) resumeGame(); else pauseGame(); return; }

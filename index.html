@@ -306,7 +306,7 @@ kbd{display:inline-block;min-width:1.6em;padding:.1em .45em;border:.12rem solid 
 .face{background:var(--panel);border:.16rem solid var(--ink);border-radius:1rem;padding:.3rem .6rem;display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:#fff;box-shadow:0 .2rem 0 var(--ink)}
 .face svg{width:2rem;height:2rem}.face:active{transform:translateY(.15rem)}
 .qvis>svg.grid,.qvis .duo svg.grid{max-height:17rem}
-.screen>*{flex-shrink:0}
+.screen:not(.battle)>*{flex-shrink:0}
 .cards-grid{grid-template-columns:repeat(5,minmax(0,1fr));width:min(74rem,96vw)}
 @media (max-aspect-ratio:1/1){.cards-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 [data-screen=results]{gap:.5rem;padding-top:2.4rem;padding-bottom:.6rem;justify-content:flex-start}
@@ -330,6 +330,30 @@ sup{font-size:.6em;line-height:0}
 .pw.low .pbar i{background:var(--orange)}.pw.low .pchip{background:#b04a10}
 .pw.sin .pchip{background:#3b2a8c}
 @media (max-aspect-ratio:1/1){.pw{flex-direction:column;align-items:stretch}.pbar{flex:1}}
+
+/* ---- respuestas: cuatro cuadrados iguales en una fila; pantallas bajas sin cortes ---- */
+:root{--sq:min(clamp(4.8rem,18vh,11rem),calc((100vw - 4.2rem)/4))}
+#app{height:100%}
+@supports (height:100dvh){#app{height:100dvh;bottom:auto}}
+.qpanel{display:flex;flex-direction:column;gap:.55rem;padding:.3rem .7rem .6rem;width:min(70rem,100%)}
+.qcard{grid-area:auto;flex:1 1 0;min-height:0;width:100%}
+.answers{flex:none;display:flex;justify-content:center;gap:.7rem}
+.ans{grid-area:auto!important;flex:none;flex-direction:column;gap:.15rem;width:var(--sq);height:var(--sq);min-height:0;padding:.25rem;font-size:clamp(1.05rem,calc(var(--sq)*.27),2.3rem)}
+.ans.long{font-size:clamp(.72rem,calc(var(--sq)*.155),1.2rem)}
+.ans svg.a{width:.8em;height:.8em}
+.ans .av svg{height:calc(var(--sq)*.46);width:auto}
+.ans[data-dir=left]{order:1}.ans[data-dir=up]{order:2}.ans[data-dir=down]{order:3}.ans[data-dir=right]{order:4}
+@media (max-aspect-ratio:1/1){.qpanel{padding-bottom:.5rem}.answers{gap:.5rem}}
+/* si el contenido no cabe, se puede desplazar en vez de cortarse */
+.screen:not(.battle){justify-content:flex-start}
+.screen:not(.battle)>:first-child{margin-top:auto}.screen:not(.battle)>:last-child{margin-bottom:auto}
+.battle{height:100%}
+@media (max-height:560px){.hud{padding-top:.3rem}.arena{flex-basis:38%}.qtext{margin-top:1.1rem}}
+
+.ans .av{overflow-wrap:normal;word-break:normal;hyphens:none;max-width:100%}
+.ans.l1{font-size:clamp(.9rem,calc(var(--sq)*.2),1.9rem)}
+.ans.l2{font-size:clamp(.78rem,calc(var(--sq)*.155),1.5rem)}
+.ans.l3{font-size:clamp(.7rem,calc(var(--sq)*.125),1.25rem)}
 </style>
 </head>
 <body>
@@ -2188,10 +2212,10 @@ function dirsFor(n) { return n === 4 ? ['up', 'left', 'right', 'down'] : n === 3
 function renderQuestion(q) {
   const info = Q.info(q.cat, S.cycle), dirs = dirsFor(q.answers.length), plain = strip(q.text);
   const cls = plain.length <= 20 && /[0-9?]/.test(plain) ? 'eq' : plain.length > 70 ? 'long' : '';
-  const btns = q.answers.map((a, i) => `<button class="ans${!a.includes('<') && a.length > 11 ? ' long' : ''}" data-dir="${dirs[i]}" data-i="${i}" data-act="ans" aria-label="${dirs[i] === 'up' ? 'Arriba' : dirs[i] === 'down' ? 'Abajo' : dirs[i] === 'left' ? 'Izquierda' : 'Derecha'}: ${strip(a).replace(/"/g, '')}">${ARROW(dirs[i])}<span class="av">${a}</span></button>`).join('');
+  const btns = q.answers.map((a, i) => `<button class="ans${a.includes('<') ? '' : a.length > 10 ? ' l3' : a.length > 7 ? ' l2' : a.length > 5 ? ' l1' : ''}" data-dir="${dirs[i]}" data-i="${i}" data-act="ans" aria-label="${dirs[i] === 'up' ? 'Arriba' : dirs[i] === 'down' ? 'Abajo' : dirs[i] === 'left' ? 'Izquierda' : 'Derecha'}: ${strip(a).replace(/"/g, '')}">${ARROW(dirs[i])}<span class="av">${a}</span></button>`).join('');
   S.removed = new Set(); setPower();
   const rl = S.team ? (S.qn++ % 4) : -1;
-  const p = $('qpanel'); p.style.display = ''; p.innerHTML = `<div class="qcard" id="qcard" style="--c:${info.color}"><span class="qcat">${info.name}</span>${S.team ? '<div class="role">Persona ' + (rl + 1) + ': ' + ROLES[rl] + '</div>' : ''}${S.limit ? '<div class="tbar"><i></i><b>' + S.limit + ' s</b></div>' : ''}<div class="qtext ${cls}">${q.text}</div><div class="qvis">${q.visual}</div></div>${btns}`;
+  const p = $('qpanel'); p.style.display = ''; p.innerHTML = `<div class="qcard" id="qcard" style="--c:${info.color}"><span class="qcat">${info.name}</span>${S.team ? '<div class="role">Persona ' + (rl + 1) + ': ' + ROLES[rl] + '</div>' : ''}${S.limit ? '<div class="tbar"><i></i><b>' + S.limit + ' s</b></div>' : ''}<div class="qtext ${cls}">${q.text}</div><div class="qvis">${q.visual}</div></div><div class="answers">${btns}</div>`;
 }
 function battleKey(a) {
   if (a === 'pause') { if (S && S.paused) resumeGame(); else pauseGame(); return; }
