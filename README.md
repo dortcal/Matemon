@@ -7,15 +7,27 @@ Juego educativo de matemáticas para Primaria. Se juega en el navegador (sin ins
 ## Contenidos por nivel
 | Nivel | Curso | Contenidos |
 |---|---|---|
-| Cría Chispa | 1.º–2.º | Sumas y restas, secuencias, mayor y menor, formas y cuerpos geométricos, cuadraditos (sin tablas, divisiones ni fracciones) |
+| Cría Chispa | 1.º–2.º | Sumas y restas, secuencias y algoritmos, mayor y menor, formas, cuadraditos, medidas y datos (sin tablas, divisiones ni fracciones) |
 | Domador Rayo | 3.º–4.º | Tablas, divisiones, fracciones sencillas, polígonos, áreas en cuadrícula y perímetro |
 | Maestro Volcán | 5.º–6.º | Decimales, fracciones, ángulos, triángulos, áreas de triángulo y figuras compuestas |
 
-Tiempo máximo por pregunta: **1 minuto** en 1.º–2.º, **2 minutos** en 3.º–4.º y **3 minutos** en 5.º–6.º. Los dos primeros ciclos tienen además más corazones y dificultad más suave. Modos: **Historia** (todos los retos, 2 jefes y jefe final) y **Duelo rápido** por categoría. Las preguntas se generan al vuelo y no se repiten en la sesión. La vinculación con el currículo de Canarias es una propuesta pendiente de contrastar.
+Tiempo máximo por pregunta: **1 minuto** en 1.º–2.º, **2 minutos** en 3.º–4.º y **3 minutos** en 5.º–6.º. Los dos primeros ciclos tienen además más corazones y dificultad más suave. Modos: **Historia** (todos los retos, 2 jefes y jefe final) y **Duelo rápido** por categoría. Las preguntas se generan al vuelo y no se repiten en la sesión.
 
 **Papel y boli:** al empezar el modo historia en 3.º–4.º y 5.º–6.º aparece un aviso divertido que recomienda jugar con papel y bolígrafo. En esos ciclos se mezclan además preguntas muy fáciles (aprox. 1 de cada 3) para que casi todo el alumnado pueda acertarlas.
 
 **Poder:** cada acierto carga la barra PODER; cuando está llena, **Espacio** elimina dos respuestas incorrectas (una vez por carga, no en todas las preguntas).
+
+## Los seis sentidos matemáticos
+| Sentido | Dónde se trabaja |
+|---|---|
+| Numérico | Sumas y restas (con problemas cotidianos), tablas, divisiones, fracciones, mayor y menor, decimales y porcentajes (5.º–6.º) |
+| De la medida | **Medidas** (reloj, comparar magnitudes, euros, unidades y conversiones, estimar la unidad, volumen) y Áreas (superficie y perímetro) |
+| Espacial | Geometría: figuras y cuerpos, polígonos, ángulos, **ejes de simetría, giros y localización en cuadrículas y coordenadas** |
+| Algebraico y pensamiento computacional | Secuencias y algoritmos: patrones, series, **ecuaciones sencillas, máquinas de números, condicionales, robot con flechas y bucles** |
+| Estocástico | **Datos y azar**: pictogramas, gráficos de barras, moda, media, seguro/posible/imposible, probabilidad |
+| Socioafectivo | Mensajes de ánimo ante el error, pistas que explican, tiempo amplio, **autoevaluación emocional**, **Modo equipo** con roles rotatorios, nombres y personajes diversos, lenguaje inclusivo |
+
+> **Nota curricular:** la organización por sentidos sigue la estructura LOMLOE. La concreción por ciclo (saberes básicos y criterios de evaluación) del currículo de Canarias (Decreto 211/2022, anexo de Matemáticas) no se ha contrastado literalmente con el texto oficial; conviene revisarla antes de citarla en documentos de centro.
 
 ## Controles (Makey Makey)
 ↑ ← → ↓ para elegir respuesta, **Espacio** para aceptar, continuar y usar el PODER (en la Makey Makey no hace falta el clic), `Esc` pausa, `M` silencio. También W A S D y 1–4.

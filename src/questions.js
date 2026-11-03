@@ -300,6 +300,7 @@ function seqShape(c, d) {
   return build({ cat: 'secuencias', text: '¿Qué figura sigue?', visual: row, correct: tok(ans[0], ans[1]), wrong: poolW.filter(t => key(t) !== key(ans)).map(t => tok(t[0], t[1])), hint, key: 'sq|' + tokens.map(key).join(''), big: true });
 }
 function secuencias(c, d) {
+  if (R.chance(c === 1 ? .25 : .35)) { const q = algoritmo(c, d); if (q) return q; }
   const pv = c === 1 ? .5 : c === 2 ? .3 : .2;
   return R.chance(pv) ? seqShape(c, d) : seqNum(c, d);
 }
@@ -439,6 +440,7 @@ function angleSvg(deg) {
   return svg('0 0 120 110', `<line x1="${ox}" y1="${oy}" x2="${ox + L + 10}" y2="${oy}" ${STW}/><line x1="${ox}" y1="${oy}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" ${STW}/>${mark}<circle cx="${ox}" cy="${oy}" r="4" fill="#ff3d9a"/>`, 'fig');
 }
 function geometria(c, d) {
+  if (R.chance(.35)) { const q = espacial(c, d); if (q) return q; }
   if (c === 1) {
     const form = R.pick(['name2d', 'name2d', 'sides', 'name3d', 'real', 'find2d', 'find3d']);
     const n2 = ['círculo', 'cuadrado', 'triángulo', 'rectángulo'], k2 = ['circulo', 'cuadrado', 'triangulo', 'rectangulo'];
@@ -559,22 +561,240 @@ function areas(c, d) {
 }
 
 /* ---------- registro ---------- */
-const GEN = { sumres, tablas, divisiones, secuencias, comparar, fracciones, geometria, areas };
+const GEN = { sumres, tablas, divisiones, secuencias, comparar, fracciones, geometria, areas, medida, datos };
 const BYCYCLE = {
-  1: ['sumres', 'secuencias', 'comparar', 'geometria', 'areas'],
-  2: ['sumres', 'tablas', 'divisiones', 'secuencias', 'fracciones', 'comparar', 'geometria', 'areas'],
-  3: ['sumres', 'tablas', 'divisiones', 'secuencias', 'fracciones', 'comparar', 'geometria', 'areas']
+  1: ['sumres', 'secuencias', 'comparar', 'geometria', 'areas', 'medida', 'datos'],
+  2: ['sumres', 'tablas', 'divisiones', 'secuencias', 'fracciones', 'comparar', 'geometria', 'areas', 'medida', 'datos'],
+  3: ['sumres', 'tablas', 'divisiones', 'secuencias', 'fracciones', 'comparar', 'geometria', 'areas', 'medida', 'datos']
 };
 const INFO = {
   sumres: { name: 'Sumas y restas', color: '#ff7a3d', boss: 'Gran Sumador' },
-  tablas: { name: 'Tablas de multiplicar', color: '#ff3d9a', boss: 'Rey de las Tablas' },
-  divisiones: { name: 'Divisiones', color: '#9b6bff', boss: 'Divisor Supremo' },
+  tablas: { name: 'Tablas de multiplicar', color: '#ff3d9a', boss: 'Reina de las Tablas' },
+  divisiones: { name: 'Divisiones', color: '#9b6bff', boss: 'Divisora Suprema' },
   secuencias: { name: 'Secuencias lógicas', color: '#2de2ff', boss: 'Maga del Patrón' },
   fracciones: { name: 'Fracciones', color: '#ffd23f', boss: 'Lord Pizza' },
-  comparar: { name: 'Mayor y menor', color: '#b6ff3b', boss: 'Juez Mayor-Menor' },
+  comparar: { name: 'Mayor y menor', color: '#b6ff3b', boss: 'Jueza Mayor-Menor' },
   geometria: { name: 'Geometría', color: '#4d8dff', boss: 'Arquitecto Prisma' },
-  areas: { name: 'Áreas', color: '#ff8fb8', boss: 'Gigante Cuadrícula' }
+  areas: { name: 'Áreas', color: '#ff8fb8', boss: 'Gigante Cuadrícula' },
+  medida: { name: 'Medidas', color: '#34d399', boss: 'Maestra del Reloj' },
+  datos: { name: 'Datos y azar', color: '#fb7185', boss: 'Capitán Gráfico' }
 };
+
+/* ---------- MEDIDA (sentido de la medida) ---------- */
+function clockSvg(h, m) {
+  let s = `<circle cx="60" cy="60" r="52" fill="#fff" ${ST}/>`;
+  for (let i = 1; i <= 12; i++) { const a = (i * 30 - 90) * Math.PI / 180; s += `<text x="${(60 + 41 * Math.cos(a)).toFixed(1)}" y="${(60 + 41 * Math.sin(a) + 5).toFixed(1)}" text-anchor="middle" font-size="14" font-weight="900" fill="${INK}" font-family="Arial Black,sans-serif">${i}</text>`; }
+  const ha = ((h % 12) + m / 60) * 30 - 90, ma = m * 6 - 90, P = (a, l) => `${(60 + l * Math.cos(a * Math.PI / 180)).toFixed(1)}" y2="${(60 + l * Math.sin(a * Math.PI / 180)).toFixed(1)}`;
+  s += `<line x1="60" y1="60" x2="${P(ha, 24)}" stroke="${INK}" stroke-width="7" stroke-linecap="round"/><line x1="60" y1="60" x2="${P(ma, 36)}" stroke="#ff3d9a" stroke-width="4.5" stroke-linecap="round"/><circle cx="60" cy="60" r="5" fill="${INK}"/>`;
+  return svg('0 0 120 120', s, 'fig');
+}
+const art = h => (h === 1 ? 'la 1' : `las ${h}`);
+function timeWords(h, m) {
+  const h12 = ((h - 1) % 12) + 1, n12 = (h12 % 12) + 1;
+  if (m === 0) return `${art(h12)} en punto`;
+  if (m === 15) return `${art(h12)} y cuarto`;
+  if (m === 30) return `${art(h12)} y media`;
+  if (m === 45) return `${art(n12)} menos cuarto`;
+  return m < 30 ? `${art(h12)} y ${m}` : `${art(n12)} menos ${60 - m}`;
+}
+const digital = (h, m) => `${h}:${String(m).padStart(2, '0')}`;
+const WEEK = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+const MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const UNITS = [['m', 'cm', 100], ['km', 'm', 1000], ['kg', 'g', 1000], ['l', 'ml', 1000], ['h', 'min', 60], ['cm', 'mm', 10]];
+const EST = [['la altura de una puerta', 'm', ['cm', 'km', 'mm']], ['la longitud de un lápiz', 'cm', ['m', 'km', 'mm']], ['la distancia entre dos pueblos', 'km', ['m', 'cm', 'mm']], ['el peso de una manzana', 'g', ['kg', 'l', 'ml']], ['el peso de un coche', 'kg', ['g', 'ml', 'l']], ['la capacidad de una botella de agua', 'l', ['ml', 'kg', 'cm']], ['una cucharadita de jarabe', 'ml', ['l', 'kg', 'g']], ['lo que dura una clase', 'min', ['s', 'h', 'g']], ['lo que tardas en parpadear', 's', ['min', 'h', 'ml']], ['la longitud de una hormiga', 'mm', ['m', 'cm', 'km']]];
+function medida(c, d) {
+  const form = R.pick(c === 1 ? ['clock', 'clock', 'cmp', 'cmp', 'money', 'days'] : c === 2 ? ['clock', 'units', 'units', 'est', 'money', 'time'] : ['units', 'units', 'timeadd', 'est', 'vol', 'money', 'clock']);
+  if (form === 'clock') {
+    const h = R.int(1, 12), m = c === 1 ? R.pick(d < .4 ? [0] : [0, 30]) : c === 2 ? R.pick([0, 15, 30, 45, 5, 10, 20, 25, 35, 40, 50, 55]) : R.pick([0, 15, 30, 45, 5, 10, 20, 25, 35, 40, 50, 55]);
+    if (c === 3) { const ok = digital(h, m); return build({ cat: 'medida', text: '¿Qué hora marca el reloj?', visual: clockSvg(h, m), correct: ok, wrong: [digital(h, (m + 15) % 60), digital(m === 0 ? h : (m / 5 > 12 ? 1 : m / 5), h * 5 % 60), digital(h % 12 + 1, m), digital(h, (m + 30) % 60), digital(((h + 10) % 12) + 1, m)], hint: `La hora corta marca el ${h} y la larga los minutos: ${ok}`, key: 'm|ck' + h + m }); }
+    const ok = timeWords(h, m);
+    return build({ cat: 'medida', text: '¿Qué hora marca el reloj?', visual: clockSvg(h, m), correct: ok, wrong: [timeWords(h, (m + 30) % 60), timeWords(h % 12 + 1, m), timeWords(((h + 10) % 12) + 1, m), timeWords(h, m === 0 ? 30 : 0)].concat(c === 1 ? [] : [timeWords(h, (m + 15) % 60)]), hint: `La aguja corta señala la hora y la larga los minutos: ${ok}`, key: 'm|ck' + h + m, big: false });
+  }
+  if (form === 'cmp') {
+    const P = R.pick([['¿Qué pesa MÁS?', 'un elefante', 'un gato'], ['¿Qué pesa MÁS?', 'un coche', 'una pluma'], ['¿Qué pesa MENOS?', 'una hoja', 'una mesa'], ['¿Qué mide MÁS?', 'un autobús', 'un lápiz'], ['¿Qué mide MENOS?', 'una hormiga', 'una jirafa'], ['¿Qué pesa MÁS?', 'una vaca', 'un pájaro'], ['¿Qué pesa MENOS?', 'un bolígrafo', 'una bicicleta'], ['¿Qué mide MÁS?', 'un árbol', 'una flor'], ['¿Qué mide MENOS?', 'un dedo', 'una puerta'], ['¿Qué tiene MÁS capacidad?', 'una bañera', 'una taza'], ['¿Qué tiene MENOS capacidad?', 'un dedal', 'una garrafa'], ['¿Qué dura MÁS?', 'un mes', 'un día'], ['¿Qué dura MENOS?', 'una hora', 'un año'], ['¿Qué pesa MÁS?', 'un camión', 'una moto'], ['¿Qué mide MÁS?', 'el Teide', 'un edificio'], ['¿Qué tiene MÁS capacidad?', 'una piscina', 'un vaso'], ['¿Qué tiene MENOS capacidad?', 'una cucharita', 'un cubo'], ['¿Qué dura MÁS?', 'un día', 'una hora'], ['¿Qué dura MENOS?', 'un minuto', 'una semana']]);
+    const more = /MÁS/.test(P[0]), win = P[0].includes('MENOS') ? P[2 - 1] : P[1];
+    const ok = (more ? P[1] : P[1]); // P[1] siempre es la respuesta correcta (ya redactadas)
+    return build({ cat: 'medida', text: P[0], correct: P[1], wrong: [P[2]], n: 2, min: 2, hint: `${P[1][0].toUpperCase() + P[1].slice(1)} ${more ? 'es mayor' : 'es menor'} que ${P[2]}`, key: 'm|cmp' + P[0] + P[1] });
+  }
+  if (form === 'money') {
+    if (c === 1) { const a = R.int(1, 4), b = R.int(1, 3), cc = d > .5 ? R.int(0, 2) : 0, t = a + 2 * b + 5 * cc; return build({ cat: 'medida', text: `Tienes ${a} moneda${a > 1 ? 's' : ''} de 1 €, ${b} de 2 €${cc ? ' y ' + cc + ' billete' + (cc > 1 ? 's' : '') + ' de 5 €' : ''}. ¿Cuántos euros tienes?`, correct: t + ' €', wrong: numWrong(t).map(x => x + ' €'), hint: `Suma: ${[...Array(a).fill(1), ...Array(b).fill(2), ...Array(cc).fill(5)].join(' + ')} = ${t} €`, key: 'm|mo1' + a + b + cc }); }
+    if (c === 2) { const a = R.int(2, 9), b = R.int(1, 9), pay = R.pick([10, 20]), t = a + b; if (t >= pay) return null; return build({ cat: 'medida', text: `Compras ${R.pick(['un bocadillo', 'unas papas', 'un helado'])} de ${a} € y ${R.pick(['un zumo', 'un batido', 'una fruta'])} de ${b} €. Pagas con ${pay} €. ¿Cuánto te devuelven?`, correct: (pay - t) + ' €', wrong: [pay - t + 1, pay - t - 1, t, pay - t + 2, pay - t - 2, pay].filter(x => x >= 0 && x !== pay - t).map(x => x + ' €'), hint: `${a} + ${b} = ${t}; ${pay} − ${t} = ${pay - t} €`, key: 'm|mo2' + a + b + pay }); }
+    const a = R.int(100, 799) / 100, b = R.int(100, 799) / 100, t = Math.round((a + b) * 100) / 100;
+    return build({ cat: 'medida', text: `Un cuaderno cuesta ${D(a)} € y un bolígrafo ${D(b)} €. ¿Cuánto cuestan los dos?`, correct: D(t) + ' €', wrong: [t + .1, t - .1, t + 1, t - 1, Math.round(Math.abs(a - b) * 100) / 100, t + .5].filter(x => x > 0 && x !== t).map(x => D(x) + ' €'), hint: `${D(a)} + ${D(b)} = ${D(t)} €`, key: 'm|mo3' + a + b });
+  }
+  if (form === 'days') {
+    if (R.chance(.65) || d < .5) { const i = R.int(0, 6), next = R.chance(.5), ans = WEEK[(i + (next ? 1 : 6)) % 7]; return build({ cat: 'medida', text: `Hoy es ${WEEK[i]}. ¿Qué día ${next ? 'será mañana' : 'fue ayer'}?`, correct: ans, wrong: WEEK.filter(x => x !== ans), hint: `Después de ${WEEK[i]} ${next ? 'viene ' + ans : 'estuvimos en ' + ans}`, key: 'm|dy' + i + next }); }
+    const i = R.int(0, 11), ans = MONTHS[(i + 1) % 12]; return build({ cat: 'medida', text: `¿Qué mes viene después de ${MONTHS[i]}?`, correct: ans, wrong: MONTHS.filter(x => x !== ans), hint: `Después de ${MONTHS[i]} viene ${ans}`, key: 'm|mn' + i });
+  }
+  if (form === 'units') {
+    const U = c === 2 ? R.pick(UNITS.slice(0, 5)) : R.pick(UNITS), n = c === 2 ? R.int(1, 5) : R.pick([1.5, 2.5, 3.5, 0.5, 4, 6, 2.25, 7.5]);
+    if (c === 3 && R.chance(.4)) { const big = n * U[2]; return build({ cat: 'medida', text: `${N(big)} ${U[1]} = ${BLANK} ${U[0]}`, correct: N(n), wrong: [n * 10, n / 10, n * 100, n / 100, n + 1].filter(x => x !== n && x > 0).map(N), hint: `1 ${U[0]} = ${N(U[2])} ${U[1]}, así que ${N(big)} ${U[1]} son ${N(n)} ${U[0]}`, key: 'm|u2' + U + n }); }
+    const ans = n * U[2];
+    return build({ cat: 'medida', text: `${N(n)} ${U[0]} = ${BLANK} ${U[1]}`, correct: N(ans), wrong: [ans * 10, ans / 10, ans * 100, ans / 100, ans + U[2]].filter(x => x !== ans && x > 0).map(N), hint: `1 ${U[0]} = ${N(U[2])} ${U[1]}, así que ${N(n)} ${U[0]} = ${N(ans)} ${U[1]}`, key: 'm|u' + U + n });
+  }
+  if (form === 'est') {
+    const e = R.pick(EST); return build({ cat: 'medida', text: `¿En qué unidad medirías ${e[0]}?`, correct: e[1], wrong: e[2], hint: `Para ${e[0]} lo más cómodo es medir en ${e[1]}`, key: 'm|es' + e[0] });
+  }
+  if (form === 'time') {
+    const k = R.pick([[2, 0], [1, 30], [3, 0], [2, 30], [4, 0], [1, 15]]), t = k[0] * 60 + k[1];
+    return build({ cat: 'medida', text: `¿Cuántos minutos hay en ${k[0]} hora${k[0] > 1 ? 's' : ''}${k[1] ? ' y ' + (k[1] === 30 ? 'media' : k[1] + ' minutos') : ''}?`, correct: String(t), wrong: [t + 10, t - 10, t + 30, t - 30, k[0] * 100 + k[1], t + 60].filter(x => x > 0 && x !== t).map(String), hint: `1 hora = 60 minutos: ${k[0]} × 60 = ${k[0] * 60}${k[1] ? ' + ' + k[1] : ''} = ${t} minutos`, key: 'm|tm' + t });
+  }
+  if (form === 'timeadd') {
+    const h = R.int(8, 18), m = R.pick([0, 15, 30, 45]), dh = R.int(0, 2), dm = R.pick([15, 30, 45]), tot = h * 60 + m + dh * 60 + dm, eh = Math.floor(tot / 60), em = tot % 60;
+    return build({ cat: 'medida', text: `Una actividad empieza a las ${digital(h, m)} y dura ${dh ? dh + ' h ' : ''}${dm} min. ¿A qué hora termina?`, correct: digital(eh, em), wrong: [tot + 15, tot - 15, tot + 60, tot - 60, tot + 30].map(x => digital(Math.floor(x / 60), x % 60)), hint: `${digital(h, m)} + ${dh ? dh + ' h ' : ''}${dm} min = ${digital(eh, em)}`, key: 'm|ta' + h + m + dh + dm });
+  }
+  if (form === 'vol') {
+    if (R.chance(.5)) { const l = R.int(2, 5); return build({ cat: 'medida', text: `Un cubo tiene aristas de ${l} cm. ¿Cuál es su volumen?`, visual: solid('cubo'), correct: `${l ** 3} cm³`, wrong: [l * l, 3 * l, l ** 3 + l, l ** 3 - l, 6 * l * l].filter(x => x > 0 && x !== l ** 3).map(x => x + ' cm³'), hint: `Volumen = ${l} × ${l} × ${l} = ${l ** 3} cm³`, key: 'm|vc' + l }); }
+    const a = R.int(2, 5), b = R.int(2, 4), cc = R.int(2, 4), v = a * b * cc;
+    return build({ cat: 'medida', text: `Un prisma se llena con ${a} × ${b} × ${cc} cubitos de 1 cm³. ¿Cuál es su volumen?`, correct: `${v} cm³`, wrong: [a + b + cc, v + a, v - b, a * b, v + 10].filter(x => x > 0 && x !== v).map(x => x + ' cm³'), hint: `Volumen = ${a} × ${b} × ${cc} = ${v} cm³`, key: 'm|vp' + a + b + cc });
+  }
+  return null;
+}
+
+/* ---------- DATOS Y AZAR (sentido estocástico) ---------- */
+const FRUITS = [['plátano', '#ffd23f'], ['papaya', '#ff7a3d'], ['mango', '#ff3d9a'], ['piña', '#b6ff3b'], ['uva', '#9b6bff']];
+function pictoSvg(cats, vals) {
+  let s = ''; cats.forEach((c, i) => { s += `<text x="4" y="${24 + i * 32}" font-size="15" font-weight="900" fill="#fff" font-family="Arial Black,sans-serif" stroke="${INK}" stroke-width="3.5" paint-order="stroke">${c[0]}</text>`; for (let k = 0; k < vals[i]; k++) s += `<circle cx="${100 + k * 22}" cy="${19 + i * 32}" r="9" fill="${c[1]}" stroke="${INK}" stroke-width="2.5"/>`; });
+  return svg(`0 0 ${Math.max(...vals) * 22 + 112} ${cats.length * 32 + 4}`, s, 'fig wide');
+}
+function barSvg(cats, vals, step, max) {
+  const W = 40 + cats.length * 46, H = 150; let s = '';
+  for (let v = 0; v <= max; v += step) { const y = 128 - v / max * 108; s += `<line x1="30" y1="${y}" x2="${W}" y2="${y}" stroke="#ffffff55" stroke-width="1.5"/><text x="26" y="${y + 5}" text-anchor="end" font-size="12" font-weight="900" fill="#fff" font-family="Arial Black,sans-serif">${v}</text>`; }
+  cats.forEach((c, i) => { const h = vals[i] / max * 108, x = 40 + i * 46; s += `<rect x="${x}" y="${128 - h}" width="32" height="${h}" rx="3" fill="${c[1]}" ${ST} stroke-width="2.5"/><text x="${x + 16}" y="144" text-anchor="middle" font-size="11" font-weight="900" fill="#fff" font-family="Arial Black,sans-serif">${c[0].slice(0, 7)}</text>`; });
+  return svg(`0 0 ${W} ${H}`, s, 'fig wide');
+}
+function bagSvg(counts, cols) {
+  let s = '', i = 0; const per = Math.max(4, Math.ceil(Math.sqrt(counts.reduce((a, b) => a + b, 0) * 1.6)));
+  counts.forEach((n, ci) => { for (let k = 0; k < n; k++, i++) s += `<circle cx="${18 + (i % per) * 26}" cy="${18 + Math.floor(i / per) * 26}" r="10.5" fill="${cols[ci][1]}" stroke="${INK}" stroke-width="2.5"/>`; });
+  const rows = Math.ceil(i / per);
+  return svg(`0 0 ${per * 26 + 8} ${rows * 26 + 8}`, s, 'fig wide');
+}
+const BALLS = [['roja', '#ff3d5a'], ['azul', '#2d9bff'], ['verde', '#43d65a'], ['amarilla', '#ffd23f']];
+function datos(c, d) {
+  const form = R.pick(c === 1 ? ['pic', 'pic', 'pic', 'azar', 'azar'] : c === 2 ? ['bar', 'bar', 'pic', 'azar', 'moda'] : ['bar', 'bar', 'azar', 'media', 'moda', 'prob']);
+  if (form === 'pic') {
+    const cats = R.shuffle(FRUITS).slice(0, 4), vals = cats.map(() => R.int(1, c === 1 ? 6 : 8)); if (new Set(vals).size < 4) return null;
+    const v = pictoSvg(cats, vals), kind = R.pick(c === 1 ? ['max', 'count', 'min'] : ['max', 'count', 'diff', 'tot']), i = R.int(0, 3);
+    if (kind === 'max' || kind === 'min') { const best = kind === 'max' ? Math.max(...vals) : Math.min(...vals), bi = vals.indexOf(best); return build({ cat: 'datos', text: `¿Qué fruta es la ${kind === 'max' ? 'MÁS' : 'MENOS'} votada?`, visual: v, correct: cats[bi][0], wrong: cats.filter((_, j) => j !== bi).map(x => x[0]), hint: `Cada círculo es un voto. Cuenta: ${cats.map((x, j) => x[0] + ' ' + vals[j]).join(', ')}`, key: 'd|p' + kind + vals + cats.map(x => x[0]) }); }
+    if (kind === 'count') return build({ cat: 'datos', text: `¿Cuántos votos tiene el ${cats[i][0]}?`.replace('el uva', 'la uva').replace('el papaya', 'la papaya').replace('el piña', 'la piña'), visual: v, correct: String(vals[i]), wrong: numWrong(vals[i]), hint: `Cuenta los círculos de ${cats[i][0]}: ${vals[i]}`, key: 'd|pc' + vals + i + cats.map(x => x[0]) });
+    if (kind === 'tot') { const t = vals.reduce((a, b) => a + b, 0); return build({ cat: 'datos', text: '¿Cuántos votos hay en total?', visual: v, correct: String(t), wrong: numWrong(t), hint: `${vals.join(' + ')} = ${t}`, key: 'd|pt' + vals }); }
+    const j = (i + 1) % 4, dif = Math.abs(vals[i] - vals[j]); return build({ cat: 'datos', text: `¿Cuántos votos de diferencia hay entre ${cats[i][0]} y ${cats[j][0]}?`, visual: v, correct: String(dif), wrong: numWrong(dif, [vals[i] + vals[j]]), hint: `${Math.max(vals[i], vals[j])} − ${Math.min(vals[i], vals[j])} = ${dif}`, key: 'd|pd' + vals + i });
+  }
+  if (form === 'bar') {
+    const n = 4, cats = R.shuffle(FRUITS).slice(0, n), step = c === 2 ? 2 : 10, max = c === 2 ? 10 : 50, vals = cats.map(() => c === 2 ? R.int(1, 10) : R.int(1, 10) * 5);
+    if (new Set(vals).size < n) return null; const v = barSvg(cats, vals, step, max), i = R.int(0, n - 1), j = (i + 1) % n;
+    const kind = R.pick(c === 2 ? ['val', 'max', 'diff'] : ['val', 'max', 'diff', 'tot']);
+    if (kind === 'val') return build({ cat: 'datos', text: `¿Qué valor tiene la barra de ${cats[i][0]}?`, visual: v, correct: String(vals[i]), wrong: numWrong(vals[i], [vals[i] + step / 2]), hint: `Mira hasta dónde llega la barra de ${cats[i][0]}: ${vals[i]}`, key: 'd|bv' + vals + i + cats.map(x => x[0]) });
+    if (kind === 'max') { const bi = vals.indexOf(Math.max(...vals)); return build({ cat: 'datos', text: '¿Qué barra es la MÁS alta?', visual: v, correct: cats[bi][0], wrong: cats.filter((_, k) => k !== bi).map(x => x[0]), hint: `La más alta es ${cats[bi][0]} con ${vals[bi]}`, key: 'd|bm' + vals + cats.map(x => x[0]) }); }
+    if (kind === 'tot') { const t = vals.reduce((a, b) => a + b, 0); return build({ cat: 'datos', text: 'Suma todas las barras. ¿Cuál es el total?', visual: v, correct: String(t), wrong: numWrong(t), hint: `${vals.join(' + ')} = ${t}`, key: 'd|bt' + vals }); }
+    const dif = Math.abs(vals[i] - vals[j]); return build({ cat: 'datos', text: `¿Cuántas unidades más tiene ${vals[i] > vals[j] ? cats[i][0] : cats[j][0]} que ${vals[i] > vals[j] ? cats[j][0] : cats[i][0]}?`, visual: v, correct: String(dif), wrong: numWrong(dif, [vals[i] + vals[j]]), hint: `${Math.max(vals[i], vals[j])} − ${Math.min(vals[i], vals[j])} = ${dif}`, key: 'd|bd' + vals + i + cats.map(x => x[0]) });
+  }
+  if (form === 'azar') {
+    const cols = R.shuffle(BALLS).slice(0, 3);
+    if (c === 1 || d < .4) {
+      const mode = R.pick(['sure', 'imp', 'pos']); let counts, target;
+      if (mode === 'sure') { counts = [R.int(3, 8)]; target = 0; } else if (mode === 'imp') { counts = [R.int(3, 8)]; target = 1; } else { counts = [R.int(2, 5), R.int(2, 5)]; target = R.int(0, 1); }
+      const real = mode === 'sure' ? 'seguro' : mode === 'imp' ? 'imposible' : 'posible';
+      return build({ cat: 'datos', text: `Sacas una bola sin mirar. ¿Sacar una bola ${cols[target][0]} es seguro, posible o imposible?`, visual: bagSvg(counts, cols), correct: real, wrong: ['seguro', 'posible', 'imposible'].filter(x => x !== real), n: 3, hint: mode === 'sure' ? 'Todas las bolas son de ese color: es seguro' : mode === 'imp' ? 'No hay ninguna bola de ese color: es imposible' : 'Hay bolas de ese color y de otros: es posible', key: 'd|az' + mode + counts + target + cols.map(x => x[0]) });
+    }
+    const a = R.int(1, 3), b = R.int(5, 9), arr = R.chance(.5) ? [b, a] : [a, b], t = R.int(0, 1), pr = arr[t] > arr[1 - t] ? 'muy probable' : 'poco probable';
+    return build({ cat: 'datos', text: `Sacas una bola sin mirar. ¿Sacar una bola ${cols[t][0]} es…?`, visual: bagSvg(arr, cols), correct: pr, wrong: ['seguro', 'muy probable', 'poco probable', 'imposible'].filter(x => x !== pr), hint: `Hay ${arr[t]} bolas ${cols[t][0]}s y ${arr[1 - t]} ${cols[1 - t][0]}s: ${pr}`, key: 'd|az2' + arr + t + cols.map(x => x[0]) });
+  }
+  if (form === 'moda') {
+    const base = R.int(1, 9), arr = []; const m = R.int(1, 9); for (let i = 0; i < 3; i++) arr.push(m);
+    while (arr.length < (c === 2 ? 7 : 9)) { const x = R.int(1, c === 2 ? 9 : 20); if (x !== m && arr.filter(y => y === x).length < 2) arr.push(x); }
+    const sh = R.shuffle(arr); return build({ cat: 'datos', text: `Notas de un grupo: ${sh.join(', ')}. ¿Cuál es la MODA (el dato que más se repite)?`, correct: String(m), wrong: numWrong(m, [Math.max(...arr), Math.min(...arr)]), hint: `El ${m} aparece 3 veces: es la moda`, key: 'd|mo' + sh });
+  }
+  if (form === 'media') {
+    const n = R.pick([4, 5]), mean = R.int(3, 15), arr = []; let sum = mean * n; for (let i = 0; i < n - 1; i++) { const x = Math.max(1, mean + R.int(-3, 3)); arr.push(x); sum -= x; }
+    if (sum < 1) return null; arr.push(sum); const sh = R.shuffle(arr);
+    return build({ cat: 'datos', text: `Calcula la MEDIA de: ${sh.join(', ')}`, correct: String(mean), wrong: numWrong(mean, [Math.max(...arr), Math.min(...arr), mean * n]), hint: `Suma: ${sh.join(' + ')} = ${mean * n}; ${mean * n} ÷ ${n} = ${mean}`, key: 'd|me' + sh });
+  }
+  const cols = R.shuffle(BALLS).slice(0, 3), cnt = [R.int(1, 5), R.int(1, 5), R.int(1, 5)], tot = cnt.reduce((a, b) => a + b, 0), t = R.int(0, 2), g = gcd(cnt[t], tot);
+  return build({ cat: 'datos', text: `Sacas una bola sin mirar. ¿Qué probabilidad hay de sacar una bola ${cols[t][0]}?`, visual: bagSvg(cnt, cols), correct: F(cnt[t], tot), wrong: [F(1, tot), F(tot - cnt[t], tot), F(cnt[t], tot + 1), F(cnt[t], cnt[(t + 1) % 3]), F(tot, cnt[t])], hint: `${cnt[t]} bolas ${cols[t][0]}s de un total de ${tot}: ${cnt[t]}/${tot}`, big: true, key: 'd|pr' + cnt + t + cols.map(x => x[0]) });
+}
+
+/* ---------- ESPACIAL (posición, giros, simetría) ---------- */
+const DIRS4 = ['arriba', 'derecha', 'abajo', 'izquierda'];
+function espacial(c, d) {
+  const form = R.pick(c === 1 ? ['cell', 'cell', 'turn'] : c === 2 ? ['cell', 'turn', 'sym', 'sym'] : ['coord', 'coord', 'turn', 'sym']);
+  if (form === 'cell') {
+    const g = c === 1 ? 4 : 5, r0 = R.int(0, g - 1), c0 = R.int(0, g - 1), s = 28, pad = 22; let o = '';
+    for (let r = 0; r < g; r++) for (let cc = 0; cc < g; cc++) o += `<rect x="${pad + cc * s}" y="${pad + r * s}" width="${s}" height="${s}" fill="#fff" stroke="#8a7fb8" stroke-width="2"/>`;
+    for (let k = 0; k < g; k++) o += `<text x="${pad + k * s + s / 2}" y="16" text-anchor="middle" class="dim">${'ABCDE'[k]}</text><text x="8" y="${pad + k * s + s / 2 + 5}" text-anchor="middle" class="dim">${k + 1}</text>`;
+    o += `<polygon points="${starPts(pad + c0 * s + s / 2, pad + r0 * s + s / 2 + 1, 12, 5.5, 5)}" fill="#ffd23f" ${ST} stroke-width="2.5"/>`;
+    const ok = `${'ABCDE'[c0]}${r0 + 1}`;
+    return build({ cat: 'geometria', text: '¿En qué casilla está la estrella?', visual: svg(`0 0 ${pad + g * s + 8} ${pad + g * s + 8}`, o, 'fig grid'), correct: ok, wrong: [`${'ABCDE'[r0 % g]}${c0 + 1}`, `${'ABCDE'[Math.min(g - 1, c0 + 1)]}${r0 + 1}`, `${'ABCDE'[c0]}${Math.min(g, r0 + 2)}`, `${'ABCDE'[Math.max(0, c0 - 1)]}${r0 + 1}`, `${'ABCDE'[c0]}${Math.max(1, r0)}`], hint: `Letra de la columna y número de la fila: columna ${'ABCDE'[c0]}, fila ${r0 + 1} → ${ok}`, key: 'e|cell' + g + c0 + r0 });
+  }
+  if (form === 'coord') {
+    const x = R.int(1, 6), y = R.int(1, 6), s = 24, pad = 24; let o = '';
+    for (let k = 0; k <= 6; k++) o += `<line x1="${pad + k * s}" y1="${pad}" x2="${pad + k * s}" y2="${pad + 6 * s}" stroke="#ffffff66" stroke-width="1.5"/><line x1="${pad}" y1="${pad + k * s}" x2="${pad + 6 * s}" y2="${pad + k * s}" stroke="#ffffff66" stroke-width="1.5"/><text x="${pad + k * s}" y="${pad + 6 * s + 16}" text-anchor="middle" class="dim">${k}</text><text x="${pad - 8}" y="${pad + (6 - k) * s + 5}" text-anchor="end" class="dim">${k}</text>`;
+    o += `<line x1="${pad}" y1="${pad}" x2="${pad}" y2="${pad + 6 * s}" stroke="#fff" stroke-width="3"/><line x1="${pad}" y1="${pad + 6 * s}" x2="${pad + 6 * s}" y2="${pad + 6 * s}" stroke="#fff" stroke-width="3"/><circle cx="${pad + x * s}" cy="${pad + (6 - y) * s}" r="7" fill="#ff3d9a" ${ST} stroke-width="2.5"/>`;
+    return build({ cat: 'geometria', text: '¿Cuáles son las coordenadas del punto?', visual: svg(`0 0 ${pad + 6 * s + 20} ${pad + 6 * s + 26}`, o, 'fig grid'), correct: `(${x}, ${y})`, wrong: [`(${y}, ${x})`, `(${x + 1 > 6 ? x - 1 : x + 1}, ${y})`, `(${x}, ${y + 1 > 6 ? y - 1 : y + 1})`, `(${Math.max(0, x - 1)}, ${y})`], hint: `Primero se lee el número horizontal y luego el vertical: ${x} hacia la derecha y ${y} hacia arriba → (${x}, ${y})`, key: 'e|co' + x + y });
+  }
+  if (form === 'turn') {
+    const s = R.int(0, 3), k = c === 1 ? 1 : R.pick([1, 2, 3]), right = c === 1 ? true : R.chance(.5), ans = DIRS4[(s + (right ? k : 4 - k)) % 4];
+    const turn = k === 1 ? 'un cuarto de vuelta' + (c === 3 ? ' (90°)' : '') : k === 2 ? 'media vuelta' + (c === 3 ? ' (180°)' : '') : 'tres cuartos de vuelta' + (c === 3 ? ' (270°)' : '');
+    const arrow = svg('0 0 80 80', `<circle cx="40" cy="40" r="34" fill="#fff" ${ST}/><g transform="rotate(${s * 90} 40 40)"><polygon points="40,10 52,38 28,38" fill="#ff3d9a" ${ST} stroke-width="2.5"/><rect x="35" y="36" width="10" height="26" fill="#ff3d9a" ${ST} stroke-width="2.5"/></g>`, 'fig');
+    return build({ cat: 'geometria', text: `Miras hacia ${DIRS4[s]} y giras ${turn} a la ${right ? 'derecha' : 'izquierda'}. ¿Hacia dónde miras ahora?`, visual: arrow, correct: ans, wrong: DIRS4.filter(x => x !== ans), hint: `Cada cuarto de vuelta a la ${right ? 'derecha' : 'izquierda'} cambia la dirección: ${DIRS4[s]} → ${ans}`, key: 'e|tu' + s + k + right });
+  }
+  const t = c === 2 ? R.pick([[4, 'cuadrado', polyFig(4)], [2, 'rectángulo', shape2d('rectangulo')], [3, 'triángulo equilátero', polyFig(3)]]) : R.pick([[5, 'pentágono regular', polyFig(5)], [6, 'hexágono regular', polyFig(6)], [4, 'cuadrado', polyFig(4)], [3, 'triángulo equilátero', polyFig(3)], [2, 'rombo', shape2d('rombo')]]);
+  return build({ cat: 'geometria', text: `¿Cuántos ejes de simetría tiene un ${t[1]}?`, visual: t[2], correct: String(t[0]), wrong: ['1', '2', '3', '4', '5', '6', '0'], hint: `Un ${t[1]} tiene ${t[0]} ejes de simetría (líneas que lo dividen en dos mitades iguales)`, key: 'e|sy' + t[1] });
+}
+
+/* ---------- ALGORITMOS, ECUACIONES Y LÓGICA (sentido algebraico y pensamiento computacional) ---------- */
+const AR = d => `<svg class="arw" viewBox="0 0 24 24" style="transform:rotate(${{ U: 0, R: 90, D: 180, L: 270 }[d]}deg)" aria-hidden="true"><path d="M12 3L21 15H15V21H9V15H3z" fill="#ffd23f" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+function robotQ(c, d) {
+  const g = c === 1 ? 4 : 5, V = { U: [-1, 0], D: [1, 0], L: [0, -1], R: [0, 1] };
+  for (let tries = 0; tries < 60; tries++) {
+    const loop = c >= 2 && d > .35 && R.chance(.5); const n = loop ? 2 : (c === 1 ? R.int(2, 3) : R.int(3, 5));
+    const block = []; for (let i = 0; i < n; i++) block.push(R.pick(['U', 'D', 'L', 'R'])); const k = loop ? R.int(2, 3) : 1;
+    let r = R.int(0, g - 1), cc = R.int(0, g - 1); const sr = r, sc = cc; let ok = true;
+    for (let t = 0; t < k && ok; t++) for (const m of block) { r += V[m][0]; cc += V[m][1]; if (r < 0 || r >= g || cc < 0 || cc >= g) { ok = false; break; } }
+    if (!ok || (r === sr && cc === sc)) continue;
+    const cand = [[r, cc]], addC = (rr, c2) => { if (rr >= 0 && rr < g && c2 >= 0 && c2 < g && !(rr === sr && c2 === sc) && !cand.some(p => p[0] === rr && p[1] === c2)) cand.push([rr, c2]); };
+    [[r, g - 1 - cc], [g - 1 - r, cc], [r + 1, cc], [r - 1, cc], [r, cc + 1], [r, cc - 1], [sr, cc], [r, sc]].forEach(p => addC(p[0], p[1]));
+    if (cand.length < 4) continue; const four = [cand[0]].concat(R.shuffle(cand.slice(1)).slice(0, 3)), letters = R.shuffle(['A', 'B', 'C', 'D']), s = 30, pad = 4;
+    let o = ''; for (let a = 0; a < g; a++) for (let b = 0; b < g; b++) o += `<rect x="${pad + b * s}" y="${pad + a * s}" width="${s}" height="${s}" fill="#fff" stroke="#8a7fb8" stroke-width="2"/>`;
+    o += `<rect x="${pad + sc * s + 3}" y="${pad + sr * s + 3}" width="${s - 6}" height="${s - 6}" rx="6" fill="#ff3d9a" ${ST} stroke-width="2.5"/><text x="${pad + sc * s + s / 2}" y="${pad + sr * s + s / 2 + 5}" text-anchor="middle" font-size="14" font-weight="900" fill="#fff" font-family="Arial Black,sans-serif">R</text>`;
+    four.forEach((p, i) => { o += `<circle cx="${pad + p[1] * s + s / 2}" cy="${pad + p[0] * s + s / 2}" r="11" fill="#2de2ff" ${ST} stroke-width="2.5"/><text x="${pad + p[1] * s + s / 2}" y="${pad + p[0] * s + s / 2 + 5}" text-anchor="middle" font-size="14" font-weight="900" fill="${INK}" font-family="Arial Black,sans-serif">${letters[i]}</text>`; });
+    const inst = `<div class="inst">${loop ? '<b>Repite ' + k + ' veces:</b> ' : ''}${block.map(AR).join('')}</div>`;
+    const names = { U: 'arriba', D: 'abajo', L: 'izquierda', R: 'derecha' };
+    return build({ cat: 'secuencias', text: '¿En qué letra termina el robot R?', visual: `<div class="duo">${svg(`0 0 ${g * s + 2 * pad} ${g * s + 2 * pad}`, o, 'fig grid')}${inst}</div>`, correct: letters[0], wrong: letters.slice(1), hint: `Paso a paso: ${block.map(m => names[m]).join(', ')}${loop ? ' (' + k + ' veces)' : ''} → llega a la letra ${letters[0]}`, key: 'a|rb' + g + sr + sc + block.join('') + k });
+  }
+  return null;
+}
+function machineQ(c, d) {
+  let v = R.int(2, c === 1 ? 10 : 20); const s0 = v, steps = [], n = c === 1 ? 2 : c === 2 ? R.int(2, 3) : 3;
+  for (let i = 0; i < n; i++) {
+    const op = R.pick(c === 1 ? ['+', '−'] : c === 2 ? ['+', '−', '×'] : ['+', '−', '×', '÷']);
+    if (op === '+') { const a = R.int(1, c === 1 ? 5 : 12); v += a; steps.push(`sumas ${a}`); }
+    else if (op === '−') { const a = R.int(1, Math.max(1, Math.min(v - 1, c === 1 ? 5 : 12))); if (v - a < 0) return null; v -= a; steps.push(`restas ${a}`); }
+    else if (op === '×') { const a = R.int(2, c === 2 ? 3 : 5); v *= a; steps.push(`multiplicas por ${a}`); }
+    else { const dv = [2, 3, 4, 5].filter(x => v % x === 0 && v / x >= 1); if (!dv.length) return null; const a = R.pick(dv); v /= a; steps.push(`divides entre ${a}`); }
+  }
+  if (v > 200) return null;
+  return build({ cat: 'secuencias', text: `Una máquina de números: empiezas con ${s0}, ${steps.join(', luego ')}. ¿Qué número sale?`, correct: N(v), wrong: numWrong(v, [v + 2, v - 2]), hint: `Hazlo paso a paso con papel: ${s0} → ${steps.join(' → ')} = ${N(v)}`, key: 'a|ma' + s0 + steps.join() });
+}
+function ecuQ(c, d) {
+  if (c === 1) { const a = R.int(1, 8), x = R.int(1, 9); return build({ cat: 'secuencias', text: `Si ${tok('star', '#ffd23f')} + ${a} = ${a + x}, ¿cuánto vale la estrella?`, correct: String(x), wrong: numWrong(x, [a, a + x]), hint: `${a + x} − ${a} = ${x}`, key: 'a|ec1' + a + x }); }
+  const kind = c === 2 ? R.pick(['+', '−', '×']) : R.pick(['2x+', 'x÷', '3x−']);
+  if (kind === '+') { const a = R.int(2, 20), x = R.int(2, 20); return build({ cat: 'secuencias', text: `Si x + ${a} = ${a + x}, ¿cuánto vale x?`, correct: String(x), wrong: numWrong(x, [a, a + x]), hint: `x = ${a + x} − ${a} = ${x}`, key: 'a|ec+' + a + x }); }
+  if (kind === '−') { const a = R.int(2, 12), x = R.int(a + 1, 30); return build({ cat: 'secuencias', text: `Si x − ${a} = ${x - a}, ¿cuánto vale x?`, correct: String(x), wrong: numWrong(x, [x - a, a]), hint: `x = ${x - a} + ${a} = ${x}`, key: 'a|ec-' + a + x }); }
+  if (kind === '×') { const a = R.int(2, 9), x = R.int(2, 10); return build({ cat: 'secuencias', text: `Si ${a} × x = ${a * x}, ¿cuánto vale x?`, correct: String(x), wrong: numWrong(x, [a, a * x]), hint: `x = ${a * x} ÷ ${a} = ${x}`, key: 'a|ec×' + a + x }); }
+  if (kind === '2x+') { const a = R.int(2, 5), b = R.int(1, 9), x = R.int(2, 9); return build({ cat: 'secuencias', text: `Si ${a} × x + ${b} = ${a * x + b}, ¿cuánto vale x?`, correct: String(x), wrong: numWrong(x, [x + 1, a, b]), hint: `Primero quita ${b}: ${a * x + b} − ${b} = ${a * x}; luego ${a * x} ÷ ${a} = ${x}`, key: 'a|ec2' + a + b + x }); }
+  if (kind === 'x÷') { const a = R.int(2, 9), q = R.int(2, 12); return build({ cat: 'secuencias', text: `Si x ÷ ${a} = ${q}, ¿cuánto vale x?`, correct: String(a * q), wrong: numWrong(a * q, [q, a + q]), hint: `x = ${q} × ${a} = ${a * q}`, key: 'a|ecd' + a + q }); }
+  const a = R.int(2, 5), b = R.int(1, 9), x = R.int(2, 9); return build({ cat: 'secuencias', text: `Si ${a} × x − ${b} = ${a * x - b}, ¿cuánto vale x?`, correct: String(x), wrong: numWrong(x, [x + 1, a, b]), hint: `Primero suma ${b}: ${a * x - b} + ${b} = ${a * x}; luego ${a * x} ÷ ${a} = ${x}`, key: 'a|ec3' + a + b + x });
+}
+function condQ(c, d) {
+  const par = R.chance(.5), s = R.int(3, 30), isEven = s % 2 === 0, a = R.int(2, 5), b = R.int(1, 3);
+  const ans = isEven ? s / 2 : s + a;
+  return build({ cat: 'secuencias', text: `Programa: si el número es PAR, lo divides entre 2; si es IMPAR, le sumas ${a}. Empiezas con ${s}. ¿Qué número sale?`, correct: N(ans), wrong: numWrong(ans, [isEven ? s + a : s / 2 | 0, s]), hint: `${s} es ${isEven ? 'par' : 'impar'}, así que ${isEven ? s + ' ÷ 2' : s + ' + ' + a} = ${N(ans)}`, key: 'a|co' + s + a });
+}
+function algoritmo(c, d) {
+  const f = R.pick(c === 1 ? ['robot', 'robot', 'machine', 'ecu'] : ['robot', 'machine', 'ecu', 'ecu', 'cond']);
+  return f === 'robot' ? robotQ(c, d) : f === 'machine' ? machineQ(c, d) : f === 'ecu' ? ecuQ(c, d) : condQ(c, d);
+}
 
 /* ---------- PREGUNTAS MUY FÁCILES (ciclos 2 y 3): se mezclan para que casi todo el alumnado pueda acertarlas ---------- */
 const EASY_P = 0.34;
@@ -621,6 +841,12 @@ const EASY = {
     if (c === 3 && R.chance(.5)) { const deg = R.pick([90, 30, 45, 60, 120, 180]), type = deg < 90 ? 'agudo' : deg === 90 ? 'recto' : deg < 180 ? 'obtuso' : 'llano'; return build({ cat: 'geometria', text: `Este ángulo mide ${deg}°. ¿Qué tipo de ángulo es?`, visual: deg === 180 ? svg('0 0 120 110', `<line x1="14" y1="80" x2="106" y2="80" ${STW}/><circle cx="60" cy="80" r="4" fill="#ff3d9a"/>`, 'fig') : angleSvg(deg), correct: type, wrong: ['agudo', 'recto', 'obtuso', 'llano'].filter(x => x !== type), hint: 'Agudo < 90°, recto = 90°, obtuso entre 90° y 180°, llano = 180°', key: 'e|g3a' + deg }); }
     const q = geometria(1, R.pick([0, .2, .4])); if (q) q.key = 'e|' + q.key; return q;
   },
+  medida(c) {
+    if (c === 2) return medida(1, R.pick([0, .2, .4]));
+    const U = R.pick([['m', 'cm', 100], ['kg', 'g', 1000], ['l', 'ml', 1000], ['h', 'min', 60]]), n = R.int(1, 4);
+    return build({ cat: 'medida', text: `${n} ${U[0]} = ${BLANK} ${U[1]}`, correct: N(n * U[2]), wrong: [n * U[2] * 10, n * U[2] / 10, n * 10, n + U[2]].filter(x => x !== n * U[2]).map(N), hint: `1 ${U[0]} = ${U[2]} ${U[1]}, así que ${n} ${U[0]} = ${n * U[2]} ${U[1]}`, key: 'e|mu' + U + n });
+  },
+  datos(c) { return datos(1, R.pick([0, .2])); },
   areas(c) {
     if (c === 2) { const q = areas(1, R.pick([0, .1, .3])); if (q) q.key = 'e|' + q.key; return q; }
     const l = R.int(2, 6), w = R.int(2, 6), sq = R.chance(.4);

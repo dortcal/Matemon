@@ -272,3 +272,19 @@ kbd{display:inline-block;min-width:1.6em;padding:.1em .45em;border:.12rem solid 
 .ans.gone{opacity:.12;filter:grayscale(1);transform:scale(.92);pointer-events:none}
 @media (max-aspect-ratio:1/1){.power{order:5;padding:.15rem .5rem}.power .pl{display:none}.power.ready .pl{display:inline}}
 .hintcard .oops.good{color:#7dff8a}
+
+.inst{display:flex;align-items:center;justify-content:center;gap:.2rem;flex-wrap:wrap;font-size:.95rem;max-width:13rem}
+.qvis .inst svg,.inst .arw{height:1.8rem!important;width:1.8rem!important;max-width:none}
+.role{position:absolute;left:0;right:0;bottom:.35rem;text-align:center;font-size:.72rem;color:var(--cyan);text-transform:uppercase;letter-spacing:.04em}
+.feelbox{display:flex;flex-direction:column;align-items:center;gap:.4rem}
+.face{background:var(--panel);border:.16rem solid var(--ink);border-radius:1rem;padding:.3rem .6rem;display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:#fff;box-shadow:0 .2rem 0 var(--ink)}
+.face svg{width:2rem;height:2rem}.face:active{transform:translateY(.15rem)}
+.qvis>svg.grid,.qvis .duo svg.grid{max-height:17rem}
+.screen>*{flex-shrink:0}
+.cards-grid{grid-template-columns:repeat(5,minmax(0,1fr));width:min(74rem,96vw)}
+@media (max-aspect-ratio:1/1){.cards-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+[data-screen=results]{gap:.5rem;padding-top:2.4rem;padding-bottom:.6rem;justify-content:flex-start}
+[data-screen=results] .letter{font-size:clamp(4rem,17vmin,8rem)}
+[data-screen=results] .stats{padding:.5rem 1rem}
+[data-screen=results] .minipets div{width:2.6rem;height:2.6rem}
+[data-screen=results] .stars svg{width:1.7rem;height:1.7rem}

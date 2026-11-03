@@ -28,6 +28,8 @@ const ICON = {
   fracciones: '<circle cx="24" cy="24" r="16"/><path d="M24 24V8M24 24l13 9" /><path d="M24 24l-13 9" />',
   comparar: '<path d="M20 10L7 24l13 14M28 10l13 14-13 14"/>',
   geometria: '<path d="M6 40L20 10l14 30zM30 8h12v12H30z"/>',
+  medida: '<circle cx="24" cy="24" r="16"/><path d="M24 12v12l8 5"/>',
+  datos: '<path d="M8 8v32h34"/><path d="M16 32v-8M26 32V14M36 32v-14"/>',
   areas: '<path d="M8 8h32v32H8zM8 19h32M8 29h32M19 8v32M29 8v32"/><path d="M19 19h10v10H19z" fill="currentColor"/>'
 };
 const catIcon = c => `<svg viewBox="0 0 48 48" aria-hidden="true">${ICON[c]}</svg>`;
@@ -94,6 +96,7 @@ function worldScreen() {
   <div class="row">${Object.keys(WORLDS).map(k => { const W = WORLDS[k]; return `<button class="card" style="--c:${W.color}" data-nav data-world="${k}" ${k === P.world ? 'data-first' : ''} data-act="world" data-v="${k}"><div class="minis" style="display:flex;gap:.2rem;height:4rem">${W.els.map((e, i) => `<div style="width:4rem">${C.svg(C.make(k.length * 17 + i * 5, [e]), { uid: k + i })}</div>`).join('')}</div><span class="nm">${W.name}</span><span class="ds">${W.desc}</span></button>`; }).join('')}</div>`, { back: 'level', backBtn: true });
 }
 let eggSeeds = [];
+P.team = !!SAVE.last.team;
 function eggScreen() {
   const els = WORLDS[P.world].els;
   eggSeeds = [0, 1, 2].map(i => ({ seed: Math.floor(Math.random() * 1e6) + 1, el: els[i % els.length] }));
@@ -122,7 +125,8 @@ function modeScreen() {
   show('mode', `<div style="display:flex;align-items:center;gap:1rem"><div style="width:clamp(4rem,12vmin,7rem)">${C.svg(cr, { mood: 'happy', uid: 'md' })}</div><div><h2 class="t" style="text-align:left">¿A qué jugamos?</h2><p class="s" style="text-align:left">${cr.name} · ${LEVELS[P.cycle].name}</p></div></div>
   <button class="card wide" style="--c:var(--yellow)" data-nav data-first data-act="story">${bk('story')}<div class="ic" style="color:var(--yellow)"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 5l5.500 12 13 1.500-9.700 9 2.800 12.800L24 33l-11.600 7.300 2.800-12.800-9.700-9 13-1.500z"/></svg></div><div><span class="nm">Modo historia</span><br><span class="ds">Recorre la liga mezclando todos los retos, con 2 jefes y el JEFE FINAL</span></div></button>
   <div class="cards-grid">${cats.map(c => { const I2 = Q.info(c, P.cycle); return `<button class="card" style="--c:${I2.color}" data-nav data-act="single" data-v="${c}">${bk(c)}<div class="ic" style="color:${I2.color}">${catIcon(c)}</div><span class="nm">${I2.name}</span></button>`; }).join('')}</div>
-  <p class="keys">Duelo rápido: 2 combates + jefe de la categoría</p>`, { back: 'egg', backBtn: true });
+  <div class="row"><button class="btn ${P.team ? 'cyan' : 'ghost'}" data-nav data-act="team">Modo equipo: ${P.team ? 'SÍ' : 'NO'}</button></div>
+  <p class="keys">Duelo rápido: 2 combates + jefe de la categoría · Modo equipo: roles que rotan para jugar en grupo</p>`, { back: 'egg', backBtn: true });
 }
 function dexScreen() {
   const n = SAVE.dex.length;
@@ -147,19 +151,28 @@ function helpModal() {
   <button class="btn" data-first data-nav data-act="closemodal">¡Entendido!</button>`);
 }
 function paperModal() {
-  modal(`<h3>¡Alto ahí, entrenador!</h3>
+  modal(`<h3>¡Alto ahí, mente brillante!</h3>
   <p>Los monstruos de la Liga son muy listos, pero tienen un punto débil: <b>¡no soportan que hagas las cuentas con calma!</b></p>
   <p>Así que te recomendamos jugar con <b>un papel y un bolígrafo (o un lápiz, que también vale)</b> para hacer las operaciones antes de contestar. Tu cerebro lo agradecerá, los números grandes dejarán de ponerse nerviosos y tus criaturas presumirán de ti.</p>
   <p>Eso sí: el papel no hace magia solo, ¡la magia eres tú!</p>
   <div class="row"><button class="btn" data-first data-nav data-act="gostory">¡Ya tengo papel y boli!</button><button class="btn ghost" data-nav data-act="closemodal">Volver</button></div>`);
 }
 function teacherModal() {
-  modal(`<h3>Para docentes</h3><p>Contenidos por nivel (propuesta del juego, <b>pendiente de contrastar con el currículo oficial de Canarias</b> de cada centro):</p>
-  <table><tr><th>Nivel</th><th>Contenidos</th></tr>
-  <tr><td>Cría Chispa<br>1.º–2.º</td><td>Sumas y restas (hasta 100), huecos y problemas · secuencias de figuras y de 1 en 1, 2, 5, 10 · mayor/menor y signos &lt; &gt; = (hasta 999) · figuras planas y cuerpos geométricos · contar cuadraditos de superficie. <b>Sin tablas, divisiones ni fracciones.</b></td></tr>
-  <tr><td>Domador Rayo<br>3.º–4.º</td><td>Sumas y restas hasta 9.999 y problemas · tablas del 2 al 10 · divisiones exactas y con resto · secuencias · fracciones sencillas (leer, fracción de una cantidad, comparar) · comparar números y operaciones · polígonos, cuerpos, ángulos rectos, paralelas · áreas en cuadrícula y perímetro.</td></tr>
-  <tr><td>Maestro Volcán<br>5.º–6.º</td><td>Cálculo hasta 999.999 y decimales · multiplicar por 2 cifras, ×10/100/1000 · divisiones con resto y prueba · series geométricas · fracciones (equivalentes, suma, simplificar, decimal, %) · decimales · ángulos, triángulos, círculo · áreas de rectángulo, triángulo, paralelogramo y figuras compuestas.</td></tr></table>
-  <p><b>Tiempo:</b> cada pregunta tiene un tiempo máximo (barra visible): 1 minuto en 1.º–2.º, 2 minutos en 3.º–4.º y 3 minutos en 5.º–6.º. Si se agota cuenta como fallo y se muestra la pista. Los dos primeros ciclos también tienen más corazones y una subida de dificultad más suave.</p><p><b>Poder:</b> la barra PODER se carga con los aciertos (4 en 1.º–4.º, 5 en 5.º–6.º) y permite eliminar dos respuestas incorrectas en una pregunta, una vez por carga.</p><p><b>Papel y boli:</b> al empezar el modo historia en 3.º–4.º y 5.º–6.º aparece un aviso divertido que recomienda jugar con papel y bolígrafo para hacer las operaciones. En esos dos ciclos se mezclan además preguntas muy fáciles (aprox. una de cada tres) para que casi todo el alumnado pueda acertarlas.</p><p>Las preguntas se generan al vuelo (decenas de miles de combinaciones) y no se repiten dentro de una sesión. Ante un fallo se muestra una pista con el cálculo resuelto. No se recogen datos personales: solo se guardan en este navegador las puntuaciones y las criaturas domadas.</p>
+  modal(`<h3>Para docentes</h3>
+  <p>El juego trabaja los <b>seis sentidos matemáticos</b> del currículo LOMLOE (estructura de saberes básicos de Matemáticas en Primaria):</p>
+  <table><tr><th>Sentido</th><th>Dónde se trabaja en el juego</th></tr>
+  <tr><td>Numérico</td><td>Sumas y restas (con problemas de la vida diaria), tablas, divisiones, fracciones, mayor y menor, decimales y porcentajes en 5.º–6.º.</td></tr>
+  <tr><td>De la medida</td><td>Medidas (reloj y horas, comparar longitud, peso, capacidad y tiempo, euros, unidades y conversiones, estimar la unidad adecuada, volumen en 5.º–6.º) y Áreas (superficie y perímetro).</td></tr>
+  <tr><td>Espacial</td><td>Geometría: figuras planas y cuerpos, polígonos, ángulos, ejes de simetría, giros y localización en cuadrículas y coordenadas.</td></tr>
+  <tr><td>Algebraico y pensamiento computacional</td><td>Secuencias y algoritmos: patrones, series, ecuaciones sencillas, máquinas de números, condicionales («si… entonces»), robot que sigue flechas y bucles («repite»).</td></tr>
+  <tr><td>Estocástico</td><td>Datos y azar: pictogramas, gráficos de barras, moda, media, seguro/posible/imposible y probabilidad.</td></tr>
+  <tr><td>Socioafectivo</td><td>Mensajes de ánimo ante el error, pistas que explican (no solo «mal»), tiempo amplio y poder de ayuda, autoevaluación emocional al final, <b>Modo equipo</b> con roles que rotan, nombres y personajes diversos y lenguaje inclusivo.</td></tr></table>
+  <p><b>Por ciclos:</b> 1.º–2.º sin tablas, divisiones ni fracciones; 3.º–4.º añade tablas, divisiones, fracciones sencillas y áreas en cuadrícula; 5.º–6.º, decimales, ángulos, áreas de triángulo, probabilidad y volumen.</p>
+  <p><b>Tiempo:</b> cada pregunta tiene un tiempo máximo (barra visible): 1 minuto en 1.º–2.º, 2 minutos en 3.º–4.º y 3 minutos en 5.º–6.º. Si se agota cuenta como fallo y se muestra la pista.</p>
+  <p><b>Papel y boli:</b> al empezar el modo historia en 3.º–4.º y 5.º–6.º aparece un aviso que recomienda jugar con papel y bolígrafo. En esos ciclos se mezclan además preguntas muy fáciles (aprox. 1 de cada 3).</p>
+  <p><b>Poder:</b> la barra PODER se carga con los aciertos y elimina dos respuestas incorrectas, una vez por carga.</p>
+  <p><b>Aviso curricular:</b> la organización por sentidos sigue la estructura LOMLOE. La concreción por ciclo (saberes y criterios de evaluación) del currículo de Canarias, Decreto 211/2022, anexo de Matemáticas, no se ha podido contrastar literalmente: conviene revisarla antes de citarla en documentos de centro.</p>
+  <p>Las preguntas se generan al vuelo (decenas de miles de combinaciones) y no se repiten dentro de una sesión. No se recogen datos personales: solo se guardan en este navegador las puntuaciones y las criaturas domadas.</p>
   <button class="btn" data-first data-nav data-act="closemodal">Cerrar</button>`);
 }
 
@@ -227,6 +240,8 @@ function act(a, v, el) {
     case 'reroll': eggScreen(); break;
     case 'accept': sfx('select'); modeScreen(); break;
     case 'story': if (P.cycle >= 2) paperModal(); else startRun('story', null); break;
+    case 'team': P.team = !P.team; SAVE.last.team = P.team; save(); modeScreen(); break;
+    case 'feel': feel(+v); break;
     case 'gostory': closeModal(); startRun('story', null); break;
     case 'single': startRun('single', v); break;
     case 'dex': dexScreen(); break;
@@ -246,9 +261,16 @@ function act(a, v, el) {
     case 'cont': if (S && S.resume) S.resume(); break;
   }
 }
+function feel(v) {
+  const m = { 1: '¡Genial! Esa confianza se ha ganado con esfuerzo. Puedes ayudar a quien esté al lado.', 2: 'Es normal: aprender lleva tiempo. Repasa las pistas y vuelve a intentarlo, cada vez sale mejor.', 3: 'Está bien tener dudas. Pide ayuda a tu equipo o a tu docente: nadie aprende solo y preguntar es de valientes.' }[v];
+  const e = document.getElementById('feelmsg'); if (e) e.textContent = m; sfx(v === 1 ? 'heal' : 'select'); live(m);
+}
 function toggleFull() { try { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); } catch (e) {} }
 
 /* ---------- partida ---------- */
+const ENC = ['¡Casi!', 'Equivocarse también es aprender.', 'No pasa nada, ¡a por la siguiente!', 'Los errores nos ayudan a crecer.', '¡Buen intento!', 'Respira y mira la pista con calma.'];
+const PRAISE = ['¡Correcto!', '¡Muy bien!', '¡Bien pensado!', '¡Eso es!'];
+const ROLES = ['Lee la pregunta en voz alta', 'Calcula con papel y boli', 'Propone la respuesta', 'Revisa y pulsa'];
 const BOSS_FINAL = 'Gran Maestro Calculón';
 function buildPlan(mode, cat, cycle) {
   const els = WORLDS[P.world].els, mk = () => C.make(Math.floor(Math.random() * 1e7) + 7, els);
@@ -256,10 +278,10 @@ function buildPlan(mode, cat, cycle) {
   if (mode === 'single') {
     plan.push({ kind: 'wild', cat, need: 4, foe: mk() }, { kind: 'wild', cat, need: 4, foe: mk() }, { kind: 'boss', cat, need: 5, foe: mk(), title: Q.info(cat, cycle).boss });
   } else {
-    const order = R.shuffle(Q.cats(cycle));
+    const order = R.shuffle(Q.cats(cycle)), step = order.length > 8 ? 4 : 3;
     order.forEach((c, i) => {
       plan.push({ kind: 'wild', cat: c, need: 3, foe: mk() });
-      if ((i + 1) % 3 === 0 && i < order.length - 1) plan.push({ kind: 'mini', cat: 'mix', mix: order.slice(0, i + 1), need: 5, foe: mk(), title: Q.info(c, cycle).boss });
+      if ((i + 1) % step === 0 && i < order.length - 1) plan.push({ kind: 'mini', cat: 'mix', mix: order.slice(0, i + 1), need: 5, foe: mk(), title: Q.info(c, cycle).boss });
     });
     plan.push({ kind: 'final', cat: 'mix', mix: order, need: 8, foe: mk(), title: BOSS_FINAL });
   }
@@ -268,7 +290,7 @@ function buildPlan(mode, cat, cycle) {
 function startRun(mode, cat) {
   tok++; closeModal();
   const maxL = P.cycle === 1 ? 7 : P.cycle === 2 ? 6 : 5, plan = buildPlan(mode, cat, P.cycle);
-  S = { mode, cat, cycle: P.cycle, me: mkCr(P.cr), lives: maxL, maxLives: maxL, score: 0, streak: 0, best: 0, correct: 0, wrong: 0, answered: 0, stage: 1, plan, pi: -1, tamed: [], dyn: 0, bonus: { enc: 0, boss: 0 }, locked: true, paused: false, totalNeed: plan.reduce((s, e) => s + e.need, 0), limit: P.cycle === 1 ? 60 : P.cycle === 2 ? 120 : 180, pow: 0, powNeed: P.cycle === 3 ? 5 : 4, removed: new Set(), evo2: mode === 'story' ? 9 : 5, evo3: mode === 'story' ? 24 : 11, lastCat: '', stats: {} };
+  S = { mode, cat, cycle: P.cycle, me: mkCr(P.cr), lives: maxL, maxLives: maxL, score: 0, streak: 0, best: 0, correct: 0, wrong: 0, answered: 0, stage: 1, plan, pi: -1, tamed: [], dyn: 0, bonus: { enc: 0, boss: 0 }, locked: true, paused: false, totalNeed: plan.reduce((s, e) => s + e.need, 0), team: P.team, qn: 0, limit: P.cycle === 1 ? 60 : P.cycle === 2 ? 120 : 180, pow: 0, powNeed: P.cycle === 3 ? 5 : 4, removed: new Set(), evo2: mode === 'story' ? 9 : 5, evo3: mode === 'story' ? 24 : 11, lastCat: '', stats: {} };
   curTrack = ''; UI.audioOn && musicFor('battle');
   renderBattle();
   run().catch(e => { if (e !== CANCEL) { console.error(e); } });
@@ -402,7 +424,8 @@ function renderQuestion(q) {
   const cls = plain.length <= 20 && /[0-9?]/.test(plain) ? 'eq' : plain.length > 70 ? 'long' : '';
   const btns = q.answers.map((a, i) => `<button class="ans${!a.includes('<') && a.length > 11 ? ' long' : ''}" data-dir="${dirs[i]}" data-i="${i}" data-act="ans" aria-label="${dirs[i] === 'up' ? 'Arriba' : dirs[i] === 'down' ? 'Abajo' : dirs[i] === 'left' ? 'Izquierda' : 'Derecha'}: ${strip(a).replace(/"/g, '')}">${ARROW(dirs[i])}<span class="av">${a}</span></button>`).join('');
   S.removed = new Set(); setPower();
-  const p = $('qpanel'); p.style.display = ''; p.innerHTML = `<div class="qcard" id="qcard" style="--c:${info.color}"><span class="qcat">${info.name}</span>${S.limit ? '<div class="tbar"><i></i><b>' + S.limit + ' s</b></div>' : ''}<div class="qtext ${cls}">${q.text}</div><div class="qvis">${q.visual}</div></div>${btns}`;
+  const rl = S.team ? (S.qn++ % 4) : -1;
+  const p = $('qpanel'); p.style.display = ''; p.innerHTML = `<div class="qcard" id="qcard" style="--c:${info.color}"><span class="qcat">${info.name}</span>${S.team ? '<div class="role">Persona ' + (rl + 1) + ': ' + ROLES[rl] + '</div>' : ''}${S.limit ? '<div class="tbar"><i></i><b>' + S.limit + ' s</b></div>' : ''}<div class="qtext ${cls}">${q.text}</div><div class="qvis">${q.visual}</div></div>${btns}`;
 }
 function battleKey(a) {
   if (a === 'pause') { if (S && S.paused) resumeGame(); else pauseGame(); return; }
@@ -427,7 +450,7 @@ async function answer(i) {
       S.score += pts; btns.forEach((b, j) => b.classList.add(j === i ? 'ok' : 'dim'));
       sfx(S.streak % 3 === 0 ? 'combo' : 'correct'); setHud();
       const card0 = $('qcard'), t0 = performance.now();
-      if (card0 && q.hint) { card0.innerHTML = `<div class="hintcard"><span class="oops good">¡Correcto!</span><div class="ht">${q.hint}</div><span class="go">Pulsa <b>ESPACIO</b> o toca para seguir</span></div>`; S.hintAt = t0; }
+      if (card0 && q.hint) { card0.innerHTML = `<div class="hintcard"><span class="oops good">${R.pick(PRAISE)}</span><div class="ht">${q.hint}</div><span class="go">Pulsa <b>ESPACIO</b> o toca para seguir</span></div>`; S.hintAt = t0; }
       anim($('me'), 'lunger', 560); setMe('happy'); anim($('me').querySelector('.inner'), 'hop', 600);
       await sleepSafe(180);
       const ac = C.ELEM[S.me.element].acc, to = await orb($('me'), $('foe'), ac, 340);
@@ -456,7 +479,7 @@ async function answer(i) {
       setMe();
       // pista
       const card = $('qcard');
-      card.innerHTML = `<div class="hintcard"><span class="oops">${S.timedOut ? '¡Se acabó el tiempo!' : '¡Casi!'} La respuesta era ${strip(q.answers[q.correct]) || '…'}</span><div class="ht">${q.hint}</div><span class="go">Pulsa <b>ESPACIO</b> o toca para seguir</span></div>`;
+      card.innerHTML = `<div class="hintcard"><span class="oops">${S.timedOut ? '¡Se acabó el tiempo!' : R.pick(ENC)} La respuesta era ${strip(q.answers[q.correct]) || '…'}</span><div class="ht">${q.hint}</div><span class="go">Pulsa <b>ESPACIO</b> o toca para seguir</span></div>`;
       if (!strip(q.answers[q.correct])) card.querySelector('.oops').textContent = '¡Casi! Fíjate bien en la figura correcta';
       S.hintAt = performance.now(); S.timedOut = false;
       await new Promise(r => { let t; S.resume = () => { clearTimeout(t); S.resume = null; r(); }; t = setTimeout(() => { if (S && S.resume) S.resume(); }, 7000); card.onclick = () => { if (performance.now() - S.hintAt > 400 && S.resume) S.resume(); }; });
@@ -498,7 +521,7 @@ function quitRun() { clearInterval(timerId); tok++; S = null; closeModal(); docu
 /* ---------- resultados ---------- */
 function rate(done) {
   const acc = S.correct / Math.max(1, S.answered);
-  if (done) { if (acc >= .95 && S.lives >= S.maxLives - 1) return ['S', 5, '¡Leyenda de la Liga!']; if (acc >= .85) return ['A', 4, 'Domador Estrella']; if (acc >= .7) return ['B', 3, 'Entrenador Valiente']; return ['C', 2, 'Aprendiz en Camino']; }
+  if (done) { if (acc >= .95 && S.lives >= S.maxLives - 1) return ['S', 5, '¡Leyenda de la Liga!']; if (acc >= .85) return ['A', 4, 'Estrella de la Liga']; if (acc >= .7) return ['B', 3, 'Mente Valiente']; return ['C', 2, 'Aprendiz en Camino']; }
   return S.correct / S.totalNeed >= .6 ? ['C', 2, 'Aprendiz en Camino'] : ['D', 1, 'Cría con Mucho Futuro'];
 }
 function finish(done) {
@@ -514,6 +537,7 @@ function finish(done) {
   show('results', `<div class="rating"><span class="chip">${done ? '¡Misión cumplida!' : 'Entrenamiento terminado'} · ${name}</span><div class="letter">${letter}</div><div class="stars">${Array.from({ length: 5 }, (_, i) => i < stars ? STAR : STAR_OFF).join('')}</div><div class="rtitle">${title}</div></div>
   <div class="stats"><div><span>Aciertos</span><b>${S.correct}/${S.answered}</b></div><div><span>Precisión</span><b>${acc}%</b></div><div><span>Mejor racha</span><b>${S.best}</b></div><div><span>Vidas</span><b>${S.lives}/${S.maxLives}</b></div><div><span>Puntos de combate</span><b>${(S.score - S.bonus.enc - S.bonus.boss).toLocaleString('es-ES')}</b></div><div><span>Criaturas y jefes</span><b>+${S.bonus.enc + S.bonus.boss}</b></div>${done ? `<div><span>Corazones</span><b>+${livesB}</b></div><div><span>Misión</span><b>+${compB}</b></div>` : ''}<div class="tot"><span>TOTAL ${isBest ? '<span class="newb">¡RÉCORD!</span>' : ''}</span><b>${total.toLocaleString('es-ES')}</b></div></div>
   ${S.tamed.length ? `<div class="minipets">${S.tamed.map((t, i) => `<div title="${t.cr.name}">${C.svg(t.cr, { mood: 'happy', uid: 'r' + i })}</div>`).join('')}</div>` : ''}
+  <div class="feelbox"><span class="chip">¿Cómo te has sentido con los retos?</span><div class="row">${[['Con confianza', 1, '#b6ff3b', 'M26 34q10 10 20 0'], ['Más o menos', 2, '#ffd23f', 'M26 38h20'], ['Con dudas', 3, '#ff9f43', 'M26 40q10-9 20 0']].map(f => `<button class="face" data-nav data-act="feel" data-v="${f[1]}" aria-label="${f[0]}"><svg viewBox="0 0 72 72"><circle cx="36" cy="36" r="30" fill="${f[2]}" stroke="#1b1140" stroke-width="4"/><circle cx="26" cy="29" r="4" fill="#1b1140"/><circle cx="46" cy="29" r="4" fill="#1b1140"/><path d="${f[3]}" fill="none" stroke="#1b1140" stroke-width="4" stroke-linecap="round"/></svg><span>${f[0]}</span></button>`).join('')}</div><p class="s" id="feelmsg" aria-live="polite"></p></div>
   <div class="row"><button class="btn" data-nav data-first data-act="again">Jugar otra vez</button><button class="btn cyan" data-nav data-act="menu">Cambiar modo</button><button class="btn ghost" data-nav data-act="home">Inicio</button></div>`, { noFocus: false });
   live(`Calificación ${letter}. ${title}. ${S.correct} aciertos de ${S.answered}. Total ${total} puntos`);
   window.__last = { letter, total, acc, done, stats: S.stats };
