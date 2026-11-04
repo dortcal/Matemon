@@ -299,7 +299,7 @@ function teacherModal() {
   <p><b>Alcance:</b> es un recurso de práctica que trabaja una selección de los saberes. No sustituye la manipulación de materiales, el uso de la calculadora ni las investigaciones estadísticas propias del aula. Algunos saberes se tratan a un nivel inferior al del anexo (por ejemplo, decimales hasta las centésimas y sumas y restas hasta 100 en 1.º–2.º).</p>
   <p><b>Tiempo:</b> cada pregunta tiene un tiempo máximo (barra visible): 1 minuto en 1.º–2.º, 2 minutos en 3.º–4.º y 3 minutos en 5.º–6.º. Si se agota cuenta como fallo y se muestra la pista.</p>
   <p><b>Papel y boli:</b> al empezar el modo historia en 3.º–4.º y 5.º–6.º aparece un aviso que recomienda jugar con papel y bolígrafo. En esos ciclos se mezclan además preguntas muy fáciles (aprox. 1 de cada 3).</p>
-  <p><b>Superpoderes:</b> al terminar (o en game over) el botón «¡Descubre tus superpoderes!» muestra, con los datos de la partida, los sentidos y los criterios 2.1, 2.2, 4.1, 4.2 y 7.1 en los que va mejor y los que debe entrenar. Es orientativo y solo de esa partida: no sustituye la evaluación docente.</p><p><b>Informe del alumnado:</b> al terminar (o en game over) el botón «Informe del alumnado» muestra y permite <b>descargar en PDF</b> un informe de la partida: resumen, sentidos y criterios (orientativos), resultados y tiempo medio por actividad, y la lista de errores con su explicación. Incluye espacio para escribir a mano el nombre; el juego no guarda ni envía datos personales. El PDF se genera en el propio dispositivo.</p><p><b>Continuar tras perder todas las vidas:</b> al quedarse sin vidas aparece una cuenta atrás de 6 segundos; tocando la pantalla o pulsando ESPACIO (también con Makey Makey) la criatura revive con todas sus vidas y una frase divertida distinta cada vez. Así el alumnado con más dificultades puede llegar al final y el informe recoge más datos. Para que no iguale a quien lo logra sin continuar, cada continuación baja la calificación un nivel (máximo 3; la S solo es posible sin continuar), resta 500 puntos y suprime el bonus de corazones. El número de continuaciones y las actividades donde ocurrieron aparecen en la pantalla final y en el informe. Si la cuenta atrás termina, la partida acaba.</p><p><b>Poder:</b> la barra PODER se carga con los aciertos y elimina dos respuestas incorrectas, una vez por carga.</p>
+  <p><b>Superpoderes:</b> al terminar (o en game over) el botón «¡Descubre tus superpoderes!» muestra, con los datos de la partida, los sentidos y los criterios 2.1, 2.2, 4.1, 4.2 y 7.1 en los que va mejor y los que debe entrenar. Es orientativo y solo de esa partida: no sustituye la evaluación docente.</p><p><b>Informe del alumnado:</b> al terminar (o en game over) el botón «Informe del alumnado» muestra y permite <b>descargar en PDF</b> un informe de la partida: resumen, sentidos y criterios (orientativos), resultados y tiempo medio por actividad, y la lista de errores con su explicación. Incluye espacio para escribir a mano el nombre; el juego no guarda ni envía datos personales. El PDF se genera en el propio dispositivo.</p><p><b>Continuar tras perder todas las vidas:</b> al quedarse sin vidas aparece una cuenta atrás de 6 segundos; tocando la pantalla o pulsando ESPACIO (también con Makey Makey) la criatura revive con todas sus vidas y una frase divertida distinta cada vez. Así el alumnado con más dificultades puede llegar al final y el informe recoge más datos. Para que no iguale a quien lo logra sin continuar, cada continuación baja la calificación un nivel (máximo 3; la S solo es posible sin continuar), resta 500 puntos y suprime el bonus de corazones. El número de continuaciones y las actividades donde ocurrieron aparecen en la pantalla final y en el informe. Si la cuenta atrás termina, la partida acaba.</p><p><b>Ceremonia final:</b> al completar la misión se reproduce una animación de unos 10 segundos (fuegos artificiales, medalla al esfuerzo, criaturas domadas y un mensaje de superación adaptado a cómo ha jugado); se puede saltar tocando la pantalla o con ESPACIO.</p><p><b>Poder:</b> la barra PODER se carga con los aciertos y elimina dos respuestas incorrectas, una vez por carga.</p>
   <p>Las preguntas se generan al vuelo (decenas de miles de combinaciones) y no se repiten dentro de una sesión. No se recogen datos personales: solo se guardan en este navegador las puntuaciones y las criaturas domadas.</p>
   <button class="btn" data-first data-nav data-act="closemodal">Cerrar</button>`);
   const mb = document.querySelector('#modal .mbox'); if (mb) mb.classList.add('wide');
@@ -339,6 +339,7 @@ window.addEventListener('pointerdown', startAudio, { passive: true });
 
 function onAct(a) {
   if (a === 'mute') { toggleMute(); return; }
+  if (UI.screen === 'cere') { if (a === 'ok' && performance.now() - (UI.cereT || 0) > 1500) UI.cereSkip = true; return; }
   if (S && S.contWait) { if (a === 'ok') S.contWait(); return; }
   if (UI.busy) return;
   if (modalOpen()) {
@@ -687,7 +688,23 @@ const REVIVE = [
   ['¡Los números te echaban de menos!', 'Sin ti se aburrían un montón'],
   ['¡Segundo aire!', 'Domar criaturas es caerse y levantarse'],
   ['¡Cielo despejado!', 'Hasta las estrellas del Teide te guiñan un ojo'],
-  ['¡Eso es no rendirse!', 'Aprender también es volver a intentarlo']
+  ['¡Eso es no rendirse!', 'Aprender también es volver a intentarlo'],
+  ['¡Reinicio de cerebro completado!', 'Instalando ideas nuevas… 100 %'],
+  ['¡Tu criatura ha vuelto del más allá!', 'Dice que allí no había ni una calculadora'],
+  ['¡Un respiro y a por ello!', 'Los grandes cálculos se hacen con calma'],
+  ['¡Ni el Teide se resiste!', 'Con tu constancia, hasta los volcanes se rinden'],
+  ['¡Magia de corazones!', 'Abracadabra… ¡vidas nuevas para ti!'],
+  ['¡Las papas arrugadas también aprenden!', 'Con un poquito de mojo, todo mejora'],
+  ['¡Despierta, mente valiente!', 'Estabas soñando con tablas de multiplicar'],
+  ['¡Toma energía de los alisios!', 'Soplan buenas ideas desde el Atlántico'],
+  ['¡Superpoder de volver a intentarlo!', 'Es el más difícil y tú ya lo tienes'],
+  ['¡Vuelve el equipo!', 'Criatura y cerebro, otra vez juntos'],
+  ['¡Zas! ¡Vidas recargadas!', 'Ahora toca pensar con calma'],
+  ['¡Qué bien suena un «otra vez»!', 'Equivocarse es parte del juego'],
+  ['¡Más fuerte que un dragón de Icod!', 'Tu criatura sacude el polvo y se levanta'],
+  ['¡Un guiño de las estrellas!', 'Desde el Observatorio del Teide te animan'],
+  ['¡Fuerza de laurisilva!', 'Raíces profundas: no hay quien te tumbe'],
+  ['¡Cero rendiciones!', 'Corazones nuevos y mucha cabeza']
 ];
 const ASKS = ['¿Un último esfuerzo?', 'Tu criatura te necesita', '¿Le damos otra oportunidad?', 'Aún queda Liga por delante', '¡No te rindas ahora!', '¿Seguimos juntos?'];
 let reviveBag = [], askBag = [], lastRevive = null, lastAsk = null;
@@ -721,6 +738,41 @@ function askContinue(my) {
   });
 }
 
+
+/* ---------- ceremonia de final (≈10 s) ---------- */
+const EFFORT_CLEAN = ['Has llegado al final sin rendirte ni una vez. ¡Impresionante!', 'Constancia, cabeza y corazón: así se gana una Liga.', 'Cada reto superado te ha hecho más fuerte. ¡Y lo notas!'];
+const EFFORT_ERR = ['Has fallado, has aprendido y has seguido: así se aprende de verdad.', 'Los errores no te frenaron: te enseñaron el camino. ¡Eso es esfuerzo!', 'Equivocarse y volver a intentarlo es el superpoder más grande.'];
+const EFFORT_CONT = ['Te caíste, respiraste y volviste a levantarte. Eso hace grande a quien doma criaturas.', 'Terminar después de tropezar vale oro: ¡la constancia gana ligas!', 'Cada error te enseñó algo y tú seguiste. ¡Eso es esfuerzo de verdad!'];
+async function cereWait(ms, my) { const t = performance.now(); while (performance.now() - t < ms) { if (my !== tok || UI.cereSkip) return; await sleepRaw(50); } }
+async function ceremony(my) {
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches, k = reduce ? .6 : 1, T = ms => cereWait(ms * k, my);
+  document.getElementById('topctl').dataset.mode = ''; UI.cereSkip = false; UI.cereT = performance.now();
+  const medal = `<svg viewBox="0 0 100 120" aria-hidden="true"><path d="M28 0h20l12 44H40z" fill="#ff3d9a" stroke="#1b1140" stroke-width="4" stroke-linejoin="round"/><path d="M72 0H52l-12 44h20z" fill="#2de2ff" stroke="#1b1140" stroke-width="4" stroke-linejoin="round"/><circle cx="50" cy="78" r="34" fill="#ffd23f" stroke="#1b1140" stroke-width="5"/><circle cx="50" cy="78" r="25" fill="none" stroke="#ff9f1c" stroke-width="4"/><polygon points="50,58 56,72 71,73 60,83 63,98 50,90 37,98 40,83 29,73 44,72" fill="#fff" stroke="#1b1140" stroke-width="3" stroke-linejoin="round"/></svg>`;
+  const parade = S.tamed.slice(0, 12).map((t, i) => `<div style="animation-delay:${(i * .22).toFixed(2)}s">${C.svg(t.cr, { mood: 'happy', uid: 'cp' + i })}</div>`).join('');
+  show('cere', `<div class="cere"><div class="stage"><div class="rays"></div><div class="cpet">${C.svg(S.me, { mood: 'happy', stage: S.stage, uid: 'ce' })}</div><div class="medal" id="cmedal">${medal}</div></div>
+    <div class="ctitle" id="ctitle" aria-live="polite">¡Lo has conseguido!</div><div class="cmsg" id="cmsg"></div><div class="cparade" id="cpar" aria-hidden="true"></div>
+    <div class="cbar"><i style="animation-duration:${10 * k}s"></i></div><div class="cskip" id="cskip">Toca la pantalla o pulsa ESPACIO para saltar</div></div>`, { noFocus: true });
+  const sc = app.querySelector('.cere'); sc.addEventListener('click', () => { if (performance.now() - UI.cereT > 1500) UI.cereSkip = true; });
+  const set = (t, m) => { const a = $('ctitle'), b = $('cmsg'); if (!a) return; a.textContent = t; b.textContent = m || ''; anim(a, 'cpop2', 500); if (m) anim(b, 'cpop2', 500); };
+  live('¡Lo has conseguido! Has llegado al final del juego.');
+  sfx('win'); FX.confetti(90); const W = innerWidth, H = innerHeight;
+  const fw = setInterval(() => { if (my !== tok || UI.screen !== 'cere') return clearInterval(fw); FX.burst(W * (.15 + Math.random() * .7), H * (.12 + Math.random() * .4), [['#ffd23f', '#fff', '#ff3d9a'], ['#2de2ff', '#fff', '#b6ff3b'], ['#ff9f43', '#ffd23f', '#ff6a8a']][Math.floor(Math.random() * 3)], 34, 8); }, 650 / k);
+  setTimeout(() => { const s = $('cskip'); if (s) s.classList.add('on'); }, 1500);
+  try {
+    await T(2500); if (my !== tok || UI.cereSkip) throw 0;
+    set('Tú y ' + S.me.name, 'habéis llegado juntos hasta el final'); sfx('heal');
+    await T(2300); if (UI.cereSkip) throw 0;
+    const m = $('cmedal'); if (m) m.classList.add('in'); set('Medalla al esfuerzo', ''); sfx('evolve'); FX.confetti(70);
+    await T(1500); if (UI.cereSkip) throw 0;
+    const pr = $('cpar'); if (pr) pr.innerHTML = parade;
+    set(S.tamed.length === 1 ? 'Has domado 1 criatura' : 'Has domado ' + S.tamed.length + ' criaturas', 'y has resuelto ' + S.correct + ' retos'); if (S.tamed.length) sfx('capture');
+    await T(2000); if (UI.cereSkip) throw 0;
+    set(S.cont ? 'Superación' : S.wrong ? 'Aprender de los errores' : 'Sin una sola caída', R.pick(S.cont ? EFFORT_CONT : S.wrong ? EFFORT_ERR : EFFORT_CLEAN));
+    await T(1900);
+  } catch (e) { if (e !== 0) throw e; }
+  clearInterval(fw); UI.cereSkip = false;
+}
+
 /* ---------- resultados ---------- */
 const GR = [['S', 5, '¡Leyenda de la Liga!'], ['A', 4, 'Estrella de la Liga'], ['B', 3, 'Mente Valiente'], ['C', 2, 'Aprendiz en Camino'], ['D', 1, 'Cría con Mucho Futuro']];
 function rate(done) {
@@ -731,11 +783,15 @@ function rate(done) {
 }
 function finish(done) {
   tok++; const my = tok; AU.stopMusic(); curTrack = ''; S.t1 = Date.now();
+  if (done) ceremony(my).then(() => { if (my === tok && S) showResults(done); }).catch(e => { if (e !== CANCEL) { console.error(e); if (S) showResults(done); } });
+  else showResults(done);
+}
+function showResults(done) {
   const rt = rate(done), [letter, stars, title] = rt.res, cont = S.cont || 0, livesB = done && !cont ? S.lives * 300 : 0, compB = done ? 1000 : 0, gross = S.score + livesB + compB, total = Math.max(0, gross - cont * CONT_PEN), pen = gross - total;
   const key = S.cycle + '|' + (S.mode === 'story' ? 'story' : S.cat), prev = SAVE.best[key], isBest = total > 0 && (!prev || total > prev.score);
   if (isBest) SAVE.best[key] = { score: total, letter }; save();
   const acc = Math.round(100 * S.correct / Math.max(1, S.answered));
-  if (done) { sfx('win'); FX.confetti(160); } else sfx('lose');
+  if (done) FX.confetti(120); else sfx('lose');
   document.getElementById('topctl').dataset.mode = '';
   const name = S.mode === 'story' ? 'Modo historia' : Q.info(S.cat, S.cycle).name;
   const st = Object.keys(S.stats).map(c => { const s = S.stats[c], t = s.c + s.w; return `<div><span>${Q.info(c, S.cycle).name}</span><b>${s.c}/${t}</b></div>`; }).join('');
