@@ -404,6 +404,18 @@ sup{font-size:.6em;line-height:0}
 .kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.2rem 1.2rem}.kv div{display:flex;justify-content:space-between;gap:.6rem;font-size:.82rem;border-bottom:.08rem dashed #6c5bb8;padding:.1rem 0}.kv span{color:#cfc6f5}.kv b{color:var(--yellow);text-align:right}
 .errs{margin:.2rem 0;padding-left:1.2rem}.errs li{font-size:.82rem;margin:.35rem 0;line-height:1.3}.errs small{color:#cfc6f5}
 @media (max-aspect-ratio:1/1){.kv{grid-template-columns:1fr}}
+
+/* continuar */
+.cont{position:fixed;inset:0;z-index:38;background:rgba(10,2,40,.84);display:flex;align-items:center;justify-content:center;padding:1rem;cursor:pointer;animation:scrIn .25s}
+.cbox{display:flex;flex-direction:column;align-items:center;gap:.5rem;text-align:center;max-height:100%}
+.cont .ct{font-size:clamp(2rem,9vmin,4.6rem);text-transform:uppercase;color:#ff4d6d;line-height:1;paint-order:stroke fill;-webkit-text-stroke:.14em var(--ink);text-shadow:0 .1em 0 var(--ink)}
+.cont .cs{font-size:clamp(1.05rem,3.6vmin,1.9rem);color:#fff;text-shadow:0 .08em 0 var(--ink)}
+.ring{position:relative;width:clamp(6rem,24vmin,11rem);aspect-ratio:1}.ring svg{width:100%;height:100%;display:block}
+.ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:clamp(2.6rem,11vmin,5rem);color:var(--yellow);text-shadow:0 .06em 0 var(--ink)}
+.cont .btn{pointer-events:none}.cont .chint{color:#cfc6f5;font-size:clamp(.85rem,2.6vmin,1.2rem)}.cont .chint b{color:var(--yellow)}
+.cnote{max-width:34rem;margin:.2rem auto 0;background:rgba(27,17,64,.78);border:.12rem solid #ff9f43;border-radius:.8rem;padding:.4rem .8rem;font-size:.85rem;text-align:center;color:#fff}.cnote b{color:var(--yellow)}
+.stats .pen b{color:#ff6a8a}
+.cnote2{background:rgba(255,159,67,.14);border-left:.25rem solid #ff9f43;padding:.4rem .6rem;font-size:.82rem}
 </style>
 </head>
 <body>
@@ -1986,15 +1998,16 @@ function reportData() {
   const secs = L.length ? Math.round(10 * L.reduce((a, b) => a + b.secs, 0) / L.length) / 10 : 0;
   const mins = Math.max(1, Math.round(((S.t1 || Date.now()) - (S.t0 || Date.now())) / 60000));
   const total = S.final ? S.final.total : S.score, letter = S.final ? S.final.letter : '', title = S.final ? S.final.title : '', done = S.final ? S.final.done : false;
-  return { date: new Date().toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' }), level: LEVELS[S.cycle].name + ' (' + LEVELS[S.cycle].grades + ')', mode: S.mode === 'story' ? 'Modo historia' : 'Duelo rápido: ' + Q.info(S.cat, S.cycle).name, world: WORLDS[P.world].name, result: done ? 'Misión cumplida' : 'Entrenamiento terminado (sin vidas)', letter, title, total, n, okN, acc: all.p, best: S.best, lives: S.lives + '/' + S.maxLives, tamed: S.tamed.length, mins, secs, timeouts: L.filter(x => x.timeout).length, powUsed: S.powUsed || 0, feel: { 1: 'Con confianza', 2: 'Más o menos', 3: 'Con dudas' }[S.feel] || 'No indicada', limit: S.limit, sens: sens.map(a => ({ name: a[0], x: a[1], l: lvl(a[1]) })), crit: crit.map(a => ({ name: a[0], x: a[1], l: lvl(a[1]) })), cats, weak, errors, evo: S.stage };
+  return { date: new Date().toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' }), level: LEVELS[S.cycle].name + ' (' + LEVELS[S.cycle].grades + ')', mode: S.mode === 'story' ? 'Modo historia' : 'Duelo rápido: ' + Q.info(S.cat, S.cycle).name, world: WORLDS[P.world].name, result: done ? 'Misión cumplida' + (S.cont ? ' (con continuaciones)' : '') : 'Entrenamiento terminado (sin vidas)', letter, title, total, cont: S.cont || 0, pen: S.final ? S.final.pen : 0, base: S.final ? S.final.base : '', contCats: [...new Set((S.contCats || []).map(c => Q.info(c, S.cycle).name))], n, okN, acc: all.p, best: S.best, lives: S.lives + '/' + S.maxLives, tamed: S.tamed.length, mins, secs, timeouts: L.filter(x => x.timeout).length, powUsed: S.powUsed || 0, feel: { 1: 'Con confianza', 2: 'Más o menos', 3: 'Con dudas' }[S.feel] || 'No indicada', limit: S.limit, sens: sens.map(a => ({ name: a[0], x: a[1], l: lvl(a[1]) })), crit: crit.map(a => ({ name: a[0], x: a[1], l: lvl(a[1]) })), cats, weak, errors, evo: S.stage };
 }
 function reportModal() {
   if (!S || !S.log) return;
   const r = reportData(), bar = (x, l) => `<span class="pbar"><i style="width:${x.n ? x.p : 0}%"></i></span><span class="pchip">${l[1]}${x.n ? ` · ${x.p}% (${x.c}/${x.n})` : ''}</span>`;
   const row = (a) => `<div class="pw ${a.l[0]}"><div class="pwt">${a.name}</div><div class="pwv">${bar(a.x, a.l)}</div></div>`;
-  const kv = [['Nivel', r.level], ['Modo', r.mode], ['Mundo', r.world], ['Resultado', r.result + (r.letter ? ' · calificación ' + r.letter + ' (' + r.title + ')' : '')], ['Puntuación total', r.total.toLocaleString('es-ES')], ['Aciertos', `${r.okN}/${r.n} (${r.acc} %)`], ['Mejor racha', r.best], ['Vidas al terminar', r.lives], ['Criaturas domadas', r.tamed], ['Duración', r.mins + ' min'], ['Tiempo medio por respuesta', fmtS(r.secs) + ' s (límite ' + r.limit + ' s)'], ['Tiempos agotados', r.timeouts], ['Poderes usados', r.powUsed], ['Autoevaluación', r.feel]];
+  const kv = [['Nivel', r.level], ['Modo', r.mode], ['Mundo', r.world], ['Resultado', r.result + (r.letter ? ' · calificación ' + r.letter + ' (' + r.title + ')' : '')], ['Puntuación total', r.total.toLocaleString('es-ES')], ['Aciertos', `${r.okN}/${r.n} (${r.acc} %)`], ['Mejor racha', r.best], ['Vidas al terminar', r.lives], ['Criaturas domadas', r.tamed], ['Duración', r.mins + ' min'], ['Tiempo medio por respuesta', fmtS(r.secs) + ' s (límite ' + r.limit + ' s)'], ['Tiempos agotados', r.timeouts], ['Poderes usados', r.powUsed], ['Continuaciones usadas', r.cont ? r.cont + (r.pen ? ' (−' + r.pen.toLocaleString('es-ES') + ' pts)' : '') : 'Ninguna'], ['Autoevaluación', r.feel]];
   modal(`<h3>Informe del alumnado</h3><p><small>${r.date} · MateMonstruos · Liga del Teide</small></p>
   <div class="kv">${kv.map(a => `<div><span>${a[0]}</span><b>${a[1]}</b></div>`).join('')}</div>
+  ${r.cont ? `<p class="cnote2"><b>Continuaciones:</b> el alumno o la alumna se quedó sin vidas ${r.cont} ${r.cont === 1 ? 'vez' : 'veces'} y siguió jugando (en: ${r.contCats.join(', ')}). La calificación de una partida con continuaciones baja un nivel por cada una (máximo 3) y se restan 500 puntos por continuación. Sin continuar, su juego equivalía a una ${r.base}. Estas actividades merecen especial atención.</p>` : ''}
   <h4>Sentidos matemáticos</h4>${r.sens.map(row).join('')}
   <h4>Criterios de evaluación (orientativo)</h4>${r.crit.map(row).join('')}
   <h4>Por actividad</h4><table class="tt"><tr><th>Actividad</th><th>Aciertos</th><th>%</th><th>Tiempo medio</th></tr>${r.cats.map(c => `<tr><td>${c.name}</td><td>${c.c}/${c.t}</td><td>${c.p} %</td><td>${fmtS(c.avg)} s</td></tr>`).join('')}</table>
@@ -2026,8 +2039,9 @@ function buildPDF(r) {
   y = H - 86 - 14; txt(M, y - 8, 'Alumno/a: ________________________________   Grupo: ____________   Docente: ____________________', 9, false, GREY); y -= 22;
   // resumen en dos columnas
   h2('Resumen de la partida');
-  const kv = [['Nivel', r.level], ['Modo', r.mode], ['Mundo', r.world], ['Resultado', r.result], ['Calificación', r.letter ? r.letter + ' · ' + r.title : '-'], ['Puntuación total', String(r.total)], ['Aciertos', `${r.okN}/${r.n} (${r.acc} %)`], ['Mejor racha', String(r.best)], ['Vidas al terminar', r.lives], ['Criaturas domadas', String(r.tamed)], ['Duración', r.mins + ' min'], ['Tiempo medio por respuesta', fmtS(r.secs) + ' s (límite ' + r.limit + ' s)'], ['Tiempos agotados', String(r.timeouts)], ['Poderes usados', String(r.powUsed)], ['Autoevaluación', r.feel]];
+  const kv = [['Nivel', r.level], ['Modo', r.mode], ['Mundo', r.world], ['Resultado', r.result], ['Calificación', r.letter ? r.letter + ' · ' + r.title : '-'], ['Puntuación total', String(r.total)], ['Aciertos', `${r.okN}/${r.n} (${r.acc} %)`], ['Mejor racha', String(r.best)], ['Vidas al terminar', r.lives], ['Criaturas domadas', String(r.tamed)], ['Duración', r.mins + ' min'], ['Tiempo medio por respuesta', fmtS(r.secs) + ' s (límite ' + r.limit + ' s)'], ['Tiempos agotados', String(r.timeouts)], ['Poderes usados', String(r.powUsed)], ['Continuaciones usadas', r.cont ? r.cont + (r.pen ? ' (-' + r.pen + ' pts)' : '') : 'Ninguna'], ['Autoevaluación', r.feel]];
   for (let i = 0; i < kv.length; i += 2) { need(18); y -= 14; [kv[i], kv[i + 1]].forEach((a, k) => { if (!a) return; const x = M + k * (CW / 2); txt(x, y, a[0] + ':', 8.5, false, GREY); const lw = wd(a[0] + ': ', 8.5, false); const v = wrap(a[1], 9.5, CW / 2 - lw - 8, true)[0] || ''; txt(x + lw + 2, y, v, 9.5, true); }); }
+  if (r.cont) para(`Continuaciones: se quedó sin vidas ${r.cont} ${r.cont === 1 ? 'vez' : 'veces'} y siguió jugando (en: ${r.contCats.join(', ')}). La calificación baja un nivel por continuación (máximo 3) y se restan 500 puntos por cada una. Sin continuar, su juego equivalía a una ${r.base}. Conviene prestar atención a estas actividades.`, 8.5, [160, 50, 30]);
   y -= 4;
   const bars = list => list.forEach(a => {
     const lines = wrap(a.name, 9, 330, false); need(lines.length * 12 + 8); y -= 13; lines.forEach((l, i) => { txt(M, y - i * 11, l, 9, false); }); const top = y; if (lines.length > 1) y -= (lines.length - 1) * 11;
@@ -2106,7 +2120,7 @@ function teacherModal() {
   <p><b>Alcance:</b> es un recurso de práctica que trabaja una selección de los saberes. No sustituye la manipulación de materiales, el uso de la calculadora ni las investigaciones estadísticas propias del aula. Algunos saberes se tratan a un nivel inferior al del anexo (por ejemplo, decimales hasta las centésimas y sumas y restas hasta 100 en 1.º–2.º).</p>
   <p><b>Tiempo:</b> cada pregunta tiene un tiempo máximo (barra visible): 1 minuto en 1.º–2.º, 2 minutos en 3.º–4.º y 3 minutos en 5.º–6.º. Si se agota cuenta como fallo y se muestra la pista.</p>
   <p><b>Papel y boli:</b> al empezar el modo historia en 3.º–4.º y 5.º–6.º aparece un aviso que recomienda jugar con papel y bolígrafo. En esos ciclos se mezclan además preguntas muy fáciles (aprox. 1 de cada 3).</p>
-  <p><b>Superpoderes:</b> al terminar (o en game over) el botón «¡Descubre tus superpoderes!» muestra, con los datos de la partida, los sentidos y los criterios 2.1, 2.2, 4.1, 4.2 y 7.1 en los que va mejor y los que debe entrenar. Es orientativo y solo de esa partida: no sustituye la evaluación docente.</p><p><b>Informe del alumnado:</b> al terminar (o en game over) el botón «Informe del alumnado» muestra y permite <b>descargar en PDF</b> un informe de la partida: resumen, sentidos y criterios (orientativos), resultados y tiempo medio por actividad, y la lista de errores con su explicación. Incluye espacio para escribir a mano el nombre; el juego no guarda ni envía datos personales. El PDF se genera en el propio dispositivo.</p><p><b>Poder:</b> la barra PODER se carga con los aciertos y elimina dos respuestas incorrectas, una vez por carga.</p>
+  <p><b>Superpoderes:</b> al terminar (o en game over) el botón «¡Descubre tus superpoderes!» muestra, con los datos de la partida, los sentidos y los criterios 2.1, 2.2, 4.1, 4.2 y 7.1 en los que va mejor y los que debe entrenar. Es orientativo y solo de esa partida: no sustituye la evaluación docente.</p><p><b>Informe del alumnado:</b> al terminar (o en game over) el botón «Informe del alumnado» muestra y permite <b>descargar en PDF</b> un informe de la partida: resumen, sentidos y criterios (orientativos), resultados y tiempo medio por actividad, y la lista de errores con su explicación. Incluye espacio para escribir a mano el nombre; el juego no guarda ni envía datos personales. El PDF se genera en el propio dispositivo.</p><p><b>Continuar tras perder todas las vidas:</b> al quedarse sin vidas aparece una cuenta atrás de 6 segundos; tocando la pantalla o pulsando ESPACIO (también con Makey Makey) la criatura revive con todas sus vidas y una frase divertida distinta cada vez. Así el alumnado con más dificultades puede llegar al final y el informe recoge más datos. Para que no iguale a quien lo logra sin continuar, cada continuación baja la calificación un nivel (máximo 3; la S solo es posible sin continuar), resta 500 puntos y suprime el bonus de corazones. El número de continuaciones y las actividades donde ocurrieron aparecen en la pantalla final y en el informe. Si la cuenta atrás termina, la partida acaba.</p><p><b>Poder:</b> la barra PODER se carga con los aciertos y elimina dos respuestas incorrectas, una vez por carga.</p>
   <p>Las preguntas se generan al vuelo (decenas de miles de combinaciones) y no se repiten dentro de una sesión. No se recogen datos personales: solo se guardan en este navegador las puntuaciones y las criaturas domadas.</p>
   <button class="btn" data-first data-nav data-act="closemodal">Cerrar</button>`);
   const mb = document.querySelector('#modal .mbox'); if (mb) mb.classList.add('wide');
@@ -2146,6 +2160,7 @@ window.addEventListener('pointerdown', startAudio, { passive: true });
 
 function onAct(a) {
   if (a === 'mute') { toggleMute(); return; }
+  if (S && S.contWait) { if (a === 'ok') S.contWait(); return; }
   if (UI.busy) return;
   if (modalOpen()) {
     const m = document.getElementById('modal');
@@ -2228,7 +2243,7 @@ function buildPlan(mode, cat, cycle) {
 function startRun(mode, cat) {
   tok++; closeModal();
   const maxL = P.cycle === 1 ? 7 : P.cycle === 2 ? 6 : 5, plan = buildPlan(mode, cat, P.cycle);
-  S = { mode, cat, cycle: P.cycle, me: mkCr(P.cr), lives: maxL, maxLives: maxL, score: 0, streak: 0, best: 0, correct: 0, wrong: 0, answered: 0, stage: 1, plan, pi: -1, tamed: [], dyn: 0, bonus: { enc: 0, boss: 0 }, locked: true, paused: false, totalNeed: plan.reduce((s, e) => s + e.need, 0), limit: P.cycle === 1 ? 60 : P.cycle === 2 ? 120 : 180, log: [], powUsed: 0, t0: Date.now(), pow: 0, powNeed: P.cycle === 3 ? 5 : 4, removed: new Set(), evo2: mode === 'story' ? 9 : 5, evo3: mode === 'story' ? 24 : 11, lastCat: '', stats: {} };
+  S = { mode, cat, cycle: P.cycle, me: mkCr(P.cr), lives: maxL, maxLives: maxL, score: 0, streak: 0, best: 0, correct: 0, wrong: 0, answered: 0, stage: 1, plan, pi: -1, tamed: [], dyn: 0, bonus: { enc: 0, boss: 0 }, locked: true, paused: false, totalNeed: plan.reduce((s, e) => s + e.need, 0), limit: P.cycle === 1 ? 60 : P.cycle === 2 ? 120 : 180, log: [], powUsed: 0, t0: Date.now(), pow: 0, powNeed: P.cycle === 3 ? 5 : 4, removed: new Set(), evo2: mode === 'story' ? 9 : 5, evo3: mode === 'story' ? 24 : 11, lastCat: '', stats: {}, cont: 0, contCats: [] };
   curTrack = ''; UI.audioOn && musicFor('battle');
   renderBattle();
   run().catch(e => { if (e !== CANCEL) { console.error(e); } });
@@ -2424,9 +2439,15 @@ async function answer(i) {
       setMe('hurt'); anim($('me').querySelector('.inner'), 'shake', 500); setHearts(S.lives); floatText('−1', $('me'), '#ff6a8a'); setHud();
       if (S.lives <= 0) {
         setMe('faint'); $('me').querySelector('.inner').classList.remove('bob'); anim($('me').querySelector('.inner'), 'faint', 1100); sfx('lose');
-        banner('¡Sin vidas!', 'Tu criatura necesita descansar', false, 1700); await sleep(1900); S.q = null; return S.resolveAsk();
-      }
-      setMe();
+        await sleep(900);
+        const again = await askContinue(my); if (my !== tok || !S) throw CANCEL;
+        if (!again) { banner('¡Sin vidas!', 'Tu criatura necesita descansar', false, 1700); await sleep(1900); S.q = null; return S.resolveAsk(); }
+        S.cont++; S.contCats.push(q.cat); S.lives = S.maxLives; S.streak = 0;
+        sfx('heal'); setMe('happy'); anim($('me'), 'popin', 700); setHearts(); setHud();
+        { const c = center($('me')); FX.burst(c[0], c[1], ['#fff', '#ff6a8a', '#ffd23f'], 50, 9); }
+        const ph = nextRevive(); banner(ph[0], ph[1], false, 2600); live(ph[0] + ' ' + ph[1]);
+        await sleep(700); setMe();
+      } else setMe();
       // pista
       const card = $('qcard');
       card.innerHTML = `<div class="hintcard"><span class="oops">${S.timedOut ? '¡Se acabó el tiempo!' : R.pick(ENC)} La respuesta era ${strip(q.answers[q.correct]) || '…'}</span><div class="ht">${q.hint}</div><span class="go">Pulsa <b>ESPACIO</b> o toca para seguir</span></div>`;
@@ -2468,29 +2489,84 @@ function pauseGame() {
 function resumeGame() { if (S) S.paused = false; closeModal(); }
 function quitRun() { clearInterval(timerId); tok++; S = null; closeModal(); document.getElementById('topctl').dataset.mode = ''; modeScreen(); curTrack = ''; musicFor('menu'); }
 
+
+/* ---------- continuar tras perder todas las vidas ---------- */
+const CONT_SECS = 6, CONT_PEN = 500;
+const REVIVE = [
+  ['¡Resucitamos!', 'Era un calambre en el cerebro y ya se ha pasado'],
+  ['¡Vuelve la estrella!', 'Estaba echándose una siestecita'],
+  ['¡Gofio de emergencia!', 'Una cucharada y a seguir peleando'],
+  ['¡Otra oportunidad!', 'Los errores son entrenamiento disfrazado'],
+  ['¡Corazones al 100 %!', 'Recargados con energía del Teide'],
+  ['¡Sorpresa!', 'Tu criatura se estaba haciendo la dormida'],
+  ['¡Ni un volcán te para!', 'Respira, piensa y vuelve a la carga'],
+  ['¡Modo fénix activado!', 'Las criaturas valientes renacen de las cenizas'],
+  ['¡Plátano de Canarias!', 'Potasio puro para las próximas cuentas'],
+  ['¡Mente brillante en marcha!', 'Esta vez, con papel y boli a mano'],
+  ['¡Más duro que el basalto!', 'Las rocas del Teide no se rinden'],
+  ['¡Vuelves como un cohete!', 'Tres, dos, uno… ¡a calcular!'],
+  ['¡Los números te echaban de menos!', 'Sin ti se aburrían un montón'],
+  ['¡Segundo aire!', 'Domar criaturas es caerse y levantarse'],
+  ['¡Cielo despejado!', 'Hasta las estrellas del Teide te guiñan un ojo'],
+  ['¡Eso es no rendirse!', 'Aprender también es volver a intentarlo']
+];
+const ASKS = ['¿Un último esfuerzo?', 'Tu criatura te necesita', '¿Le damos otra oportunidad?', 'Aún queda Liga por delante', '¡No te rindas ahora!', '¿Seguimos juntos?'];
+let reviveBag = [], askBag = [], lastRevive = null, lastAsk = null;
+function bagPick(bag, src, last) {
+  if (!bag.length) { bag.push(...R.shuffle(src.slice())); if (bag.length > 1 && bag[bag.length - 1] === last) bag.unshift(bag.pop()); }
+  return bag.pop();
+}
+function nextRevive() { return lastRevive = bagPick(reviveBag, REVIVE, lastRevive); }
+function nextAsk() { return lastAsk = bagPick(askBag, ASKS, lastAsk); }
+function askContinue(my) {
+  return new Promise(resolve => {
+    const ov = document.createElement('div'); ov.className = 'cont'; ov.setAttribute('role', 'alertdialog'); ov.setAttribute('aria-live', 'assertive');
+    const R0 = 54, CIRC = 2 * Math.PI * R0, ask = nextAsk();
+    ov.innerHTML = `<div class="cbox"><div class="ct">¡Sin vidas!</div><div class="cs">${ask}</div>
+      <div class="ring"><svg viewBox="0 0 130 130" aria-hidden="true"><circle cx="65" cy="65" r="${R0}" fill="rgba(27,17,64,.7)" stroke="#3b2a8f" stroke-width="12"/><circle id="cring" cx="65" cy="65" r="${R0}" fill="none" stroke="#ffd23f" stroke-width="12" stroke-linecap="round" transform="rotate(-90 65 65)" stroke-dasharray="${CIRC}" stroke-dashoffset="0"/></svg><b id="cnum">${CONT_SECS}</b></div>
+      <div class="cgo"><span class="btn">¡Seguir jugando!</span></div>
+      <div class="chint">Toca la pantalla o pulsa <b>ESPACIO</b></div></div>`;
+    document.getElementById('app').appendChild(ov);
+    live('Sin vidas. ' + ask + ' Toca la pantalla o pulsa espacio para continuar. Tienes ' + CONT_SECS + ' segundos.');
+    const t0 = performance.now(), ring = ov.querySelector('#cring'), num = ov.querySelector('#cnum'); let done = false, lastN = CONT_SECS, iv;
+    const end = v => { if (done) return; done = true; clearInterval(iv); if (S) S.contWait = null; ov.remove(); resolve(v); };
+    const go = () => { if (performance.now() - t0 < 450) return; end(true); };
+    S.contWait = go; ov.addEventListener('click', go);
+    requestAnimationFrame(() => { ring.style.transition = `stroke-dashoffset ${CONT_SECS}s linear`; ring.style.strokeDashoffset = CIRC; });
+    iv = setInterval(() => {
+      if (my !== tok || !S) return end(false);
+      const el = (performance.now() - t0) / 1000, n = Math.max(0, Math.ceil(CONT_SECS - el));
+      if (n !== lastN) { lastN = n; num.textContent = n; if (n > 0) sfx('click'); }
+      if (el >= CONT_SECS) end(false);
+    }, 100);
+  });
+}
+
 /* ---------- resultados ---------- */
+const GR = [['S', 5, '¡Leyenda de la Liga!'], ['A', 4, 'Estrella de la Liga'], ['B', 3, 'Mente Valiente'], ['C', 2, 'Aprendiz en Camino'], ['D', 1, 'Cría con Mucho Futuro']];
 function rate(done) {
   const acc = S.correct / Math.max(1, S.answered);
-  if (done) { if (acc >= .95 && S.lives >= S.maxLives - 1) return ['S', 5, '¡Leyenda de la Liga!']; if (acc >= .85) return ['A', 4, 'Estrella de la Liga']; if (acc >= .7) return ['B', 3, 'Mente Valiente']; return ['C', 2, 'Aprendiz en Camino']; }
-  return S.correct / S.totalNeed >= .6 ? ['C', 2, 'Aprendiz en Camino'] : ['D', 1, 'Cría con Mucho Futuro'];
+  const i = done ? ((acc >= .95 && S.lives >= S.maxLives - 1) ? 0 : acc >= .85 ? 1 : acc >= .7 ? 2 : 3) : (S.correct / S.totalNeed >= .6 ? 3 : 4);
+  const drop = Math.min(S.cont || 0, 3);
+  return { base: GR[i], res: GR[Math.min(4, i + drop)], drop };
 }
 function finish(done) {
   tok++; const my = tok; AU.stopMusic(); curTrack = ''; S.t1 = Date.now();
-  const [letter, stars, title] = rate(done), livesB = done ? S.lives * 300 : 0, compB = done ? 1000 : 0, total = S.score + livesB + compB;
-  const key = S.cycle + '|' + (S.mode === 'story' ? 'story' : S.cat), prev = SAVE.best[key], isBest = !prev || total > prev.score;
+  const rt = rate(done), [letter, stars, title] = rt.res, cont = S.cont || 0, livesB = done && !cont ? S.lives * 300 : 0, compB = done ? 1000 : 0, gross = S.score + livesB + compB, total = Math.max(0, gross - cont * CONT_PEN), pen = gross - total;
+  const key = S.cycle + '|' + (S.mode === 'story' ? 'story' : S.cat), prev = SAVE.best[key], isBest = total > 0 && (!prev || total > prev.score);
   if (isBest) SAVE.best[key] = { score: total, letter }; save();
   const acc = Math.round(100 * S.correct / Math.max(1, S.answered));
   if (done) { sfx('win'); FX.confetti(160); } else sfx('lose');
   document.getElementById('topctl').dataset.mode = '';
   const name = S.mode === 'story' ? 'Modo historia' : Q.info(S.cat, S.cycle).name;
   const st = Object.keys(S.stats).map(c => { const s = S.stats[c], t = s.c + s.w; return `<div><span>${Q.info(c, S.cycle).name}</span><b>${s.c}/${t}</b></div>`; }).join('');
-  show('results', `<div class="rating"><span class="chip">${done ? '¡Misión cumplida!' : 'Entrenamiento terminado'} · ${name}</span><div class="letter">${letter}</div><div class="stars">${Array.from({ length: 5 }, (_, i) => i < stars ? STAR : STAR_OFF).join('')}</div><div class="rtitle">${title}</div></div>
-  <div class="stats"><div><span>Aciertos</span><b>${S.correct}/${S.answered}</b></div><div><span>Precisión</span><b>${acc}%</b></div><div><span>Mejor racha</span><b>${S.best}</b></div><div><span>Vidas</span><b>${S.lives}/${S.maxLives}</b></div><div><span>Puntos de combate</span><b>${(S.score - S.bonus.enc - S.bonus.boss).toLocaleString('es-ES')}</b></div><div><span>Criaturas y jefes</span><b>+${S.bonus.enc + S.bonus.boss}</b></div>${done ? `<div><span>Corazones</span><b>+${livesB}</b></div><div><span>Misión</span><b>+${compB}</b></div>` : ''}<div class="tot"><span>TOTAL ${isBest ? '<span class="newb">¡RÉCORD!</span>' : ''}</span><b>${total.toLocaleString('es-ES')}</b></div></div>
+  show('results', `<div class="rating"><span class="chip">${done ? '¡Misión cumplida!' : 'Entrenamiento terminado'} · ${name}</span><div class="letter">${letter}</div><div class="stars">${Array.from({ length: 5 }, (_, i) => i < stars ? STAR : STAR_OFF).join('')}</div><div class="rtitle">${title}</div>${cont ? `<div class="cnote">Has usado <b>${cont}</b> ${cont === 1 ? 'continuación' : 'continuaciones'}: tu juego valía una <b>${rt.base[0]}</b>${rt.drop && letter !== rt.base[0] ? `, pero la calificación baja a <b>${letter}</b>` : ''}${pen ? ` y se restan <b>${pen.toLocaleString('es-ES')}</b> puntos` : ''}. ¡Sin continuar se consigue más!</div>` : ''}</div>
+  <div class="stats"><div><span>Aciertos</span><b>${S.correct}/${S.answered}</b></div><div><span>Precisión</span><b>${acc}%</b></div><div><span>Mejor racha</span><b>${S.best}</b></div><div><span>Vidas</span><b>${S.lives}/${S.maxLives}</b></div><div><span>Puntos de combate</span><b>${(S.score - S.bonus.enc - S.bonus.boss).toLocaleString('es-ES')}</b></div><div><span>Criaturas y jefes</span><b>+${S.bonus.enc + S.bonus.boss}</b></div>${done ? `${cont ? '' : `<div><span>Corazones</span><b>+${livesB}</b></div>`}<div><span>Misión</span><b>+${compB}</b></div>` : ''}${cont ? `<div class="pen"><span>Continuaciones (${cont})</span><b>−${pen.toLocaleString('es-ES')}</b></div>` : ''}<div class="tot"><span>TOTAL ${isBest ? '<span class="newb">¡RÉCORD!</span>' : ''}</span><b>${total.toLocaleString('es-ES')}</b></div></div>
   ${S.tamed.length ? `<div class="minipets">${S.tamed.map((t, i) => `<div title="${t.cr.name}">${C.svg(t.cr, { mood: 'happy', uid: 'r' + i })}</div>`).join('')}</div>` : ''}
   <div class="feelbox"><span class="chip">¿Cómo te has sentido con los retos?</span><div class="row">${[['Con confianza', 1, '#b6ff3b', 'M26 34q10 10 20 0'], ['Más o menos', 2, '#ffd23f', 'M26 38h20'], ['Con dudas', 3, '#ff9f43', 'M26 40q10-9 20 0']].map(f => `<button class="face" data-nav data-act="feel" data-v="${f[1]}" aria-label="${f[0]}"><svg viewBox="0 0 72 72"><circle cx="36" cy="36" r="30" fill="${f[2]}" stroke="#1b1140" stroke-width="4"/><circle cx="26" cy="29" r="4" fill="#1b1140"/><circle cx="46" cy="29" r="4" fill="#1b1140"/><path d="${f[3]}" fill="none" stroke="#1b1140" stroke-width="4" stroke-linecap="round"/></svg><span>${f[0]}</span></button>`).join('')}</div><p class="s" id="feelmsg" aria-live="polite"></p></div>
   <div class="row"><button class="btn sm" data-nav data-first data-act="again">Jugar otra vez</button><button class="btn pink sm" data-nav data-act="powers">¡Descubre tus superpoderes!</button><button class="btn violet sm" data-nav data-act="report">Informe del alumnado</button><button class="btn cyan sm" data-nav data-act="menu">Cambiar modo</button><button class="btn ghost sm" data-nav data-act="home">Inicio</button></div>`, { noFocus: false });
   live(`Calificación ${letter}. ${title}. ${S.correct} aciertos de ${S.answered}. Total ${total} puntos`);
-  S.final = { letter, total, title, done };
+  S.final = { letter, total, title, done, cont, pen, base: rt.base[0] };
   window.__last = { letter, total, acc, done, stats: S.stats };
   setTimeout(() => { UI.audioOn && AU.startMusic('menu', P.world); curTrack = 'menu' + P.world; }, 2600);
   S.ended = true;

@@ -17,6 +17,8 @@ Tiempo máximo por pregunta: **1 minuto** en 1.º–2.º, **2 minutos** en 3.º�
 
 **Superpoderes:** el botón «¡Descubre tus superpoderes!» de la pantalla final (también en game over) muestra por sentidos y por criterios de evaluación (2.1, 2.2, 4.1, 4.2 y 7.1) lo que mejor domina el alumnado y lo que debe entrenar. Es orientativo y no sustituye la evaluación docente.
 
+**Continuar tras perder las vidas:** al quedarse sin vidas aparece una cuenta atrás de 6 segundos; con un toque en la pantalla o con ESPACIO (también Makey Makey) la criatura revive con todas sus vidas y una frase divertida distinta cada vez. Cada continuación baja la calificación un nivel (máximo 3; la S solo se logra sin continuar), resta 500 puntos y anula el bonus de corazones. El número de continuaciones y las actividades donde ocurrieron figuran en la pantalla final y en el informe.
+
 **Informe del alumnado:** al terminar (o en game over), el botón «Informe del alumnado» muestra y permite descargar en PDF el detalle de la partida: resumen, sentidos y criterios (orientativos), resultados y tiempos por actividad y errores con su explicación. Se genera en el propio dispositivo y no recoge datos personales (el nombre se escribe a mano).
 
 **Poder:** cada acierto carga la barra PODER; cuando está llena, **Espacio** elimina dos respuestas incorrectas (una vez por carga, no en todas las preguntas).
