@@ -10,10 +10,14 @@ const sleepRaw = ms => new Promise(r => setTimeout(r, ms));
 
 /* ---------- datos ---------- */
 const LEVELS = {
-  1: { name: 'Cría Chispa', grades: '1.º y 2.º de Primaria', desc: 'Sumas y restas, secuencias, mayor y menor, formas y cuadraditos', color: '#b6ff3b', el: 'planta' },
-  2: { name: 'Domador Rayo', grades: '3.º y 4.º de Primaria', desc: 'Tablas, divisiones, fracciones sencillas, geometría y áreas', color: '#2de2ff', el: 'agua' },
-  3: { name: 'Maestro Volcán', grades: '5.º y 6.º de Primaria', desc: 'Decimales, fracciones, ángulos, áreas de triángulos y más', color: '#ff3d9a', el: 'fuego' }
+  1: { name: 'Cría Chispa', grades: '1.º de Primaria', cycle: 1, desc: 'Números pequeños, sumas y restas fáciles, formas, secuencias y relojes', color: '#b6ff3b', el: 'planta' },
+  2: { name: 'Aprendiz Brisa', grades: '2.º de Primaria', cycle: 1, desc: 'Hasta 100, dobles y mitades, euros, calendario, cuadraditos y gráficos', color: '#34d399', el: 'tierra' },
+  3: { name: 'Domador Rayo', grades: '3.º de Primaria', cycle: 2, desc: 'Tablas del 2 al 5 y 10, repartos, fracciones sencillas, perímetro y áreas', color: '#2de2ff', el: 'agua' },
+  4: { name: 'Guardián Marea', grades: '4.º de Primaria', cycle: 2, desc: 'Todas las tablas, restos, decimales, ángulos, áreas y moda', color: '#4d8dff', el: 'rayo' },
+  5: { name: 'Maestro Volcán', grades: '5.º de Primaria', cycle: 3, desc: 'Decimales, fracciones, operaciones combinadas, triángulos y media', color: '#ff3d9a', el: 'fuego' },
+  6: { name: 'Campeón del Teide', grades: '6.º de Primaria', cycle: 3, desc: 'Negativos, porcentajes, mcm y mcd, círculo, proporciones y probabilidad', color: '#ffd23f', el: 'cosmos' }
 };
+const CYCLE_NAMES = { 1: 'Primer ciclo', 2: 'Segundo ciclo', 3: 'Tercer ciclo' };
 const WORLDS = {
   teide: { name: 'Volcán Teide', els: ['fuego', 'tierra', 'rayo'], color: '#ff7a3d', desc: 'Lava, rocas y chispas' },
   atlantico: { name: 'Abismo Atlántico', els: ['agua', 'rayo', 'planta'], color: '#2de2ff', desc: 'Mareas, burbujas y corales' },
@@ -51,7 +55,7 @@ try { const j = localStorage.getItem('mm_save'); if (j) SAVE = Object.assign(SAV
 function save() { try { localStorage.setItem('mm_save', JSON.stringify(SAVE)); } catch (e) {} }
 
 /* ---------- estado ---------- */
-const P = { cycle: SAVE.last.cycle || 2, world: SAVE.last.world || 'teide', cr: null };
+const P0 = SAVE.last.grade || ((SAVE.last.cycle || 2) * 2 - 1), P = { grade: P0, cycle: Math.ceil(P0 / 2), world: SAVE.last.world || 'teide', cr: null };
 let UI = { screen: '', back: null }, S = null, tok = 0;
 const CANCEL = { cancelled: true };
 async function sleep(ms) {
@@ -88,8 +92,9 @@ function titleScreen() {
   musicFor('menu');
 }
 function levelScreen() {
-  show('level', `<h2 class="t">¿Qué nivel eliges?</h2><p class="s">Cada nivel adapta las preguntas a tu ciclo</p>
-  <div class="row">${[1, 2, 3].map(n => { const L = LEVELS[n]; const cr = C.make(n * 31, [L.el]); return `<button class="card lvl" style="--c:${L.color}" data-nav ${n === P.cycle ? 'data-first' : ''} data-act="level" data-v="${n}"><span class="tag">${L.grades}</span><div class="eggmini">${C.egg(L.el)}</div><span class="nm">${L.name}</span><span class="ds">${L.desc}</span></button>`; }).join('')}</div>`, { back: 'title', backBtn: true });
+  const card = n => { const L = LEVELS[n]; return `<button class="card lvl" style="--c:${L.color}" data-nav ${n === P.grade ? 'data-first' : ''} data-act="level" data-v="${n}"><div class="eggmini">${C.egg(L.el)}</div><div class="lt"><span class="tag">${L.grades}</span><span class="nm">${L.name}</span><span class="ds">${L.desc}</span></div></button>`; };
+  show('level', `<h2 class="t">¿Qué nivel eliges?</h2><p class="s">Un nivel para cada curso: ¡las preguntas se adaptan a tu curso!</p>
+  <div class="lvgrid">${[1, 2, 3].map(c => `<div class="lvcol"><span class="chip">${CYCLE_NAMES[c]}</span>${card(c * 2 - 1)}${card(c * 2)}</div>`).join('')}</div>`, { back: 'title', backBtn: true });
 }
 function worldScreen() {
   show('world', `<h2 class="t">Elige tu mundo</h2><p class="s">Cambia los fondos, la música y las criaturas</p>
@@ -120,8 +125,8 @@ async function hatch(i) {
 function best(key) { return SAVE.best[key]; }
 function modeScreen() {
   const cats = Q.cats(P.cycle), cr = mkCr(P.cr);
-  const bk = k => { const b = best(P.cycle + '|' + k); return b ? `<span class="best">${b.letter} · ${b.score}</span>` : ''; };
-  show('mode', `<div style="display:flex;align-items:center;gap:1rem"><div style="width:clamp(4rem,12vmin,7rem)">${C.svg(cr, { mood: 'happy', uid: 'md' })}</div><div><h2 class="t" style="text-align:left">¿A qué jugamos?</h2><p class="s" style="text-align:left">${cr.name} · ${LEVELS[P.cycle].name}</p></div></div>
+  const bk = k => { const b = best('g' + P.grade + '|' + k); return b ? `<span class="best">${b.letter} · ${b.score}</span>` : ''; };
+  show('mode', `<div style="display:flex;align-items:center;gap:1rem"><div style="width:clamp(4rem,12vmin,7rem)">${C.svg(cr, { mood: 'happy', uid: 'md' })}</div><div><h2 class="t" style="text-align:left">¿A qué jugamos?</h2><p class="s" style="text-align:left">${cr.name} · ${LEVELS[P.grade].name} · ${LEVELS[P.grade].grades}</p></div></div>
   <button class="card wide" style="--c:var(--yellow)" data-nav data-first data-act="story">${bk('story')}<div class="ic" style="color:var(--yellow)"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 5l5.500 12 13 1.500-9.700 9 2.800 12.800L24 33l-11.600 7.300 2.800-12.800-9.700-9 13-1.500z"/></svg></div><div><span class="nm">Modo historia</span><br><span class="ds">Recorre la liga mezclando todos los retos, con 2 jefes y el JEFE FINAL</span></div></button>
   <div class="cards-grid">${cats.map(c => { const I2 = Q.info(c, P.cycle); return `<button class="card" style="--c:${I2.color}" data-nav data-act="single" data-v="${c}">${bk(c)}<div class="ic" style="color:${I2.color}">${catIcon(c)}</div><span class="nm">${I2.name}</span></button>`; }).join('')}</div>
   <p class="keys">Duelo rápido: 2 combates + jefe de la categoría</p>`, { back: 'egg', backBtn: true });
@@ -177,7 +182,7 @@ function reportData() {
   const secs = L.length ? Math.round(10 * L.reduce((a, b) => a + b.secs, 0) / L.length) / 10 : 0;
   const mins = Math.max(1, Math.round(((S.t1 || Date.now()) - (S.t0 || Date.now())) / 60000));
   const total = S.final ? S.final.total : S.score, letter = S.final ? S.final.letter : '', title = S.final ? S.final.title : '', done = S.final ? S.final.done : false;
-  return { date: new Date().toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' }), level: LEVELS[S.cycle].name + ' (' + LEVELS[S.cycle].grades + ')', mode: S.mode === 'story' ? 'Modo historia' : 'Duelo rápido: ' + Q.info(S.cat, S.cycle).name, world: WORLDS[P.world].name, result: done ? 'Misión cumplida' + (S.cont ? ' (con continuaciones)' : '') : 'Entrenamiento terminado (sin vidas)', letter, title, total, cont: S.cont || 0, pen: S.final ? S.final.pen : 0, base: S.final ? S.final.base : '', contCats: [...new Set((S.contCats || []).map(c => Q.info(c, S.cycle).name))], n, okN, acc: all.p, best: S.best, lives: S.lives + '/' + S.maxLives, tamed: S.tamed.length, mins, secs, timeouts: L.filter(x => x.timeout).length, powUsed: S.powUsed || 0, feel: { 1: 'Con confianza', 2: 'Más o menos', 3: 'Con dudas' }[S.feel] || 'No indicada', limit: S.limit, sens: sens.map(a => ({ name: a[0], x: a[1], l: lvl(a[1]) })), crit: crit.map(a => ({ name: a[0], x: a[1], l: lvl(a[1]) })), cats, weak, errors, evo: S.stage };
+  return { date: new Date().toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' }), level: LEVELS[S.grade].name + ' (' + LEVELS[S.grade].grades + ')', mode: S.mode === 'story' ? 'Modo historia' : 'Duelo rápido: ' + Q.info(S.cat, S.cycle).name, world: WORLDS[P.world].name, result: done ? 'Misión cumplida' + (S.cont ? ' (con continuaciones)' : '') : 'Entrenamiento terminado (sin vidas)', letter, title, total, cont: S.cont || 0, pen: S.final ? S.final.pen : 0, base: S.final ? S.final.base : '', contCats: [...new Set((S.contCats || []).map(c => Q.info(c, S.cycle).name))], n, okN, acc: all.p, best: S.best, lives: S.lives + '/' + S.maxLives, tamed: S.tamed.length, mins, secs, timeouts: L.filter(x => x.timeout).length, powUsed: S.powUsed || 0, feel: { 1: 'Con confianza', 2: 'Más o menos', 3: 'Con dudas' }[S.feel] || 'No indicada', limit: S.limit, sens: sens.map(a => ({ name: a[0], x: a[1], l: lvl(a[1]) })), crit: crit.map(a => ({ name: a[0], x: a[1], l: lvl(a[1]) })), cats, weak, errors, evo: S.stage };
 }
 function reportModal() {
   if (!S || !S.log) return;
@@ -296,7 +301,15 @@ function teacherModal() {
   <tr><td>V. Estocástico</td><td>Pictogramas y barras; seguro, posible e imposible (V.1.1, V.2.1–2.2).</td><td>Barras y pictogramas; moda y media; probabilidad comparada con bolas (V.1.1, V.1.4, V.2.2–2.3).</td><td>Media, mediana, moda y rango; variables cualitativas y cuantitativas; probabilidad con fracciones y % (V.1.3, V.1.6–1.7, V.2.1, V.2.3).</td></tr>
   <tr><td>VI. Socioafectivo</td><td colspan="3">Mensajes de ánimo y pistas ante el error, tiempo amplio, poder de ayuda, autoevaluación emocional al terminar, nombres, personajes y lenguaje inclusivos (VI.1.1–1.2, VI.2.1). El trabajo en grupo se organiza en el aula: por ejemplo, varias personas ante la Makey Makey, una con la tierra y otra tocando la respuesta (VI.2.2).</td></tr></table>
   <p><b>Criterios de evaluación con los que se relaciona</b> (la evaluación corresponde al docente; el juego solo ofrece práctica y retroalimentación): 2.2 y 2.3 (operaciones en problemas y validez de la solución, mediante las pistas), 4.1 y 4.2 (pensamiento computacional), y 7.1 (emociones y error como oportunidad).</p>
-  <p><b>Alcance:</b> es un recurso de práctica que trabaja una selección de los saberes. No sustituye la manipulación de materiales, el uso de la calculadora ni las investigaciones estadísticas propias del aula. Algunos saberes se tratan a un nivel inferior al del anexo (por ejemplo, decimales hasta las centésimas y sumas y restas hasta 100 en 1.º–2.º).</p>
+  <p><b>Alcance:</b> es un recurso de práctica que trabaja una selección de los saberes. No sustituye la manipulación de materiales, el uso de la calculadora ni las investigaciones estadísticas propias del aula. Algunos saberes se tratan a un nivel inferior al del anexo (por ejemplo, decimales hasta las centésimas). El decreto organiza el currículo por ciclos; la distribución por cursos del juego es una propuesta didáctica, no una prescripción oficial.</p>
+  <p><b>Seis niveles, uno por curso:</b> el nivel elegido ajusta las preguntas al curso (1.º a 6.º). Dentro de cada ciclo, el curso bajo es más fácil y el alto más difícil, y la dificultad crece a lo largo de la partida.</p>
+  <table class="tt"><tr><th>Nivel</th><th>Curso</th><th>Qué se trabaja especialmente</th></tr>
+  <tr><td>Cría Chispa</td><td>1.º</td><td>Números hasta unas decenas, sumas y restas fáciles, decenas y unidades, anterior y posterior, pares e impares, secuencias de contar, formas, monedas de 1 y 2 €, días de la semana, azar (seguro, posible, imposible).</td></tr>
+  <tr><td>Aprendiz Brisa</td><td>2.º</td><td>Hasta 100 (y comparar hasta 999), sumar tres números, ±10, dobles y mitades, ordenar, meses, billetes y monedas, horas en punto, cuerpos geométricos, gráficos de barras.</td></tr>
+  <tr><td>Domador Rayo</td><td>3.º</td><td>Tablas del 2, 3, 4, 5 y 10, repartos en grupos, fracciones sencillas, redondeo a la decena, valor de posición, perímetro de cuadrados y áreas de rectángulos, medias horas, m y cm.</td></tr>
+  <tr><td>Guardián Marea</td><td>4.º</td><td>Todas las tablas y resultados derivados, divisiones con resto, fracciones equivalentes y de una cantidad, decimales, perímetro de rectángulos, ángulos y cuadriláteros, la moda, km, kg y h.</td></tr>
+  <tr><td>Maestro Volcán</td><td>5.º</td><td>Decimales, operaciones combinadas, fracciones y su forma decimal, áreas de triángulos y paralelogramos, ángulos de un triángulo, media aritmética, litros, duración de partidos.</td></tr>
+  <tr><td>Campeón del Teide</td><td>6.º</td><td>Números negativos, porcentajes, paréntesis, mcm y mcd, círculo (longitud y área), simplificar fracciones, probabilidad con fracciones, divisiones con decimales, mediana y moda.</td></tr></table>
   <p><b>Tiempo:</b> cada pregunta tiene un tiempo máximo (barra visible): 1 minuto en 1.º–2.º, 2 minutos en 3.º–4.º y 3 minutos en 5.º–6.º. Si se agota cuenta como fallo y se muestra la pista.</p>
   <p><b>Papel y boli:</b> al empezar el modo historia en 3.º–4.º y 5.º–6.º aparece un aviso que recomienda jugar con papel y bolígrafo. En esos ciclos se mezclan además preguntas muy fáciles (aprox. 1 de cada 3).</p>
   <p><b>Superpoderes:</b> al terminar (o en game over) el botón «¡Descubre tus superpoderes!» muestra, con los datos de la partida, los sentidos y los criterios 2.1, 2.2, 4.1, 4.2 y 7.1 en los que va mejor y los que debe entrenar. Es orientativo y solo de esa partida: no sustituye la evaluación docente.</p><p><b>Informe del alumnado:</b> al terminar (o en game over) el botón «Informe del alumnado» muestra y permite <b>descargar en PDF</b> un informe de la partida: resumen, sentidos y criterios (orientativos), resultados y tiempo medio por actividad, y la lista de errores con su explicación. Incluye espacio para escribir a mano el nombre; el juego no guarda ni envía datos personales. El PDF se genera en el propio dispositivo.</p><p><b>Continuar tras perder todas las vidas:</b> al quedarse sin vidas aparece una cuenta atrás de 6 segundos; tocando la pantalla o pulsando ESPACIO (también con Makey Makey) la criatura revive con todas sus vidas y una frase divertida distinta cada vez. Así el alumnado con más dificultades puede llegar al final y el informe recoge más datos. Para que no iguale a quien lo logra sin continuar, cada continuación baja la calificación un nivel (máximo 3; la S solo es posible sin continuar), resta 500 puntos y suprime el bonus de corazones. El número de continuaciones y las actividades donde ocurrieron aparecen en la pantalla final y en el informe. Si la cuenta atrás termina, la partida acaba.</p><p><b>Ceremonia final:</b> al completar la misión se reproduce una animación de unos 10 segundos (fuegos artificiales, medalla al esfuerzo, criaturas domadas y un mensaje de superación adaptado a cómo ha jugado); se puede saltar tocando la pantalla o con ESPACIO.</p><p><b>Poder:</b> la barra PODER se carga con los aciertos y elimina dos respuestas incorrectas, una vez por carga.</p>
@@ -365,7 +378,7 @@ function toggleMute() { const v = !AU.isMuted(); AU.setMuted(v); const m = docum
 function act(a, v, el) {
   switch (a) {
     case 'play': levelScreen(); break;
-    case 'level': P.cycle = +v; SAVE.last.cycle = P.cycle; save(); worldScreen(); break;
+    case 'level': P.grade = +v; P.cycle = Math.ceil(P.grade / 2); SAVE.last.grade = P.grade; SAVE.last.cycle = P.cycle; save(); worldScreen(); break;
     case 'world': P.world = v; SAVE.last.world = v; save(); FX.setWorld(v); curTrack = ''; musicFor('menu'); eggScreen(); break;
     case 'egg': hatch(+v); break;
     case 'reroll': eggScreen(); break;
@@ -421,9 +434,9 @@ function buildPlan(mode, cat, cycle) {
   return plan;
 }
 function startRun(mode, cat) {
-  tok++; closeModal();
+  tok++; closeModal(); P.cycle = Math.ceil(P.grade / 2);
   const maxL = P.cycle === 1 ? 7 : P.cycle === 2 ? 6 : 5, plan = buildPlan(mode, cat, P.cycle);
-  S = { mode, cat, cycle: P.cycle, me: mkCr(P.cr), lives: maxL, maxLives: maxL, score: 0, streak: 0, best: 0, correct: 0, wrong: 0, answered: 0, stage: 1, plan, pi: -1, tamed: [], dyn: 0, bonus: { enc: 0, boss: 0 }, locked: true, paused: false, totalNeed: plan.reduce((s, e) => s + e.need, 0), limit: P.cycle === 1 ? 60 : P.cycle === 2 ? 120 : 180, log: [], powUsed: 0, t0: Date.now(), pow: 0, powNeed: P.cycle === 3 ? 5 : 4, removed: new Set(), evo2: mode === 'story' ? 9 : 5, evo3: mode === 'story' ? 24 : 11, lastCat: '', stats: {}, cont: 0, contCats: [] };
+  S = { mode, cat, cycle: P.cycle, grade: P.grade, me: mkCr(P.cr), lives: maxL, maxLives: maxL, score: 0, streak: 0, best: 0, correct: 0, wrong: 0, answered: 0, stage: 1, plan, pi: -1, tamed: [], dyn: 0, bonus: { enc: 0, boss: 0 }, locked: true, paused: false, totalNeed: plan.reduce((s, e) => s + e.need, 0), limit: P.cycle === 1 ? 60 : P.cycle === 2 ? 120 : 180, log: [], powUsed: 0, t0: Date.now(), pow: 0, powNeed: P.cycle === 3 ? 5 : 4, removed: new Set(), evo2: mode === 'story' ? 9 : 5, evo3: mode === 'story' ? 24 : 11, lastCat: '', stats: {}, cont: 0, contCats: [] };
   curTrack = ''; UI.audioOn && musicFor('battle');
   renderBattle();
   run().catch(e => { if (e !== CANCEL) { console.error(e); } });
@@ -528,12 +541,12 @@ function pickCat() {
 }
 function diff() {
   const done = S.correct / S.totalNeed, base = .04 + .96 * done, boss = S.enc.title ? .12 : 0;
-  const f = S.cycle === 1 ? .5 : S.cycle === 2 ? .78 : 1;
-  return Math.max(0, Math.min(1, (base + S.dyn + boss + (Math.random() - .5) * .08) * f));
+  const rg = Q.range(S.grade), raw = Math.max(0, Math.min(1, base + S.dyn + boss + (Math.random() - .5) * .08));
+  return rg[0] + raw * (rg[1] - rg[0]);
 }
 function ask() {
   return new Promise(async res => {
-    const cat = pickCat(); S.lastCat = cat; const q = Q.generate(cat, S.cycle, diff()); S.q = q; S.tq = performance.now();
+    const cat = pickCat(); S.lastCat = cat; const q = Q.generate(cat, S.cycle, diff(), S.grade); S.q = q; S.tq = performance.now();
     renderQuestion(q); S.locked = false; S.resolveAsk = res; startTimer(q);
     live(strip(q.text) + (q.visual ? ' ' + strip(q.visual) : ''));
   });
@@ -788,7 +801,7 @@ function finish(done) {
 }
 function showResults(done) {
   const rt = rate(done), [letter, stars, title] = rt.res, cont = S.cont || 0, livesB = done && !cont ? S.lives * 300 : 0, compB = done ? 1000 : 0, gross = S.score + livesB + compB, total = Math.max(0, gross - cont * CONT_PEN), pen = gross - total;
-  const key = S.cycle + '|' + (S.mode === 'story' ? 'story' : S.cat), prev = SAVE.best[key], isBest = total > 0 && (!prev || total > prev.score);
+  const key = 'g' + S.grade + '|' + (S.mode === 'story' ? 'story' : S.cat), prev = SAVE.best[key], isBest = total > 0 && (!prev || total > prev.score);
   if (isBest) SAVE.best[key] = { score: total, letter }; save();
   const acc = Math.round(100 * S.correct / Math.max(1, S.answered));
   if (done) FX.confetti(120); else sfx('lose');

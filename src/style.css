@@ -408,3 +408,11 @@ sup{font-size:.6em;line-height:0}
 .cskip{font-size:.8rem;color:#cfc6f5;opacity:0;transition:opacity .4s}.cskip.on{opacity:.9}
 .cere .rays{inset:-42%}
 .cskip{background:rgba(27,17,64,.72);color:#fff;border-radius:2rem;padding:.2rem .8rem}
+/* niveles por curso */
+.lvgrid{display:flex;gap:1rem;justify-content:center;align-items:flex-start;width:min(66rem,98vw)}
+.lvcol{display:flex;flex-direction:column;gap:.6rem;align-items:stretch;flex:1 1 0;min-width:0}.lvcol .chip{align-self:center}
+.card.lvl{flex-direction:row;align-items:center;text-align:left;gap:.6rem;width:auto;min-width:0;padding:.55rem .7rem}
+.lvl .eggmini{flex:0 0 3.4rem;width:3.4rem;height:4rem;margin:0}
+.lvl .lt{display:flex;flex-direction:column;gap:.1rem;min-width:0}.lvl .lt .nm{font-size:1.05rem}.lvl .lt .ds{font-size:.76rem;line-height:1.2}
+@media (max-aspect-ratio:1/1),(max-width:760px){.lvgrid{flex-direction:column;align-items:stretch;width:min(30rem,96vw)}}
+.lvl .lt .tag{align-self:flex-start}

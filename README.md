@@ -7,9 +7,14 @@ Juego educativo de matemáticas para Primaria. Se juega en el navegador (sin ins
 ## Contenidos por nivel
 | Nivel | Curso | Contenidos |
 |---|---|---|
-| Cría Chispa | 1.º–2.º | Sumas y restas, secuencias y algoritmos, mayor y menor, formas, cuadraditos, medidas y datos (sin tablas, divisiones ni fracciones) |
-| Domador Rayo | 3.º–4.º | Tablas, divisiones, fracciones sencillas, polígonos, áreas en cuadrícula y perímetro |
-| Maestro Volcán | 5.º–6.º | Decimales, fracciones, ángulos, triángulos, áreas de triángulo y figuras compuestas |
+| Cría Chispa | 1.º | Números pequeños, sumas y restas fáciles, decenas y unidades, anterior y posterior, pares e impares, secuencias de contar, formas, monedas, días de la semana y azar (seguro, posible, imposible) |
+| Aprendiz Brisa | 2.º | Hasta 100, sumar tres números, ±10, dobles y mitades, ordenar, meses, billetes y monedas, horas en punto, cuerpos geométricos y gráficos de barras |
+| Domador Rayo | 3.º | Tablas del 2 al 5 y 10, repartos en grupos, fracciones sencillas, redondeo, valor de posición, perímetro y áreas de rectángulos |
+| Guardián Marea | 4.º | Todas las tablas, divisiones con resto, fracciones equivalentes y de una cantidad, decimales, ángulos, cuadriláteros y la moda |
+| Maestro Volcán | 5.º | Decimales, operaciones combinadas, fracciones y decimales, áreas de triángulos y paralelogramos, ángulos de un triángulo y media |
+| Campeón del Teide | 6.º | Números negativos, porcentajes, mcm y mcd, círculo, simplificar fracciones, probabilidad, divisiones con decimales y mediana |
+
+Un nivel por curso: dentro de cada ciclo, el curso bajo (1.º, 3.º, 5.º) es más fácil y el alto (2.º, 4.º, 6.º) más difícil, y en cada partida la dificultad va creciendo. El decreto organiza el currículo por ciclos: esta distribución por cursos es una propuesta didáctica.
 
 Tiempo máximo por pregunta: **1 minuto** en 1.º–2.º, **2 minutos** en 3.º–4.º y **3 minutos** en 5.º–6.º. Los dos primeros ciclos tienen además más corazones y dificultad más suave. Modos: **Historia** (todos los retos, 2 jefes y jefe final) y **Duelo rápido** por categoría. Las preguntas se generan al vuelo y no se repiten en la sesión.
 
