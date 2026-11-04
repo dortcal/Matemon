@@ -305,7 +305,7 @@ sup{font-size:.6em;line-height:0}
 @media (max-aspect-ratio:1/1){.pw{flex-direction:column;align-items:stretch}.pbar{flex:1}}
 
 /* ---- respuestas: cuatro cuadrados iguales en cruz alrededor de la pregunta ---- */
-:root{--sq:clamp(4rem,13.5vh,8rem)}
+:root{--sq:clamp(4.4rem,15vh,8.8rem)}
 #app{height:100%}
 @supports (height:100dvh){#app{height:100dvh;bottom:auto}}
 .arena{flex-basis:40%}.qpanel{flex-basis:60%}
@@ -314,12 +314,12 @@ sup{font-size:.6em;line-height:0}
 .qcard{grid-area:q;width:auto;min-height:0;flex:none}
 .ans{flex:none;flex-direction:column;gap:.15rem;width:var(--sq);height:var(--sq);min-height:0;padding:.25rem;font-size:clamp(1rem,calc(var(--sq)*.27),2.1rem)}
 .ans.long{font-size:clamp(.72rem,calc(var(--sq)*.155),1.2rem)}
-.ans svg.a{width:.8em;height:.8em}
+.ans svg.a{width:1.15em;height:1.15em}
 .ans .av svg{height:calc(var(--sq)*.46);width:auto}
 .ans[data-dir=up]{grid-area:up;justify-self:center}.ans[data-dir=down]{grid-area:down;justify-self:center}
 .ans[data-dir=left]{grid-area:left;align-self:center}.ans[data-dir=right]{grid-area:right;align-self:center}
 @media (max-aspect-ratio:1/1){
-  :root{--sq:min(calc((100vw - 3.4rem)/2),clamp(4.2rem,13vh,8rem))}
+  :root{--sq:min(calc((100vw - 3.4rem)/2),clamp(4.6rem,14.5vh,8.8rem))}
   .arena{flex-basis:34%}.qpanel{flex-basis:66%}
   .qpanel{grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,1fr) var(--sq) var(--sq);grid-template-areas:"q q" "up left" "right down";justify-items:center;padding-bottom:.5rem}
   .qcard{width:100%;justify-self:stretch}
@@ -341,7 +341,7 @@ sup{font-size:.6em;line-height:0}
 .ans.l3{font-size:clamp(.5rem,calc(var(--sq)*.115),1.25rem)}
 .ans.long{font-size:clamp(.5rem,calc(var(--sq)*.14),1.2rem)}
 
-:root{--sq:clamp(4.6rem,16vh,9.5rem)}
+:root{--sq:clamp(5rem,17.5vh,10.4rem)}
 .arena{flex-basis:37%}.qpanel{flex-basis:63%}
 .ans .av{width:100%;line-height:1.05}
 .ans{font-size:clamp(1rem,calc(var(--sq)*.28),2.5rem)}
