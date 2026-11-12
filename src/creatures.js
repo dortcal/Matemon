@@ -16,16 +16,6 @@ const ELEM = {
   cosmos: { body: '#9b6bff', belly: '#e6dcff', acc: '#ff5fd0', dark: '#2a1670', label: 'Cosmos' }
 };
 const BODIES = ['blob', 'cat', 'dino', 'bird', 'fish', 'bug', 'bunny', 'turtle', 'owl'];
-const NOISE = { blob: '¡Blup!', cat: '¡Miau!', dino: '¡Roarr!', bird: '¡Pío pío!', fish: '¡Glu glu!', bug: '¡Bzzz!', bunny: '¡Boing!', turtle: '¡Despacito!', owl: '¡Uuuh!' };
-const PHR = {
-  fuego: ['Cuidado, que quemo… ¡de la risa!', 'Mi ensalada favorita: sumas a la parrilla.', 'Hoy me he levantado con la chispa puesta.', '¡Ni el volcán me gana haciendo cuentas!', 'Soy tan caliente que las fracciones se derriten.', 'Mis tostadas las hago con un estornudo.', 'Cada vez que me río, saco humo.', 'Mis cuentas siempre salen… ¡ardientes!', 'No me soples, que me enciendo.', 'Prometo no quemarte los deberes.', 'Mira cómo me sale humo de las orejas.', 'Tengo más chispa que una fiesta en Tenerife.', '¿Una barbacoa? ¡Ya estoy a punto!', 'Cuanto más difícil el reto, más me enciendo.', 'Si me abrazas, ¡calentito que vas a estar!', 'Mi superpoder: calentar la sopa sin cazo.', 'Soy un genio: ¡hasta la tabla del 7 la hago a la brasa!', 'Dicen que soy de armas tomar… ¡y de sumas también!'],
-  agua: ['Splash: ese ha sido mi aplauso.', 'Soy tan mojado que mi sombra gotea.', '¿Tienes una toalla? Estoy empapado de ideas.', 'Burbuja va, burbuja viene, ¡y yo con mi sumita!', 'Llevo todo el día buceando entre números.', 'No me hagas cosquillas, que me desbordo.', 'Hablo con mucha fluidez… ¡y resuelvo también!', 'Cuidado con mi olita, ¡sale sin avisar!', 'Mi canción favorita es el glu glu glu.', 'Si me da la risa, hago un charco.', 'Sé nadar de espaldas y de fracciones.', 'Aquí abajo se estudia mucho… ¡la tabla del mar!', 'Me peino con las olas, ¿te gusta?', 'Pesco los errores y los devuelvo al mar.', 'Si me pierdo, sigo la corriente.', 'Soy más fresquito que una lechuga.', '¡Qué sed tengo! Y eso que soy de agua.', 'Mi plan perfecto: remojón y a resolver.'],
-  planta: ['¡Estoy creciendo! Mira, ya llego a la rodilla.', '¿Me riegas la imaginación?', 'Tengo raíces… ¡y también muchas ideas!', 'Mi hobby: tomar el sol y resolver sumas.', 'Cuidado, que doy abrazos de hiedra.', 'Dicen que tengo buen tallo para las mates.', 'Florezco cada vez que aciertas.', 'Estornudo polen y se me escapan los números.', 'Yo nunca dejo plantado a nadie.', 'Hago fotosíntesis y también fotosuma.', 'Si me cuentas un chiste, ¡brotan flores!', '¡Qué bien huelo! ¿A que sí?', 'Mi lema: ¡a crecer, a crecer!', 'Me encantan los problemas de huerto.', 'Hoy estoy más verde que nunca.', 'Mis hojas de cálculo son de verdad.', 'No soy una mala hierba, soy una buena idea.', 'Si me riegas poco, me pongo mustio… ¡de sueño!'],
-  rayo: ['¡Zas! Ya he resuelto la cuenta.', 'Se me ha cargado el pelo de electricidad.', 'No me toques, que doy calambre… ¡de risa!', 'Soy tan rápido que llego antes de salir.', 'Me alimento de enchufes… ¡con permiso!', 'Chispas: se me han puesto los pelos de punta.', '¿Quieres ver mi truco? ¡Pi pi pi!', 'Mis rayos siempre aciertan… menos al estornudar.', 'Voy a toda pastilla, con la carga completa.', 'Soy el más brillante de la clase.', 'Tengo mucha corriente… de simpatía.', 'Cuando me emociono, salgo iluminado en las fotos.', 'Una sumita rápida y me recargo.', 'Se me gasta la batería de tanto reír.', '¡Truenos y relámpagos! Qué buen reto.', 'Me da igual el voltaje: ¡me sé las tablas!', 'Soy tan veloz que me adelanto a la respuesta.', 'Mi móvil me envidia la carga.'],
-  tierra: ['Soy duro como una roca, pero con corazón blandito.', 'Cuidado con mis piedras: ¡pesan un montón!', 'Llevo todo el día rodando de puro gusto.', 'Me escondo bajo tierra para pensar en paz.', 'Tengo la cabeza dura… ¡pero para estudiar!', 'Soy un roquero: ¡pura piedra!', 'Cuidado con los terremotos de risa.', 'Mi comida favorita son las papas arrugadas.', 'Mi lema: paso a paso se llega a la cima.', 'Cavar, cavar y siempre encuentro un acierto.', 'Soy más fuerte que un muro… ¡y más tierno!', 'Si me tropiezas, ¡rebotas!', '¿Picnic en el barranco? ¡Me apunto!', 'Soy muy cabezón: no paro hasta acertar.', 'De pequeño fui guijarro; ahora soy una montaña.', 'No me muevo mucho, pero ¡cuánto pienso!', 'Mis amigos dicen que soy de piedra… ¡pero de piedra preciosa!', 'Ni un terremoto me despeina.'],
-  cosmos: ['Mira cuántas estrellas: ¡contémoslas juntos!', 'Vengo de lejos: de la Luna, derechito.', 'Mi nave va a toda órbita.', 'Soy un cometa: dejo un rastro de risas.', 'Me gusta pasear por la Vía Láctea.', 'Floto hasta cuando hago restas.', 'Mil estrellas contadas y todavía no me canso.', 'Si me ves brillar, es que has acertado.', 'Cuando me aburro, cuento planetas.', '¡Qué cielo tan limpio hay en Tenerife!', 'Soy más rápido que un satélite con prisa.', 'No tengo gravedad… ¡pero tengo mucha gracia!', 'Ay, se me ha escapado un asteroide.', 'Mi hobby es dormir bajo las estrellas.', '¿Una vueltecita por los anillos de Saturno?', 'Para mí las mates son un cielo… ¡lleno de estrellas!', 'Soy algo despistado: me perdí en un agujero negro.', 'Mi galaxia favorita es la tuya.']
-};
-const ELKEYS = ['fuego', 'agua', 'planta', 'rayo', 'tierra', 'cosmos'];
 const SYL = {
   fuego: [['Pir', 'Brasi', 'Lavi', 'Tiz', 'Ceni', 'Cráter', 'Fogo', 'Chispi'], ['ko', 'tón', 'la', 'zo', 'ito', 'ín', 'run', 'ñoz']],
   agua: [['Bur', 'Mari', 'Ola', 'Gotu', 'Coral', 'Nauti', 'Splu', 'Bubi'], ['xa', 'ño', 'ta', 'bi', 'llo', 'mar', 'pi', 'dú']],
@@ -36,24 +26,87 @@ const SYL = {
 };
 const EPITHET = ['', '', '', ' el Veloz', ' la Bromista', ' el Valiente', ' la Lista', ' el Curioso'];
 
-function make(seed, elements) {
-  const r = rng(seed);
-  const el = elements[Math.floor(r() * elements.length)];
-  const body = BODIES[Math.floor(r() * BODIES.length)];
-  const tail = Math.floor(r() * 3);
-  const hue = (r() - .5) * .35; // variación de tono
-  const E = ELEM[el];
-  const s = SYL[el];
-  const name = s[0][Math.floor(r() * s[0].length)] + s[1][Math.floor(r() * s[1].length)];
-  const col = { body: mix(E.body, r() < .5 ? '#ffffff' : E.dark, Math.abs(hue)), belly: E.belly, acc: E.acc, dark: E.dark };
-  // rasgos propios (se sortean después de los antiguos para conservar nombre y cola)
-  const tEl = ELKEYS[Math.floor(r() * ELKEYS.length)], tAmt = r(), swapAcc = r() < .4, bellyMix = r() < .35;
-  const pat = Math.floor(r() * 4), eyeS = Math.floor(r() * 4), gear = Math.floor(r() * 4);
-  const wide = .9 + r() * .22, short = .88 + r() * .12, say = Math.floor(r() * PHR[el].length);
-  if (tEl !== el) { col.body = mix(col.body, ELEM[tEl].body, .12 + tAmt * .3); if (swapAcc) col.acc = ELEM[tEl].acc; }
-  if (bellyMix) col.belly = mix(col.belly, col.acc, .3);
-  return { seed, element: el, body, tail, pat, eyeS, gear, wide, short, name: name.charAt(0).toUpperCase() + name.slice(1), col, label: E.label, say: NOISE[body] + ' ' + PHR[el][say] };
+/* ---------- plantel fijo: 48 criaturas con aspecto, nombre y frase propios ---------- */
+// [nombre, cuerpo, cola, pelaje, ojos, complemento, ancho, alto, tinte, cantidad, brillo, acento del tinte, frase]
+const RAW = {
+  fuego: [
+    ['Brasito', 'blob', 0, 1, 0, 0, 1.10, .95, 'fuego', 0, .18, 0, 'Soy chiquitito, pero calentito. ¡Ven, que te quito el frío!'],
+    ['Chispiña', 'cat', 1, 3, 3, 0, .94, 1, 'cosmos', .38, 0, 1, 'Mis chistes se encienden solos. ¿Te cuento uno de fuego?'],
+    ['Cenizo', 'owl', 0, 0, 2, 0, 1.04, .92, 'tierra', .30, -.18, 0, 'Uuuh… ¿ya es de día? Cinco minutitos más de siesta, porfa.'],
+    ['Volcancito', 'dino', 2, 2, 1, 1, 1.12, .9, 'rayo', .22, 0, 0, '¡Roarr! Soy un volcán de bolsillo. Cuidado con mis erupciones de risa.'],
+    ['Pirulo', 'bird', 0, 3, 0, 0, .92, 1, 'cosmos', .20, .2, 0, '¡Pío! Cuando canto, el desayuno sale tostado.'],
+    ['Lavina', 'fish', 0, 1, 1, 3, 1, .95, 'rayo', .35, .05, 1, 'Nado en lava y no me quemo. ¡Tengo mucho aguante!'],
+    ['Fogonazo', 'bug', 1, 2, 0, 0, .9, 1, 'fuego', 0, -.2, 0, 'Bzzz. Soy una luciérnaga con exceso de entusiasmo.'],
+    ['Tizón', 'turtle', 0, 0, 2, 2, 1.12, .9, 'tierra', .20, 0, 0, 'Voy despacito, pero llevo la casa… ¡y la barbacoa!']
+  ],
+  agua: [
+    ['Burbujín', 'blob', 0, 1, 0, 0, 1.12, .96, 'agua', 0, .25, 0, 'Pop, pop, pop. Me encanta hacer burbujas, ¡pero las mías no explotan!'],
+    ['Marinela', 'cat', 2, 2, 3, 0, .95, 1, 'planta', .30, 0, 1, 'Miau. Mi pescado favorito es el que todavía no he pescado.'],
+    ['Corallo', 'turtle', 0, 3, 0, 1, 1.10, .92, 'fuego', .22, 0, 1, 'He cruzado los siete mares y todos tenían olas. ¡Qué casualidad!'],
+    ['Nautilo', 'bunny', 0, 0, 1, 0, .92, 1, 'cosmos', .30, .1, 0, 'Salto de ola en ola. ¡Boing, boing y a seguir!'],
+    ['Gotita', 'bird', 0, 3, 3, 0, .9, 1, 'agua', 0, .3, 0, 'Soy una gotita con alas. Cuando llueve, ¡me siento en casa!'],
+    ['Splashín', 'dino', 1, 1, 0, 2, 1.10, .94, 'planta', .25, -.1, 0, '¡Chof! Eso ha sido una bomba. Diez puntos de salto.'],
+    ['Medusina', 'fish', 0, 2, 2, 0, .95, .9, 'cosmos', .40, .15, 1, 'Floto y floto. Soy ligera como una medusa… ¡y no pico!'],
+    ['Abisal', 'owl', 0, 0, 1, 0, 1.05, .95, 'agua', 0, -.3, 0, 'Vivo en lo más hondo, pero mis ideas siempre salen a la superficie.']
+  ],
+  planta: [
+    ['Hojita', 'bunny', 0, 0, 0, 0, .92, 1, 'planta', 0, .2, 0, 'Me como mi propia ensalada. ¡Qué ahorro!'],
+    ['Brotín', 'blob', 0, 3, 3, 0, 1.05, .95, 'rayo', .30, 0, 0, '¡Mira! Me acaba de salir una hojita nueva. Se llama Pepa.'],
+    ['Musguete', 'turtle', 0, 1, 2, 1, 1.12, .9, 'tierra', .35, -.1, 0, 'Mi caparazón tiene su propio jardín. ¿Quieres visitarlo?'],
+    ['Raicilla', 'dino', 2, 2, 1, 0, 1.10, .92, 'tierra', .20, 0, 0, 'Roarr… de lechuga. Soy un dinosaurio vegetariano.'],
+    ['Pétalo', 'bird', 0, 3, 0, 0, .9, 1, 'cosmos', .30, .15, 1, 'Canto a las flores y las flores me aplauden.'],
+    ['Frondoso', 'owl', 0, 0, 1, 0, 1.10, .9, 'planta', 0, -.25, 0, 'Uuuh. Desde esta rama veo todos tus aciertos.'],
+    ['Lianita', 'bug', 2, 1, 3, 0, .9, 1, 'agua', .30, .05, 1, 'Zumbo entre las lianas buscando los problemas más dulces.'],
+    ['Laurel', 'cat', 0, 2, 0, 0, 1, .95, 'planta', 0, 0, 0, 'Soy de la laurisilva: la niebla me peina cada mañana.']
+  ],
+  rayo: [
+    ['Zapín', 'bunny', 0, 3, 1, 0, .9, 1, 'rayo', 0, .1, 0, '¡Zas! Salto tan rápido que mi sombra llega tarde.'],
+    ['Voltio', 'cat', 2, 2, 0, 0, .96, 1, 'agua', .30, 0, 1, 'Miau-voltios. Si me acaricias, ¡nos cargamos los dos!'],
+    ['Truenito', 'blob', 0, 0, 2, 0, 1.12, .92, 'cosmos', .30, -.1, 0, 'Cuando me río, retumban hasta los armarios del cole.'],
+    ['Relampaguito', 'bird', 0, 1, 3, 0, .92, 1, 'fuego', .30, 0, 1, 'Pío, zas. Voy tan rápido que llego antes que mi eco.'],
+    ['Fulgor', 'owl', 0, 3, 1, 0, 1, .95, 'rayo', 0, -.2, 0, 'Uuuh. Mis ojos son faros: ninguna cuenta se me escapa.'],
+    ['Electra', 'fish', 0, 2, 0, 2, 1.05, .92, 'agua', .40, .1, 1, 'Soy una anguila de gala: cuando me enchufo, ¡brillo!'],
+    ['Chisporrín', 'dino', 1, 1, 3, 1, 1.08, .94, 'fuego', .25, 0, 0, '¡Roarr! Estornudé y se apagó la luz de toda la clase.'],
+    ['Cargador', 'turtle', 0, 0, 2, 3, 1.12, .9, 'tierra', .25, -.05, 0, 'Soy lento, sí, pero mi batería dura todo el día.']
+  ],
+  tierra: [
+    ['Roquete', 'blob', 0, 1, 0, 0, 1.10, .95, 'tierra', 0, .1, 0, 'Soy de piedra, pero con el corazón de gofio blandito.'],
+    ['Basaltín', 'turtle', 0, 0, 0, 2, 1.10, .9, 'tierra', 0, -.35, 0, 'Soy de basalto negro, como las playas del norte. ¡Y fuertote!'],
+    ['Guijarro', 'bunny', 0, 3, 3, 0, .9, 1, 'cosmos', .20, .1, 0, 'Me tiraron al mar como una piedra… ¡y salí saltando!'],
+    ['Barranquito', 'cat', 1, 2, 0, 0, .95, 1, 'fuego', .30, 0, 1, 'Me encanta explorar barrancos: saltar, rebotar y volver a empezar.'],
+    ['Malpaíso', 'dino', 0, 1, 2, 1, 1.12, .92, 'rayo', .15, -.1, 0, 'Roarr. Vivo en el malpaís y me sé todos los atajos.'],
+    ['Pedrusco', 'bird', 0, 0, 1, 0, .92, .95, 'tierra', 0, .25, 0, 'Soy una piedra con alas. La ciencia aún no me lo explica.'],
+    ['Terrón', 'bug', 0, 3, 0, 0, .9, 1, 'planta', .25, -.15, 0, 'Me escondo bajo tierra y, de repente, ¡bzzz, sorpresa!'],
+    ['Cuevino', 'owl', 0, 2, 2, 0, 1.05, .9, 'cosmos', .20, -.2, 0, 'Uuuh. En mi cueva guardo mil secretos y dos bocadillos.']
+  ],
+  cosmos: [
+    ['Lunita', 'bunny', 0, 3, 1, 0, .9, 1, 'cosmos', 0, .4, 0, 'Dicen que en la Luna hay un conejo. ¡Soy yo, te estaba esperando!'],
+    ['Cometín', 'cat', 2, 1, 0, 0, .95, 1, 'agua', .35, 0, 1, 'Miau del espacio. Mi cola deja estelas de purpurina.'],
+    ['Astrín', 'blob', 0, 3, 3, 0, 1.12, .93, 'fuego', .30, 0, 1, 'Floto tanto que, si me comes una galleta, ¡subo al cielo!'],
+    ['Órbita', 'bird', 0, 2, 0, 0, .92, 1, 'cosmos', 0, -.2, 0, 'Doy vueltas y vueltas, pero siempre vuelvo a ti.'],
+    ['Nebulón', 'dino', 2, 1, 2, 2, 1.12, .92, 'rayo', .30, 0, 0, 'Roarr cósmico. Estornudé y nació una nebulosa.'],
+    ['Estrellín', 'owl', 0, 0, 1, 0, 1, .95, 'cosmos', 0, .1, 0, 'Uuuh. De noche cuento estrellas y siempre me salen mil más.'],
+    ['Galaxia', 'fish', 0, 1, 3, 1, 1, .95, 'agua', .30, -.1, 1, 'Nado por la Vía Láctea: ¡es el mar más grande que existe!'],
+    ['Meteorito', 'turtle', 0, 2, 2, 3, 1.10, .9, 'tierra', .30, -.1, 0, 'Dicen que los meteoritos son rápidos. Yo vine en autobús.']
+  ]
+};
+const ROSTER = [];
+Object.keys(RAW).forEach(el => RAW[el].forEach((a, k) => {
+  const E = ELEM[el], T = ELEM[a[8]], col = { body: E.body, belly: E.belly, acc: E.acc, dark: E.dark };
+  if (a[8] !== el) { col.body = mix(col.body, T.body, a[9]); if (a[11]) col.acc = T.acc; }
+  col.body = a[10] >= 0 ? mix(col.body, '#ffffff', a[10]) : mix(col.body, E.dark, -a[10]);
+  ROSTER.push({ id: el + '-' + k, seed: ROSTER.length + 1, element: el, body: a[1], tail: a[2], pat: a[3], eyeS: a[4], gear: a[5], wide: a[6], short: a[7], name: a[0], col, label: E.label, say: a[12] });
+}));
+const BYID = {}; ROSTER.forEach(c => BYID[c.id] = c);
+const ELKEYS = Object.keys(RAW);
+/* byId admite también entradas antiguas {s, e} (semilla + elemento) */
+function byId(x) {
+  if (typeof x === 'string') return BYID[x] || ROSTER[0];
+  if (x && x.id && BYID[x.id]) return BYID[x.id];
+  const el = (x && (x.element || x.e)) || 'fuego', sd = Math.abs((x && (x.seed != null ? x.seed : x.s)) || 0), list = ROSTER.filter(c => c.element === el);
+  return list[sd % list.length] || ROSTER[0];
 }
+function make(seed, elements) { const list = ROSTER.filter(c => elements.includes(c.element)); return list[Math.abs(seed) % list.length]; }
 
 /* decoraciones elementales (origen en la base, crecen hacia arriba) */
 function decor(el, x, y, sc, col, rot) {
@@ -188,7 +241,7 @@ function svg(cr, o) {
       : `<path d="M62 54 C40 40 44 16 58 10 C56 28 70 36 78 44Z" fill="#fff" stroke="${INK}" stroke-width="4.5" stroke-linejoin="round"/><path d="M138 54 C160 40 156 16 142 10 C144 28 130 36 122 44Z" fill="#fff" stroke="${INK}" stroke-width="4.5" stroke-linejoin="round"/>`;
   }
   if (stage >= 3 && !boss) b += `<polygon points="30,60 34,70 44,72 34,76 30,86 26,76 16,72 26,70" fill="#fff" stroke="${INK}" stroke-width="2" class="spark"/><polygon points="170,50 173,58 181,59 173,63 170,71 167,63 159,59 167,58" fill="#fff" stroke="${INK}" stroke-width="2" class="spark s2"/>`;
-  const sx = boss ? 1 : (cr.wide || 1), sy = boss ? 1 : (cr.short || 1);
+  const sx = boss ? 1 : Math.min(cr.wide || 1, ['cat', 'dino', 'fish', 'bug'].includes(cr.body) ? 1.03 : 1.12), sy = boss ? 1 : (cr.short || 1);
   return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="cr-svg" aria-hidden="true"><g transform="translate(100 182) scale(${sx.toFixed(3)} ${sy.toFixed(3)}) translate(-100 -182)">${b}</g></svg>`;
 }
 
@@ -198,5 +251,5 @@ function egg(el, o) {
   return `<svg viewBox="0 0 150 190" xmlns="http://www.w3.org/2000/svg" class="egg-svg" aria-hidden="true"><defs><radialGradient id="eg${el}" cx="35%" cy="30%"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="${E.belly}"/><stop offset="1" stop-color="${E.body}"/></radialGradient></defs><path d="M75 12 C112 12 138 66 138 118 C138 158 110 182 75 182 C40 182 12 158 12 118 C12 66 38 12 75 12Z" fill="url(#eg${el})" stroke="${INK}" stroke-width="6"/><circle cx="48" cy="80" r="11" fill="${E.acc}" stroke="${INK}" stroke-width="4"/><circle cx="104" cy="104" r="14" fill="${E.dark}" opacity=".85"/><circle cx="62" cy="136" r="9" fill="${E.acc}" stroke="${INK}" stroke-width="4"/><circle cx="100" cy="58" r="7" fill="${E.dark}" opacity=".85"/>${crack}</svg>`;
 }
 
-G.Creature = { make, svg, egg, ELEM, rng, mix };
+G.Creature = { make, byId, roster: ROSTER, svg, egg, ELEM, rng, mix };
 })(typeof window !== 'undefined' ? window : globalThis);

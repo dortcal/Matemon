@@ -52,6 +52,7 @@ const I = {
 /* ---------- guardado ---------- */
 let SAVE = { best: {}, dex: [], last: {} };
 try { const j = localStorage.getItem('mm_save'); if (j) SAVE = Object.assign(SAVE, JSON.parse(j)); } catch (e) {}
+{ const seen = new Set(); SAVE.dex = (SAVE.dex || []).map(d => ({ id: C.byId(d).id })).filter(d => !seen.has(d.id) && seen.add(d.id)); } // adapta colecciones antiguas al plantel fijo
 function save() { try { localStorage.setItem('mm_save', JSON.stringify(SAVE)); } catch (e) {} }
 
 /* ---------- estado ---------- */
@@ -77,16 +78,16 @@ function show(name, html, opt) {
   }
 }
 function pet(cr, o) { return `<div class="pet">${C.svg(cr, o)}</div>`; }
-function mkCr(c) { return C.make(c.seed != null ? c.seed : c.s, [c.element || c.e]); }
+function mkCr(c) { return C.byId(c); }
 
 function titleScreen() {
   FX.setWorld(P.world);
   const els = ['fuego', 'agua', 'planta', 'cosmos', 'tierra', 'rayo'], r = R.shuffle(els).slice(0, 3);
-  const pets = r.map((e, i) => pet(C.make(1000 + Math.floor(Math.random() * 99999), [e]), { stage: i === 1 ? 2 : 1, mood: 'idle', uid: 't' + i })).join('');
+  const pets = r.map((e, i) => pet(R.pick(C.roster.filter(c => c.element === e)), { stage: i === 1 ? 2 : 1, mood: 'idle', uid: 't' + i })).join('');
   show('title', `<h1 class="logo"><span class="a">Mate</span><span class="b">Monstruos</span></h1><p class="sub">Liga del Teide · Matemáticas</p>
   <div class="title-pets">${pets}</div>
   <div class="col"><button class="btn big" data-nav data-first data-act="play">¡Jugar!</button>
-  <div class="row"><button class="btn cyan" data-nav data-act="dex">Mi colección (${SAVE.dex.length})</button><button class="btn yellow" data-nav data-act="help">Cómo se juega</button><button class="btn ghost" data-nav data-act="teacher">Para docentes</button></div></div>
+  <div class="row"><button class="btn cyan" data-nav data-act="dex">Mi colección (${SAVE.dex.length}/${C.roster.length})</button><button class="btn yellow" data-nav data-act="help">Cómo se juega</button><button class="btn ghost" data-nav data-act="teacher">Para docentes</button></div></div>
   <p class="keys"><kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd> moverte · <kbd>Espacio</kbd> aceptar · o toca la pantalla · Makey Makey listo</p>
   <p class="credits">Diseñado por <b>David OZC</b> · © David 2026 · Uso gratuito en centros educativos<br><a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es" target="_blank" rel="noopener license"><img src="https://licensebuttons.net/l/by-nc-nd/4.0/88x31.png" width="88" height="31" alt="Licencia Creative Commons BY-NC-ND 4.0"></a> <span>CC BY-NC-ND 4.0 · Reconocimiento · NoComercial · SinObraDerivada</span></p>`);
   musicFor('menu');
@@ -104,7 +105,7 @@ let eggSeeds = [];
 function eggScreen() {
   const els = WORLDS[P.world].els;
   eggSeeds = []; const bodies = [];
-  [0, 1, 2].forEach(i => { let seed, body, k = 0; do { seed = Math.floor(Math.random() * 1e6) + 1; body = C.make(seed, [els[i % els.length]]).body; } while (bodies.includes(body) && ++k < 40); bodies.push(body); eggSeeds.push({ seed, el: els[i % els.length] }); });
+  [0, 1, 2].forEach(i => { const el = els[i % els.length], pool = C.roster.filter(c => c.element === el && !bodies.includes(c.body)); const cr = R.pick(pool.length ? pool : C.roster.filter(c => c.element === el)); bodies.push(cr.body); eggSeeds.push({ id: cr.id, el }); });
   show('egg', `<h2 class="t">¡Elige un huevo misterioso!</h2><p class="s">Dentro hay tu compañero de aventuras</p>
   <div class="eggs">${eggSeeds.map((e, i) => `<button class="egg" data-nav ${i === 1 ? 'data-first' : ''} data-act="egg" data-v="${i}" aria-label="Huevo ${i + 1}">${C.egg(e.el)}</button>`).join('')}</div>`, { back: 'world', backBtn: true });
 }
@@ -117,7 +118,7 @@ async function hatch(i) {
   const wo = document.createElement('div'); wo.className = 'whiteout'; document.body.appendChild(wo); setTimeout(() => wo.remove(), 950);
   sfx('hatch'); const r = b.getBoundingClientRect(); FX.burst(r.left + r.width / 2, r.top + r.height / 2, ['#fff', '#ffd23f', '#ff3d9a', '#2de2ff'], 50, 9); FX.confetti(40);
   await sleepRaw(350);
-  const cr = C.make(e.seed, [e.el]); P.cr = { seed: cr.seed, element: cr.element };
+  const cr = C.byId(e.id); P.cr = { id: cr.id };
   UI.busy = false;
   show('reveal', `<div class="reveal"><span class="chip">¡Ha nacido!</span><div class="big-cr">${C.svg(cr, { mood: 'happy', uid: 'rv' })}</div><div class="nameplate">${cr.name}</div><span class="chip" style="background:${C.ELEM[cr.element].body};color:#1b1140">${cr.label}</span>
   <div class="row"><button class="btn" data-nav data-first data-act="accept">¡Será mi compañero!</button><button class="btn ghost" data-nav data-act="reroll">Otro huevo</button></div></div>`, { back: 'egg' });
@@ -146,7 +147,7 @@ function foeBubble(cr) {
 }
 let dexTimer = 0;
 function dexSay(el, bounce) {
-  const d = SAVE.dex[+el.dataset.v]; if (!d) return; const cr = mkCr(d);
+  const cr = C.byId(el.dataset.v);
   document.querySelectorAll('.dexbub').forEach(n => n.remove()); clearTimeout(dexTimer);
   const b = document.createElement('div'); b.className = 'dexbub'; b.style.setProperty('--c', C.ELEM[cr.element].body); b.setAttribute('role', 'status');
   b.innerHTML = `<b>${cr.name}</b><span>${cr.say}</span>`; document.body.appendChild(b);
@@ -157,11 +158,13 @@ function dexSay(el, bounce) {
   if (bounce) { const sv = el.querySelector('svg'); if (sv) anim(sv, 'dhop', 600); sfx('click'); live(cr.name + ' dice: ' + cr.say); }
   dexTimer = setTimeout(() => b.remove(), 4200);
 }
-app.addEventListener('pointerover', e => { if (e.pointerType !== 'mouse') return; const c = e.target.closest && e.target.closest('.dcell'); if (c) dexSay(c, true); });
-app.addEventListener('pointerout', e => { if (e.pointerType !== 'mouse') return; const c = e.target.closest && e.target.closest('.dcell'); if (c && !c.contains(e.relatedTarget)) { clearTimeout(dexTimer); document.querySelectorAll('.dexbub').forEach(n => n.remove()); } });
+app.addEventListener('pointerover', e => { if (e.pointerType !== 'mouse') return; const c = e.target.closest && e.target.closest('.dcell:not(.locked)'); if (c) dexSay(c, true); });
+app.addEventListener('pointerout', e => { if (e.pointerType !== 'mouse') return; const c = e.target.closest && e.target.closest('.dcell:not(.locked)'); if (c && !c.contains(e.relatedTarget)) { clearTimeout(dexTimer); document.querySelectorAll('.dexbub').forEach(n => n.remove()); } });
 function dexScreen() {
-  const n = SAVE.dex.length;
-  show('dex', `<h2 class="t">Mi colección · ${n}</h2>${n ? `<div class="dex">${SAVE.dex.map((d, i) => { const cr = mkCr(d); return `<button class="dcell" data-nav data-act="dexsay" data-v="${i}" aria-label="${cr.name}: ${cr.say.replace(/"/g, '')}">${C.svg(cr, { mood: 'happy', uid: 'd' + i })}<span>${cr.name}</span></button>`; }).join('')}</div>` : '<p class="s">Todavía no has domado ninguna criatura. ¡Gana combates para conseguirlas!</p>'}
+  const have = new Set(SAVE.dex.map(d => d.id)), n = have.size, T = C.roster.length;
+  show('dex', `<h2 class="t">Mi colección · ${n} de ${T}</h2><div class="dex">${C.roster.map((cr, i) => have.has(cr.id)
+    ? `<button class="dcell" data-nav data-act="dexsay" data-v="${cr.id}" aria-label="${cr.name}: ${cr.say.replace(/"/g, '')}">${C.svg(cr, { mood: 'happy', uid: 'd' + i })}<span>${cr.name}</span></button>`
+    : `<div class="dcell locked" aria-label="Criatura sin descubrir">${C.svg(cr, { mood: 'idle', uid: 'd' + i })}<span>???</span></div>`).join('')}</div>${n ? '' : '<p class="s">Todavía no has domado ninguna criatura. ¡Gana combates para conseguirlas!</p>'}
   <button class="btn" data-nav data-first data-act="back">Volver</button>`, { back: 'title' });
 }
 
@@ -448,11 +451,11 @@ const ENC = ['¡Casi!', 'Equivocarse también es aprender.', 'No pasa nada, ¡a 
 const PRAISE = ['¡Correcto!', '¡Muy bien!', '¡Bien pensado!', '¡Eso es!'];
 const BOSS_FINAL = 'Gran Maestro Calculón';
 function buildPlan(mode, cat, cycle) {
-  const els = WORLDS[P.world].els, me = mkCr(P.cr), usedNames = new Set([me.name]), lastBodies = [];
+  const els = WORLDS[P.world].els, me = mkCr(P.cr), used = new Set([me.id]), lastBodies = [];
   const mk = () => {
-    let c, k = 0;
-    do { c = C.make(Math.floor(Math.random() * 1e7) + 7, els); k++; } while (k < 80 && (usedNames.has(c.name) || c.body === me.body || lastBodies.includes(c.body)));
-    usedNames.add(c.name); lastBodies.push(c.body); if (lastBodies.length > 3) lastBodies.shift(); return c;
+    const base = C.roster.filter(c => els.includes(c.element) && !used.has(c.id) && c.body !== me.body);
+    let pool = base.filter(c => !lastBodies.includes(c.body)); if (!pool.length) pool = base; if (!pool.length) pool = C.roster.filter(c => els.includes(c.element) && c.id !== me.id);
+    const c = R.pick(pool); used.add(c.id); lastBodies.push(c.body); if (lastBodies.length > 3) lastBodies.shift(); return c;
   };
   const plan = [];
   if (mode === 'single') {
@@ -698,15 +701,15 @@ async function won() {
   await sleep(450);
   if (!boss) {
     anim(inner, 'spinout', 1000); sfx('capture'); const c = center($('foe')); FX.burst(c[0], c[1], ['#fff', '#b6ff3b', '#ffd23f', '#2de2ff'], 50, 10);
-    const isNew = !SAVE.dex.some(d => d.s === e.foe.seed); S.tamed.push({ cr: e.foe, isNew });
-    if (isNew) { SAVE.dex.push({ s: e.foe.seed, e: e.foe.element }); if (SAVE.dex.length > 80) SAVE.dex.shift(); save(); }
+    const isNew = !SAVE.dex.some(d => d.id === e.foe.id); S.tamed.push({ cr: e.foe, isNew });
+    if (isNew) { SAVE.dex.push({ id: e.foe.id }); save(); }
     S.score += 200; S.bonus.enc += 200; setHud();
     banner(`¡${e.foe.name} domado!`, isNew ? 'Nueva criatura en tu colección' : '', false, 1500); floatText('+200', $('foe'), '#ffd23f'); await sleep(1500);
   } else {
     anim(inner, 'spinout', 1200); sfx('win'); FX.confetti(120); const c = center($('foe')); FX.burst(c[0], c[1], ['#fff', '#ffd23f', '#ff3d9a'], 90, 13);
     S.score += 500; S.bonus.boss += 500; const heal = S.lives < S.maxLives; if (heal) { S.lives++; setHearts(); }
-    const isNew = !SAVE.dex.some(d => d.s === e.foe.seed); S.tamed.push({ cr: e.foe, isNew });
-    if (isNew) { SAVE.dex.push({ s: e.foe.seed, e: e.foe.element }); if (SAVE.dex.length > 80) SAVE.dex.shift(); save(); }
+    const isNew = !SAVE.dex.some(d => d.id === e.foe.id); S.tamed.push({ cr: e.foe, isNew });
+    if (isNew) { SAVE.dex.push({ id: e.foe.id }); save(); }
     setHud(); banner('¡JEFE DERROTADO!', '+500 puntos' + (heal ? ' · ¡+1 corazón!' : ''), true, 2300); floatText('+500', $('foe'), '#ffd23f'); if (heal) setTimeout(() => sfx('heal'), 500); await sleep(2400);
   }
 }

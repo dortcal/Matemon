@@ -57,7 +57,7 @@ Obra bajo licencia [Creative Commons Reconocimiento-NoComercial-SinObraDerivada 
 
 ## Criaturas y colección
 
-- **Más variedad:** hay 9 tipos de criatura (blob, gato, dino, pájaro, pez, bicho, conejo, tortuga y búho). Cada una combina además pelaje (lisa, con manchas, rayas o marca en la frente), estilo de ojos, complementos, colores mezclados con otros elementos y cuerpo más ancho o más bajito.
-- **Rivales distintos a tu compañero:** nunca te encuentras a una criatura con el mismo nombre ni el mismo tipo de cuerpo que la tuya, ni se repiten los nombres ni los cuerpos de los últimos rivales.
-- **Frases graciosas:** cada criatura tiene su frase propia (con un sonido según su tipo). En **Mi colección** sale al pasar el ratón por encima, al tocarla o al pulsar Espacio sobre ella. En el juego, el rival la dice en un bocadillo junto a él al empezar el combate (unos 4 s, sin bloquear la pregunta ni alargar la partida).
-
+- **48 criaturas con personalidad propia:** 8 por elemento, cada una con nombre, aspecto y frase únicos. Hay 9 tipos de cuerpo (blob, gato, dino, pájaro, pez, bicho, conejo, tortuga y búho), con pelaje, ojos, complementos y colores distintos, de modo que se distinguen de un vistazo. Ninguna frase ni nombre se repite.
+- **Rivales distintos a tu compañero:** nunca te encuentras a tu propia criatura ni a otra con tu mismo tipo de cuerpo, y en una partida no se repite ningún rival. Los tres huevos que se ofrecen son de cuerpos distintos.
+- **Frases graciosas:** cada criatura dice su frase. En **Mi colección** (con las 48 casillas, las no descubiertas en sombra) sale al pasar el ratón por encima, al tocarla o al pulsar Espacio sobre ella. En el juego, el rival la dice en un bocadillo junto a él al empezar el combate (unos 4 s, sin bloquear la pregunta ni alargar la partida).
+- Las colecciones guardadas con la versión anterior se adaptan automáticamente al nuevo plantel.

@@ -437,3 +437,5 @@ sup{font-size:.6em;line-height:0}
 .fbub.side::before{right:-.55rem;top:.9rem;border-left:0;border-bottom:0}
 .fbub.under::before{left:var(--ax,80%);top:-.55rem;margin-left:-.45rem;border-right:0;border-bottom:0}
 @media (prefers-reduced-motion:reduce){.dexbub,.fbub,.dhop{animation:none!important}}
+
+.dex .dcell.locked{cursor:default;opacity:.9}.dex .dcell.locked svg{filter:brightness(0) opacity(.28)}.dex .dcell.locked span{opacity:.5}

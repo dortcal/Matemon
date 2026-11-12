@@ -822,7 +822,7 @@ function angle2Q() {
   return build({ cat: 'geometria', text: '¿Qué tipo de ángulo es este?', visual: angleSvg(deg), correct: t, wrong: ['agudo', 'recto', 'obtuso'].filter(x => x !== t), n: 3, hint: 'Recto: como la esquina de un folio · Agudo: más cerrado · Obtuso: más abierto', key: 'x|an' + deg });
 }
 function halfRectQ() {
-  const w = 2 * R.int(2, 6), h = R.int(2, 7), v = svg('0 0 200 120', `<rect x="25" y="25" width="140" height="70" fill="#2de2ff" ${ST}/><line x1="25" y1="25" x2="165" y2="95" stroke="#fff" stroke-width="4" stroke-dasharray="8 6"/><text x="95" y="18" text-anchor="middle" class="dim">${w} cm</text><text x="172" y="64" class="dim">${h} cm</text>`, 'fig wide');
+  const w = 2 * R.int(2, 6), h = R.int(2, 7), v = svg('0 0 235 120', `<rect x="25" y="25" width="140" height="70" fill="#2de2ff" ${ST}/><line x1="25" y1="25" x2="165" y2="95" stroke="#fff" stroke-width="4" stroke-dasharray="8 6"/><text x="95" y="18" text-anchor="middle" class="dim">${w} cm</text><text x="172" y="64" class="dim">${h} cm</text>`, 'fig wide');
   return build({ cat: 'areas', text: 'El rectángulo se corta por la diagonal en dos triángulos iguales. ¿Qué área tiene cada triángulo?', visual: v, correct: `${w * h / 2} cm²`, wrong: [w * h, w + h, w * h / 2 + 2, w * h / 2 - 2, 2 * (w + h)].filter(x => x > 0 && x !== w * h / 2).map(x => x + ' cm²'), hint: `Área del rectángulo: ${w} × ${h} = ${w * h} cm²; cada triángulo es la mitad: ${w * h / 2} cm²`, key: 'x|hr' + w + h });
 }
 function barC1Q() {
