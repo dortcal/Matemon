@@ -59,5 +59,5 @@ Obra bajo licencia [Creative Commons Reconocimiento-NoComercial-SinObraDerivada 
 
 - **Más variedad:** hay 9 tipos de criatura (blob, gato, dino, pájaro, pez, bicho, conejo, tortuga y búho). Cada una combina además pelaje (lisa, con manchas, rayas o marca en la frente), estilo de ojos, complementos, colores mezclados con otros elementos y cuerpo más ancho o más bajito.
 - **Rivales distintos a tu compañero:** nunca te encuentras a una criatura con el mismo nombre ni el mismo tipo de cuerpo que la tuya, ni se repiten los nombres ni los cuerpos de los últimos rivales.
-- **Frases graciosas:** cada criatura tiene su frase propia (con un sonido según su tipo). En **Mi colección** sale al pasar el ratón por encima, al tocarla o al pulsar Espacio sobre ella. En el juego, el rival la dice al aparecer (toca o pulsa Espacio para seguir).
+- **Frases graciosas:** cada criatura tiene su frase propia (con un sonido según su tipo). En **Mi colección** sale al pasar el ratón por encima, al tocarla o al pulsar Espacio sobre ella. En el juego, el rival la dice en un bocadillo junto a él al empezar el combate (unos 4 s, sin bloquear la pregunta ni alargar la partida).
 

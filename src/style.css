@@ -430,10 +430,10 @@ sup{font-size:.6em;line-height:0}
 .dexbub::after{content:"";position:absolute;left:var(--ax,50%);bottom:-.7rem;margin-left:-.5rem;border:.5rem solid transparent;border-top:.6rem solid var(--ink);border-bottom:0}
 .dexbub.below::after{bottom:auto;top:-.7rem;border-top:0;border-bottom:.6rem solid var(--ink)}
 @keyframes bpop{from{transform:scale(.7);opacity:0}to{transform:none;opacity:1}}
-/* frase del rival al aparecer */
-.foesay{grid-area:q;align-self:center;justify-self:center;max-width:min(34rem,92%);text-align:center;background:#fff;color:var(--ink);border:.25rem solid var(--ink);border-radius:1.4rem;box-shadow:0 .4rem 0 var(--ink);padding:.9rem 1.2rem;animation:bpop .35s;display:flex;flex-direction:column;gap:.4rem;cursor:pointer}
-.foesay .who{align-self:center;background:var(--c);border-radius:.8rem;padding:.1rem .7rem;font-weight:900;text-transform:uppercase;font-size:clamp(.8rem,2.4vmin,1.1rem)}
-.foesay .who em{font-style:normal;color:#b0103a}
-.foesay .txt{font-size:clamp(1.05rem,3.6vmin,1.9rem);font-weight:900;line-height:1.15}
-.foesay .go{font-size:.75rem;opacity:.6}
-@media (prefers-reduced-motion:reduce){.dexbub,.foesay,.dhop{animation:none!important}}
+/* bocadillo del rival al aparecer */
+.fbub{position:fixed;z-index:30;padding:.45rem .75rem;border:.2rem solid var(--ink);border-radius:1.1rem;background:#fff;color:var(--ink);font-weight:900;font-size:clamp(.85rem,2.4vmin,1.15rem);line-height:1.15;box-shadow:0 .25rem 0 var(--ink);pointer-events:none;animation:bpop .3s;transition:opacity .45s}
+.fbub.out{opacity:0}
+.fbub::before{content:"";position:absolute;width:.9rem;height:.9rem;background:#fff;border:.2rem solid var(--ink);transform:rotate(45deg)}
+.fbub.side::before{right:-.55rem;top:.9rem;border-left:0;border-bottom:0}
+.fbub.under::before{left:var(--ax,80%);top:-.55rem;margin-left:-.45rem;border-right:0;border-bottom:0}
+@media (prefers-reduced-motion:reduce){.dexbub,.fbub,.dhop{animation:none!important}}

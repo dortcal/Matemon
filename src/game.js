@@ -132,8 +132,17 @@ function modeScreen() {
   <div class="cards-grid">${cats.map(c => { const I2 = Q.info(c, P.cycle); return `<button class="card" style="--c:${I2.color}" data-nav data-act="single" data-v="${c}">${bk(c)}<div class="ic" style="color:${I2.color}">${catIcon(c)}</div><span class="nm">${I2.name}</span></button>`; }).join('')}</div>
   <p class="keys">Duelo rápido: 2 combates + jefe de la categoría</p>`, { back: 'egg', backBtn: true });
 }
-function foeSayHtml(cr, title) {
-  return `<div class="foesay" style="--c:${C.ELEM[cr.element].body}"><span class="who">${title ? '<em>JEFE</em> ' + title + ' · ' : ''}${cr.name}</span><span class="txt">${cr.say}</span><span class="go">Toca o pulsa ESPACIO para seguir</span></div>`;
+function foeBubble(cr) {
+  document.querySelectorAll('.fbub').forEach(n => n.remove());
+  const f = $('foe'), pl = $('fplate'); if (!f || !S) return;
+  const r = f.getBoundingClientRect(), pr = pl ? pl.getBoundingClientRect() : r, land = innerWidth > innerHeight && r.left > innerWidth * .4;
+  const b = document.createElement('div'); b.className = 'fbub ' + (land ? 'side' : 'under'); b.setAttribute('aria-hidden', 'true'); b.style.setProperty('--c', C.ELEM[cr.element].body);
+  b.style.maxWidth = (land ? Math.min(300, r.left - 24) : Math.min(250, innerWidth - 16)) + 'px'; b.textContent = cr.say; document.body.appendChild(b);
+  const w = b.offsetWidth; let x, y;
+  if (land) { x = Math.max(8, r.left - w + 12); y = Math.max(r.top + r.height * .4, pr.bottom + 10); }
+  else { x = Math.min(innerWidth - w - 8, Math.max(8, r.right - w)); y = pr.bottom + 10; b.style.setProperty('--ax', Math.round(r.left + r.width / 2 - x) + 'px'); }
+  b.style.left = x + 'px'; b.style.top = y + 'px';
+  setTimeout(() => b.classList.add('out'), 3900); setTimeout(() => b.remove(), 4400);
 }
 let dexTimer = 0;
 function dexSay(el, bounce) {
@@ -553,10 +562,7 @@ async function run() {
     banner(boss ? `¡${e.title}!` : `¡Aparece ${e.foe.name}!`, boss ? (e.kind === 'final' ? '¡El combate definitivo!' : 'Un jefe bloquea el camino') : info.name, boss, boss ? 2300 : 1500);
     live(boss ? 'Jefe: ' + e.title : 'Aparece ' + e.foe.name);
     await sleep(boss ? 2300 : 1500);
-    $('qpanel').style.display = ''; $('qpanel').innerHTML = foeSayHtml(e.foe, boss ? e.title : '');
-    live(e.foe.name + ' dice: ' + e.foe.say); S.hintAt = performance.now();
-    await new Promise(r => { let t; S.resume = () => { clearTimeout(t); S.resume = null; r(); }; t = setTimeout(() => { if (S && S.resume) S.resume(); }, 3800); const bx = $('qpanel').querySelector('.foesay'); if (bx) bx.onclick = () => { if (S && S.resume) S.resume(); }; });
-    $('qpanel').innerHTML = ''; await sleep(150);
+    foeBubble(e.foe);
     while (S.hp > 0) {
       await ask();
       if (S.lives <= 0) return finish(false);
@@ -688,7 +694,7 @@ async function evolve(n) {
 }
 async function won() {
   const e = S.enc, boss = !!e.title, my = tok;
-  setFoe('faint'); const inner = $('foe').querySelector('.inner'); inner.classList.remove('bob');
+  document.querySelectorAll('.fbub').forEach(n => n.remove()); setFoe('faint'); const inner = $('foe').querySelector('.inner'); inner.classList.remove('bob');
   await sleep(450);
   if (!boss) {
     anim(inner, 'spinout', 1000); sfx('capture'); const c = center($('foe')); FX.burst(c[0], c[1], ['#fff', '#b6ff3b', '#ffd23f', '#2de2ff'], 50, 10);
