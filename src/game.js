@@ -103,7 +103,8 @@ function worldScreen() {
 let eggSeeds = [];
 function eggScreen() {
   const els = WORLDS[P.world].els;
-  eggSeeds = [0, 1, 2].map(i => ({ seed: Math.floor(Math.random() * 1e6) + 1, el: els[i % els.length] }));
+  eggSeeds = []; const bodies = [];
+  [0, 1, 2].forEach(i => { let seed, body, k = 0; do { seed = Math.floor(Math.random() * 1e6) + 1; body = C.make(seed, [els[i % els.length]]).body; } while (bodies.includes(body) && ++k < 40); bodies.push(body); eggSeeds.push({ seed, el: els[i % els.length] }); });
   show('egg', `<h2 class="t">¡Elige un huevo misterioso!</h2><p class="s">Dentro hay tu compañero de aventuras</p>
   <div class="eggs">${eggSeeds.map((e, i) => `<button class="egg" data-nav ${i === 1 ? 'data-first' : ''} data-act="egg" data-v="${i}" aria-label="Huevo ${i + 1}">${C.egg(e.el)}</button>`).join('')}</div>`, { back: 'world', backBtn: true });
 }
@@ -131,9 +132,27 @@ function modeScreen() {
   <div class="cards-grid">${cats.map(c => { const I2 = Q.info(c, P.cycle); return `<button class="card" style="--c:${I2.color}" data-nav data-act="single" data-v="${c}">${bk(c)}<div class="ic" style="color:${I2.color}">${catIcon(c)}</div><span class="nm">${I2.name}</span></button>`; }).join('')}</div>
   <p class="keys">Duelo rápido: 2 combates + jefe de la categoría</p>`, { back: 'egg', backBtn: true });
 }
+function foeSayHtml(cr, title) {
+  return `<div class="foesay" style="--c:${C.ELEM[cr.element].body}"><span class="who">${title ? '<em>JEFE</em> ' + title + ' · ' : ''}${cr.name}</span><span class="txt">${cr.say}</span><span class="go">Toca o pulsa ESPACIO para seguir</span></div>`;
+}
+let dexTimer = 0;
+function dexSay(el, bounce) {
+  const d = SAVE.dex[+el.dataset.v]; if (!d) return; const cr = mkCr(d);
+  document.querySelectorAll('.dexbub').forEach(n => n.remove()); clearTimeout(dexTimer);
+  const b = document.createElement('div'); b.className = 'dexbub'; b.style.setProperty('--c', C.ELEM[cr.element].body); b.setAttribute('role', 'status');
+  b.innerHTML = `<b>${cr.name}</b><span>${cr.say}</span>`; document.body.appendChild(b);
+  const r = el.getBoundingClientRect(), w = b.offsetWidth, h = b.offsetHeight;
+  let x = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), innerWidth - w - 8), y = r.top - h - 10, below = false;
+  if (y < 8) { y = r.bottom + 10; below = true; }
+  b.style.left = x + 'px'; b.style.top = y + 'px'; b.classList.toggle('below', below); b.style.setProperty('--ax', Math.round(r.left + r.width / 2 - x) + 'px');
+  if (bounce) { const sv = el.querySelector('svg'); if (sv) anim(sv, 'dhop', 600); sfx('click'); live(cr.name + ' dice: ' + cr.say); }
+  dexTimer = setTimeout(() => b.remove(), 4200);
+}
+app.addEventListener('pointerover', e => { if (e.pointerType !== 'mouse') return; const c = e.target.closest && e.target.closest('.dcell'); if (c) dexSay(c, true); });
+app.addEventListener('pointerout', e => { if (e.pointerType !== 'mouse') return; const c = e.target.closest && e.target.closest('.dcell'); if (c && !c.contains(e.relatedTarget)) { clearTimeout(dexTimer); document.querySelectorAll('.dexbub').forEach(n => n.remove()); } });
 function dexScreen() {
   const n = SAVE.dex.length;
-  show('dex', `<h2 class="t">Mi colección · ${n}</h2>${n ? `<div class="dex">${SAVE.dex.map((d, i) => { const cr = mkCr(d); return `<div>${C.svg(cr, { mood: 'happy', uid: 'd' + i })}<br>${cr.name}</div>`; }).join('')}</div>` : '<p class="s">Todavía no has domado ninguna criatura. ¡Gana combates para conseguirlas!</p>'}
+  show('dex', `<h2 class="t">Mi colección · ${n}</h2>${n ? `<div class="dex">${SAVE.dex.map((d, i) => { const cr = mkCr(d); return `<button class="dcell" data-nav data-act="dexsay" data-v="${i}" aria-label="${cr.name}: ${cr.say.replace(/"/g, '')}">${C.svg(cr, { mood: 'happy', uid: 'd' + i })}<span>${cr.name}</span></button>`; }).join('')}</div>` : '<p class="s">Todavía no has domado ninguna criatura. ¡Gana combates para conseguirlas!</p>'}
   <button class="btn" data-nav data-first data-act="back">Volver</button>`, { back: 'title' });
 }
 
@@ -391,6 +410,7 @@ function act(a, v, el) {
     case 'gostory': closeModal(); startRun('story', null); break;
     case 'single': startRun('single', v); break;
     case 'dex': dexScreen(); break;
+    case 'dexsay': if (el) dexSay(el, true); break;
     case 'help': helpModal(); break;
     case 'teacher': teacherModal(); break;
     case 'closemodal': closeModal(); break;
@@ -419,7 +439,12 @@ const ENC = ['¡Casi!', 'Equivocarse también es aprender.', 'No pasa nada, ¡a 
 const PRAISE = ['¡Correcto!', '¡Muy bien!', '¡Bien pensado!', '¡Eso es!'];
 const BOSS_FINAL = 'Gran Maestro Calculón';
 function buildPlan(mode, cat, cycle) {
-  const els = WORLDS[P.world].els, mk = () => C.make(Math.floor(Math.random() * 1e7) + 7, els);
+  const els = WORLDS[P.world].els, me = mkCr(P.cr), usedNames = new Set([me.name]), lastBodies = [];
+  const mk = () => {
+    let c, k = 0;
+    do { c = C.make(Math.floor(Math.random() * 1e7) + 7, els); k++; } while (k < 80 && (usedNames.has(c.name) || c.body === me.body || lastBodies.includes(c.body)));
+    usedNames.add(c.name); lastBodies.push(c.body); if (lastBodies.length > 3) lastBodies.shift(); return c;
+  };
   const plan = [];
   if (mode === 'single') {
     plan.push({ kind: 'wild', cat, need: 4, foe: mk() }, { kind: 'wild', cat, need: 4, foe: mk() }, { kind: 'boss', cat, need: 5, foe: mk(), title: Q.info(cat, cycle).boss });
@@ -528,6 +553,10 @@ async function run() {
     banner(boss ? `¡${e.title}!` : `¡Aparece ${e.foe.name}!`, boss ? (e.kind === 'final' ? '¡El combate definitivo!' : 'Un jefe bloquea el camino') : info.name, boss, boss ? 2300 : 1500);
     live(boss ? 'Jefe: ' + e.title : 'Aparece ' + e.foe.name);
     await sleep(boss ? 2300 : 1500);
+    $('qpanel').style.display = ''; $('qpanel').innerHTML = foeSayHtml(e.foe, boss ? e.title : '');
+    live(e.foe.name + ' dice: ' + e.foe.say); S.hintAt = performance.now();
+    await new Promise(r => { let t; S.resume = () => { clearTimeout(t); S.resume = null; r(); }; t = setTimeout(() => { if (S && S.resume) S.resume(); }, 3800); const bx = $('qpanel').querySelector('.foesay'); if (bx) bx.onclick = () => { if (S && S.resume) S.resume(); }; });
+    $('qpanel').innerHTML = ''; await sleep(150);
     while (S.hp > 0) {
       await ask();
       if (S.lives <= 0) return finish(false);

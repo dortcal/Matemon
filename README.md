@@ -54,3 +54,10 @@ Diseñado por **David OZC** · © David 2026 · **Uso gratuito en centros educat
 [![CC BY-NC-ND 4.0](https://licensebuttons.net/l/by-nc-nd/4.0/88x31.png)](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es)
 
 Obra bajo licencia [Creative Commons Reconocimiento-NoComercial-SinObraDerivada 4.0 Internacional (CC BY-NC-ND 4.0)](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es): se puede copiar y compartir con reconocimiento de autoría, sin uso comercial y sin modificaciones.
+
+## Criaturas y colección
+
+- **Más variedad:** hay 9 tipos de criatura (blob, gato, dino, pájaro, pez, bicho, conejo, tortuga y búho). Cada una combina además pelaje (lisa, con manchas, rayas o marca en la frente), estilo de ojos, complementos, colores mezclados con otros elementos y cuerpo más ancho o más bajito.
+- **Rivales distintos a tu compañero:** nunca te encuentras a una criatura con el mismo nombre ni el mismo tipo de cuerpo que la tuya, ni se repiten los nombres ni los cuerpos de los últimos rivales.
+- **Frases graciosas:** cada criatura tiene su frase propia (con un sonido según su tipo). En **Mi colección** sale al pasar el ratón por encima, al tocarla o al pulsar Espacio sobre ella. En el juego, el rival la dice al aparecer (toca o pulsa Espacio para seguir).
+
