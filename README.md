@@ -12,7 +12,7 @@ Juego educativo de matemáticas para Primaria. Se juega en el navegador (sin ins
 | Domador Rayo | 3.º | Tablas del 2 al 5 y 10, repartos en grupos, fracciones sencillas, redondeo, valor de posición, perímetro y áreas de rectángulos |
 | Guardián Marea | 4.º | Todas las tablas, divisiones con resto, fracciones equivalentes y de una cantidad, decimales, ángulos, cuadriláteros y la moda |
 | Maestro Volcán | 5.º | Decimales, operaciones combinadas, fracciones y decimales, áreas de triángulos y paralelogramos, ángulos de un triángulo y media |
-| Campeón del Teide | 6.º | Números negativos, porcentajes, mcm y mcd, círculo, simplificar fracciones, probabilidad, divisiones con decimales y mediana |
+| Campeón del Atlántico | 6.º | Números negativos, porcentajes, mcm y mcd, círculo, simplificar fracciones, probabilidad, divisiones con decimales y mediana |
 
 Un nivel por curso: dentro de cada ciclo, el curso bajo (1.º, 3.º, 5.º) es más fácil y el alto (2.º, 4.º, 6.º) más difícil, y en cada partida la dificultad va creciendo. El decreto organiza el currículo por ciclos: esta distribución por cursos es una propuesta didáctica.
 
