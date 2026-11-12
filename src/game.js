@@ -620,7 +620,7 @@ async function answer(i) {
       if (S.hp > 0) setFoe();
       if (S.stage === 1 && S.correct >= S.evo2) await evolve(2); else if (S.stage === 2 && S.correct >= S.evo3) await evolve(3);
       if (S.hp > 0) setMe();
-      { const left = Math.max(400, 3800 - (performance.now() - t0)); await new Promise(r => { let t; S.resume = () => { clearTimeout(t); S.resume = null; r(); }; t = setTimeout(() => { if (S && S.resume) S.resume(); }, left); const c = $('qcard'); if (c) c.onclick = () => { if (S && S.resume && performance.now() - S.hintAt > 400) S.resume(); }; }); }
+      { const left = Math.max(400, 8800 - (performance.now() - t0)); await new Promise(r => { let t; S.resume = () => { clearTimeout(t); S.resume = null; r(); }; t = setTimeout(() => { if (S && S.resume) S.resume(); }, left); const c = $('qcard'); if (c) c.onclick = () => { if (S && S.resume && performance.now() - S.hintAt > 400) S.resume(); }; }); }
       await sleep(120);
     } else {
       S.streak = 0; S.wrong++; S.dyn = Math.max(-.2, S.dyn - .07); S.lives--;
@@ -646,7 +646,7 @@ async function answer(i) {
       card.innerHTML = `<div class="hintcard"><span class="oops">${S.timedOut ? '¡Se acabó el tiempo!' : R.pick(ENC)} La respuesta era ${strip(q.answers[q.correct]) || '…'}</span><div class="ht">${q.hint}</div><span class="go">Pulsa <b>ESPACIO</b> o toca para seguir</span></div>`;
       if (!strip(q.answers[q.correct])) card.querySelector('.oops').textContent = '¡Casi! Fíjate bien en la figura correcta';
       S.hintAt = performance.now(); S.timedOut = false;
-      await new Promise(r => { let t; S.resume = () => { clearTimeout(t); S.resume = null; r(); }; t = setTimeout(() => { if (S && S.resume) S.resume(); }, 7000); card.onclick = () => { if (performance.now() - S.hintAt > 400 && S.resume) S.resume(); }; });
+      await new Promise(r => { let t; S.resume = () => { clearTimeout(t); S.resume = null; r(); }; t = setTimeout(() => { if (S && S.resume) S.resume(); }, 12000); card.onclick = () => { if (performance.now() - S.hintAt > 400 && S.resume) S.resume(); }; });
     }
     S.q = null; S.resolveAsk && S.resolveAsk();
   } catch (e) { if (e !== CANCEL) throw e; }
@@ -752,7 +752,7 @@ function askContinue(my) {
 }
 
 
-/* ---------- ceremonia de final (≈10 s) ---------- */
+/* ---------- ceremonia de final (≈35 s) ---------- */
 const EFFORT_CLEAN = ['Has llegado al final sin rendirte ni una vez. ¡Impresionante!', 'Constancia, cabeza y corazón: así se gana una Liga.', 'Cada reto superado te ha hecho más fuerte. ¡Y lo notas!'];
 const EFFORT_ERR = ['Has fallado, has aprendido y has seguido: así se aprende de verdad.', 'Los errores no te frenaron: te enseñaron el camino. ¡Eso es esfuerzo!', 'Equivocarse y volver a intentarlo es el superpoder más grande.'];
 const EFFORT_CONT = ['Te caíste, respiraste y volviste a levantarte. Eso hace grande a quien doma criaturas.', 'Terminar después de tropezar vale oro: ¡la constancia gana ligas!', 'Cada error te enseñó algo y tú seguiste. ¡Eso es esfuerzo de verdad!'];
@@ -764,7 +764,7 @@ async function ceremony(my) {
   const parade = S.tamed.slice(0, 12).map((t, i) => `<div style="animation-delay:${(i * .22).toFixed(2)}s">${C.svg(t.cr, { mood: 'happy', uid: 'cp' + i })}</div>`).join('');
   show('cere', `<div class="cere"><div class="stage"><div class="rays"></div><div class="cpet">${C.svg(S.me, { mood: 'happy', stage: S.stage, uid: 'ce' })}</div><div class="medal" id="cmedal">${medal}</div></div>
     <div class="ctitle" id="ctitle" aria-live="polite">¡Lo has conseguido!</div><div class="cmsg" id="cmsg"></div><div class="cparade" id="cpar" aria-hidden="true"></div>
-    <div class="cbar"><i style="animation-duration:${10 * k}s"></i></div><div class="cskip" id="cskip">Toca la pantalla o pulsa ESPACIO para saltar</div></div>`, { noFocus: true });
+    <div class="cbar"><i style="animation-duration:${35 * k}s"></i></div><div class="cskip" id="cskip">Toca la pantalla o pulsa ESPACIO para saltar</div></div>`, { noFocus: true });
   const sc = app.querySelector('.cere'); sc.addEventListener('click', () => { if (performance.now() - UI.cereT > 1500) UI.cereSkip = true; });
   const set = (t, m) => { const a = $('ctitle'), b = $('cmsg'); if (!a) return; a.textContent = t; b.textContent = m || ''; anim(a, 'cpop2', 500); if (m) anim(b, 'cpop2', 500); };
   live('¡Lo has conseguido! Has llegado al final del juego.');
@@ -772,16 +772,16 @@ async function ceremony(my) {
   const fw = setInterval(() => { if (my !== tok || UI.screen !== 'cere') return clearInterval(fw); FX.burst(W * (.15 + Math.random() * .7), H * (.12 + Math.random() * .4), [['#ffd23f', '#fff', '#ff3d9a'], ['#2de2ff', '#fff', '#b6ff3b'], ['#ff9f43', '#ffd23f', '#ff6a8a']][Math.floor(Math.random() * 3)], 34, 8); }, 650 / k);
   setTimeout(() => { const s = $('cskip'); if (s) s.classList.add('on'); }, 1500);
   try {
-    await T(2500); if (my !== tok || UI.cereSkip) throw 0;
+    await T(7500); if (my !== tok || UI.cereSkip) throw 0;
     set('Tú y ' + S.me.name, 'habéis llegado juntos hasta el final'); sfx('heal');
-    await T(2300); if (UI.cereSkip) throw 0;
+    await T(7300); if (UI.cereSkip) throw 0;
     const m = $('cmedal'); if (m) m.classList.add('in'); set('Medalla al esfuerzo', ''); sfx('evolve'); FX.confetti(70);
-    await T(1500); if (UI.cereSkip) throw 0;
+    await T(6500); if (UI.cereSkip) throw 0;
     const pr = $('cpar'); if (pr) pr.innerHTML = parade;
     set(S.tamed.length === 1 ? 'Has domado 1 criatura' : 'Has domado ' + S.tamed.length + ' criaturas', 'y has resuelto ' + S.correct + ' retos'); if (S.tamed.length) sfx('capture');
-    await T(2000); if (UI.cereSkip) throw 0;
+    await T(7000); if (UI.cereSkip) throw 0;
     set(S.cont ? 'Superación' : S.wrong ? 'Aprender de los errores' : 'Sin una sola caída', R.pick(S.cont ? EFFORT_CONT : S.wrong ? EFFORT_ERR : EFFORT_CLEAN));
-    await T(1900);
+    await T(6900);
   } catch (e) { if (e !== 0) throw e; }
   clearInterval(fw); UI.cereSkip = false;
 }
