@@ -1722,6 +1722,9 @@ const PLUS = {
     [1, 3, g => { const w = R.int(3, 5), h = R.int(3, 4), gone = new Set(), cw = R.int(1, 2), ch = R.int(1, 2); for (let x = w - cw; x < w; x++) for (let y = 0; y < ch; y++) gone.add(x + ',' + y); const ans = w * h - cw * ch; return pq('areas', 'gl' + w + h + cw + ch, `¿Cuántos cuadraditos tiene esta figura?`, String(ans), numWrong(ans, [w * h, w + h]).map(String), `Cuenta uno a uno: ${ans} cuadraditos`, { visual: svg(`0 0 ${w * GCELL + 8} ${h * GCELL + 8}`, gridSvg(w, h, gone, '#ffd23f'), 'grid') }); }],
     [1, 3, g => { const a = [R.int(2, 4), R.int(2, 3)], b = [R.int(2, 4), R.int(2, 3)], A = a[0] * a[1], B = b[0] * b[1], ok = A > B ? 'La figura A' : A < B ? 'La figura B' : 'Las dos igual'; const W = a[0] * GCELL + b[0] * GCELL + 40, H = Math.max(a[1], b[1]) * GCELL + 36; const v = svg(`0 0 ${W} ${H}`, gridSvg(a[0], a[1], null, '#2de2ff', 4, 4, 'A') + gridSvg(b[0], b[1], null, '#ff8fb8', a[0] * GCELL + 36, 4, 'B'), 'grid'); return pq('areas', 'gm' + a + b, '¿Qué figura cubre MÁS cuadraditos?', ok, ['La figura A', 'La figura B', 'Las dos igual'].filter(x => x !== ok), `A tiene ${A} cuadraditos y B tiene ${B}`, { visual: v, order: ['La figura A', 'La figura B', 'Las dos igual'] }); }],
     [3, 5, g => { const w = R.int(2, 7), h = R.int(2, 5), ans = 2 * (w + h); return pq('areas', 'gp' + w + h, 'Cada cuadradito mide 1 cm de lado. ¿Cuál es el perímetro de este rectángulo?', ans + ' cm', numWrong(ans, [w * h, w + h]).map(x => x + ' cm'), `Vuelta completa: ${w} + ${h} + ${w} + ${h} = ${ans} cm`, { visual: svg(`0 0 ${w * GCELL + 8} ${h * GCELL + 8}`, gridSvg(w, h, null, '#b6ff3b'), 'grid') }); }],
+    [1, 3, g => { const w = R.int(3, 5), h = R.int(2, 3), tot = w * h, k = R.int(2, tot - 2), pn = new Set(R.shuffle(Array.from({ length: tot }, (_, i) => i)).slice(0, k)); let c = ''; for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) c += `<rect x="${4 + x * GCELL}" y="${4 + y * GCELL}" width="${GCELL}" height="${GCELL}" fill="${pn.has(y * w + x) ? '#2de2ff' : '#fff'}" stroke="${INK}" stroke-width="2.5"/>`; const ans = tot - k; return pq('areas', 'gu' + w + h + [...pn], '¿Cuántos cuadraditos NO están pintados de azul?', String(ans), numWrong(ans, [k, tot]).map(String), `En total hay ${tot} y ${k} están pintados: ${tot} − ${k} = ${ans}`, { visual: svg(`0 0 ${w * GCELL + 8} ${h * GCELL + 8}`, c, 'grid') }); }],
+    [1, 3, g => { const a = [R.int(2, 4), R.int(2, 3)], b = [R.int(2, 4), R.int(2, 3)], A = a[0] * a[1], B = b[0] * b[1]; if (A === B) return null; const d = Math.abs(A - B), W = a[0] * GCELL + b[0] * GCELL + 40, H = Math.max(a[1], b[1]) * GCELL + 36; return pq('areas', 'gd' + a + b, `¿Cuántos cuadraditos tiene la figura ${A > B ? 'A' : 'B'} más que la figura ${A > B ? 'B' : 'A'}?`, String(d), numWrong(d, [A, B, A + B]).map(String), `${Math.max(A, B)} − ${Math.min(A, B)} = ${d}`, { visual: svg(`0 0 ${W} ${H}`, gridSvg(a[0], a[1], null, '#2de2ff', 4, 4, 'A') + gridSvg(b[0], b[1], null, '#ff8fb8', a[0] * GCELL + 36, 4, 'B'), 'grid') }); }],
+    [2, 3, g => { const r = R.int(2, 5), c = R.int(3, 6), t = R.pick(['baldosas', 'ventanas', 'sillas', 'macetas']), ans = r * c; return pq('areas', 'gf' + r + c + t, `Hay ${r} filas con ${c} ${t} en cada una. Si sumas fila a fila, ¿cuántas ${t} hay?`, String(ans), numWrong(ans, [r + c, c]).map(String), `${Array(r).fill(c).join(' + ')} = ${ans}`); }],
     [4, 6, g => { const l = R.int(3, 9), a = R.int(2, 5), cost = R.pick([1, 2, 3]), area = l * a, ans = area * cost; return pq('areas', 'pt' + l + a + cost, `Una pared mide ${l} m de largo y ${a} m de alto. Para cada m² ${cost === 1 ? 'hace falta 1 litro' : 'hacen falta ' + cost + ' litros'} de pintura. ¿Cuántos litros se necesitan?`, ans + ' l', numWrong(ans, [area, 2 * (l + a), l * a * cost + cost]).map(x => x + ' l'), `Área: ${l} × ${a} = ${area} m²; ${area} × ${cost} = ${ans} litros`); }],
     [5, 6, g => { const k = R.int(1, 9), t = R.pick(['m2dm', 'dm2cm']), ans = k * 100; return pq('areas', 'ud' + t + k, t === 'm2dm' ? `${k} m² = ${BLANK} dm²` : `${k} dm² = ${BLANK} cm²`, N(ans), [k * 10, k * 1000, k * 100 + 10, k].map(N).filter(x => x !== N(ans)), `${t === 'm2dm' ? '1 m² = 100 dm²' : '1 dm² = 100 cm²'}; ${k} × 100 = ${ans}`); }],
     [5, 6, g => { const a = R.int(3, 9), b = R.int(2, 6), c = R.int(2, 5), d = R.int(2, 5), A = a * b + c * d; return pq('areas', 'ls' + a + b + c + d, `Un jardín con forma de L se forma con un rectángulo de ${a} m × ${b} m y otro de ${c} m × ${d} m. ¿Cuál es su área total?`, A + ' m²', numWrong(A, [a * b, c * d, (a + c) * (b + d)]).map(x => x + ' m²'), `${a} × ${b} = ${a * b} y ${c} × ${d} = ${c * d}; ${a * b} + ${c * d} = ${A}`); }],
@@ -1787,11 +1790,12 @@ function plusQ(cat, g) {
 
 /* dificultad (d) que recorre cada curso: el curso bajo del ciclo es más fácil y el alto, más difícil */
 const RANGE = { 1: [0, .5], 2: [.35, 1], 3: [0, .55], 4: [.3, 1], 5: [0, .6], 6: [.35, 1] };
-const seen = new Set();
+const seen = new Set(), RECENT = {};
+const skel = q => String(q.text).replace(/<svg[\s\S]*?<\/svg>/g, '').replace(/<[^>]*>/g, '').replace(/[\d.,−-]+/g, '#').replace(/\b(Aday|Yaiza|Nauzet|Candela|Guacimara|Airam|Dácil|Jonay|Iballa|Beneharo)\b/g, 'N').slice(0, 50);
 function generate(cat, cycle, d, grade) {
   d = Math.max(0, Math.min(1, d)); GRD = grade || cycle * 2;
   const easyP = cycle >= 2 ? (GRD % 2 === 0 ? .25 : .40) : 0;
-  let last = null;
+  let last = null, alt = null;
   for (let i = 0; i < 60; i++) {
     let q = null;
     try {
@@ -1805,12 +1809,16 @@ function generate(cat, cycle, d, grade) {
     } catch (e) { q = null; }
     if (!q) continue;
     last = q;
-    if (!seen.has(q.key)) { seen.add(q.key); return q; }
+    if (seen.has(q.key)) continue;
+    const sg = skel(q), rc = (RECENT[cat] = RECENT[cat] || []), n4 = rc.slice(-4).filter(x => x === sg).length, n10 = rc.slice(-10).filter(x => x === sg).length;
+    if (n4 === 0 && n10 < 2) { seen.add(q.key); rc.push(sg); return q; }   /* tipo de pregunta distinto de los últimos */
+    if (!alt || n10 + n4 < alt.score) alt = { q, sg, score: n10 + n4 };      /* plan B: el tipo menos repetido */
   }
+  if (alt) { seen.add(alt.q.key); (RECENT[cat] = RECENT[cat] || []).push(alt.sg); return alt.q; }
   return last || generate(cat, cycle, d + .01 > 1 ? 0 : d, grade);
 }
 G.Q = {
-  generate, resetSeen: () => seen.clear(), range: g => RANGE[g].slice(), cycleOf: g => Math.ceil(g / 2), _MORE: MORE, _PLUS: PLUS, _plusQ: plusQ,
+  generate, resetSeen: () => { seen.clear(); for (const k in RECENT) delete RECENT[k]; }, range: g => RANGE[g].slice(), cycleOf: g => Math.ceil(g / 2), _MORE: MORE, _PLUS: PLUS, _plusQ: plusQ,
   cats: c => BYCYCLE[c].slice(),
   info: (cat, cycle) => { const o = Object.assign({}, INFO[cat]); if (cat === 'areas' && cycle === 1) { o.name = 'Cuadraditos'; o.boss = 'Gigante Cuadrícula'; } return o; },
   _R: R, _EASY: EASY, _EXTRA: EXTRA
