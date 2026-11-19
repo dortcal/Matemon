@@ -860,7 +860,6 @@ function showResults(done) {
   window.__last = { letter, total, acc, done, stats: S.stats };
   setTimeout(() => { UI.audioOn && AU.startMusic('menu', P.world); curTrack = 'menu' + P.world; }, 2600);
   S.ended = true; UI.resT = performance.now();
-  if (done) { const my = tok; setTimeout(() => { if (my === tok && S && S.ended && UI.screen === 'results' && !modalOpen()) { reportModal(); const cb = document.querySelector('#modal [data-act="closemodal"]'); if (cb) cb.focus(); } }, 1200); }
 }
 
 /* ---------- arranque ---------- */

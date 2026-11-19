@@ -63,4 +63,4 @@ Obra bajo licencia [Creative Commons Reconocimiento-NoComercial-SinObraDerivada 
 - Las colecciones guardadas con la versión anterior se adaptan automáticamente al nuevo plantel.
 
 
-**Fin de partida:** tras la ceremonia aparece el informe automáticamente. Las teclas quedan bloqueadas unos segundos para evitar pulsaciones repetidas y «Jugar otra vez» pide confirmar con la tecla **C** (o tocando el botón verde); después se elige un escenario distinto.
+**Fin de partida:** tras la ceremonia aparecen los resultados con el botón «Informe del alumnado». Las teclas quedan bloqueadas unos segundos para evitar pulsaciones repetidas y «Jugar otra vez» pide confirmar con la tecla **C** (o tocando el botón verde); después se elige un escenario distinto.
