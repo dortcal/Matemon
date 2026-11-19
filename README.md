@@ -24,7 +24,7 @@ Tiempo máximo por pregunta: **1 minuto** en 1.º–2.º, **2 minutos** en 3.º�
 
 **Continuar tras perder las vidas:** al quedarse sin vidas aparece una cuenta atrás de 6 segundos; con un toque en la pantalla o con ESPACIO (también Makey Makey) la criatura revive con todas sus vidas y una frase divertida distinta cada vez. Cada continuación baja la calificación un nivel (máximo 3; la S solo se logra sin continuar), resta 500 puntos y anula el bonus de corazones. El número de continuaciones y las actividades donde ocurrieron figuran en la pantalla final y en el informe.
 
-**Ceremonia final:** al completar la misión se reproduce una animación de unos 35 segundos (se puede saltar) (fuegos artificiales, medalla al esfuerzo, criaturas domadas y un mensaje de superación según cómo se ha jugado). Se puede saltar con un toque o con ESPACIO.
+**Ceremonia final:** al completar la misión se reproduce una animación de unos 35 segundos (no se puede saltar con el teclado, solo tocando la pantalla) (fuegos artificiales, medalla al esfuerzo, criaturas domadas y un mensaje de superación según cómo se ha jugado). Se puede saltar con un toque o con ESPACIO.
 
 **Informe del alumnado:** al terminar (o en game over), el botón «Informe del alumnado» muestra y permite descargar en PDF el detalle de la partida: resumen, sentidos y criterios (orientativos), resultados y tiempos por actividad y errores con su explicación. Se genera en el propio dispositivo y no recoge datos personales (el nombre se escribe a mano).
 
@@ -61,3 +61,6 @@ Obra bajo licencia [Creative Commons Reconocimiento-NoComercial-SinObraDerivada 
 - **Rivales distintos a tu compañero:** nunca te encuentras a tu propia criatura ni a otra con tu mismo tipo de cuerpo, y en una partida no se repite ningún rival. Los tres huevos que se ofrecen son de cuerpos distintos.
 - **Frases graciosas:** cada criatura dice su frase. En **Mi colección** (con las 48 casillas, las no descubiertas en sombra) sale al pasar el ratón por encima, al tocarla o al pulsar Espacio sobre ella. En el juego, el rival la dice en un bocadillo junto a él al empezar el combate (unos 4 s, sin bloquear la pregunta ni alargar la partida).
 - Las colecciones guardadas con la versión anterior se adaptan automáticamente al nuevo plantel.
+
+
+**Fin de partida:** tras la ceremonia aparece el informe automáticamente. Las teclas quedan bloqueadas unos segundos para evitar pulsaciones repetidas y «Jugar otra vez» pide confirmar con la tecla **C** (o tocando el botón verde); después se elige un escenario distinto.

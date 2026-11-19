@@ -2402,7 +2402,8 @@ function levelScreen() {
   <div class="lvgrid">${[1, 2, 3].map(c => `<div class="lvcol"><span class="chip">${CYCLE_NAMES[c]}</span>${card(c * 2 - 1)}${card(c * 2)}</div>`).join('')}</div>`, { back: 'title', backBtn: true });
 }
 function worldScreen() {
-  show('world', `<h2 class="t">Elige tu mundo</h2><p class="s">Cambia los fondos, la música y las criaturas</p>
+  const nw = UI.newWorld && WORLDS[UI.newWorld]; UI.newWorld = null;
+  show('world', `<h2 class="t">${nw ? 'Elige un escenario diferente' : 'Elige tu mundo'}</h2><p class="s">${nw ? 'Antes jugaste en ' + nw.name + '. ¡Prueba otro!' : 'Cambia los fondos, la música y las criaturas'}</p>
   <div class="row">${Object.keys(WORLDS).map(k => { const W = WORLDS[k]; return `<button class="card" style="--c:${W.color}" data-nav data-world="${k}" ${k === P.world ? 'data-first' : ''} data-act="world" data-v="${k}"><div class="minis" style="display:flex;gap:.2rem;height:4rem">${W.els.map((e, i) => `<div style="width:4rem">${C.svg(C.make(k.length * 17 + i * 5, [e]), { uid: k + i })}</div>`).join('')}</div><span class="nm">${W.name}</span><span class="ds">${W.desc}</span></button>`; }).join('')}</div>`, { back: 'level', backBtn: true });
 }
 let eggSeeds = [];
@@ -2673,7 +2674,7 @@ function moveFocus(dir, root) {
   if (!best) { const idx = items.indexOf(cur); best = (dir === 'left' || dir === 'up') ? items[(idx - 1 + items.length) % items.length] : items[(idx + 1) % items.length]; }
   best.focus({ preventScroll: false }); sfx('move');
 }
-const KEYMAP = { ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', Space: 'ok', Enter: 'ok', NumpadEnter: 'ok', Escape: 'pause', KeyP: 'pause', KeyM: 'mute', Digit1: 'n1', Digit2: 'n2', Digit3: 'n3', Digit4: 'n4', Numpad1: 'n1', Numpad2: 'n2', Numpad3: 'n3', Numpad4: 'n4' };
+const KEYMAP = { ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', Space: 'ok', Enter: 'ok', NumpadEnter: 'ok', Escape: 'pause', KeyC: 'confirm', KeyP: 'pause', KeyM: 'mute', Digit1: 'n1', Digit2: 'n2', Digit3: 'n3', Digit4: 'n4', Numpad1: 'n1', Numpad2: 'n2', Numpad3: 'n3', Numpad4: 'n4' };
 const down = new Set();
 function startAudio() { if (!UI.audioOn) { UI.audioOn = true; AU.init(); curTrack = ''; musicFor(UI.screen === 'battle' ? 'battle' : 'menu'); } }
 window.addEventListener('keydown', e => {
@@ -2687,13 +2688,15 @@ window.addEventListener('pointerdown', startAudio, { passive: true });
 
 function onAct(a) {
   if (a === 'mute') { toggleMute(); return; }
-  if (UI.screen === 'cere') { if (a === 'ok' && performance.now() - (UI.cereT || 0) > 1500) UI.cereSkip = true; return; }
+  if (UI.screen === 'cere') return; /* la ceremonia final no se puede saltar con el teclado */
+  if (a === 'confirm') { if (document.getElementById('againok')) act('again'); return; }
+  if (UI.screen === 'results' && performance.now() - (UI.resT || 0) < 3000) return; /* antipulsaciones al aparecer los resultados */
   if (S && S.contWait) { if (a === 'ok') S.contWait(); return; }
   if (UI.busy) return;
   if (modalOpen()) {
     const m = document.getElementById('modal');
     if (a === 'pause') { if (S && S.paused && UI.screen === 'battle') act('resume'); else closeModal(); return; }
-    if (a === 'ok') { const f = document.activeElement; if (f && m.contains(f) && f.tagName === 'BUTTON') f.click(); return; }
+    if (a === 'ok') { const f = document.activeElement; if (f && m.contains(f) && f.tagName === 'BUTTON' && !f.dataset.nokey) f.click(); return; }
     if (['up', 'down', 'left', 'right'].includes(a)) moveFocus(a, m); return;
   }
   if (UI.screen === 'battle') return battleKey(a);
@@ -2734,7 +2737,8 @@ function act(a, v, el) {
     case 'pause': pauseGame(); break;
     case 'resume': resumeGame(); break;
     case 'quit': quitRun(); break;
-    case 'again': startRun(S.mode, S.cat); break;
+    case 'againask': modal(`<h3>¿Empezar otra partida?</h3><p>Antes de empezar de nuevo, comprueba que has visto el informe.</p><p><b>Para confirmar pulsa la tecla C</b> o toca el botón verde. No sirve la barra espaciadora.</p><div class="row"><button class="btn violet" data-first data-nav data-act="closemodal">No, volver</button><button class="btn" id="againok" data-nokey="1" data-act="again">Sí, jugar otra vez</button></div>`); break;
+    case 'again': { closeModal(); const ks = Object.keys(WORLDS), old = P.world; P.world = ks[(ks.indexOf(old) + 1) % ks.length]; UI.newWorld = old; FX.setWorld(P.world); worldScreen(); break; }
     case 'menu': tok++; S = null; modeScreen(); musicFor('menu'); break;
     case 'home': tok++; S = null; titleScreen(); break;
     case 'full': toggleFull(); break;
@@ -3106,7 +3110,7 @@ async function ceremony(my) {
   const parade = S.tamed.slice(0, 12).map((t, i) => `<div style="animation-delay:${(i * .22).toFixed(2)}s">${C.svg(t.cr, { mood: 'happy', uid: 'cp' + i })}</div>`).join('');
   show('cere', `<div class="cere"><div class="stage"><div class="rays"></div><div class="cpet">${C.svg(S.me, { mood: 'happy', stage: S.stage, uid: 'ce' })}</div><div class="medal" id="cmedal">${medal}</div></div>
     <div class="ctitle" id="ctitle" aria-live="polite">¡Lo has conseguido!</div><div class="cmsg" id="cmsg"></div><div class="cparade" id="cpar" aria-hidden="true"></div>
-    <div class="cbar"><i style="animation-duration:${35 * k}s"></i></div><div class="cskip" id="cskip">Toca la pantalla o pulsa ESPACIO para saltar</div></div>`, { noFocus: true });
+    <div class="cbar"><i style="animation-duration:${35 * k}s"></i></div><div class="cskip" id="cskip">Toca la pantalla para saltar</div></div>`, { noFocus: true });
   const sc = app.querySelector('.cere'); sc.addEventListener('click', () => { if (performance.now() - UI.cereT > 1500) UI.cereSkip = true; });
   const set = (t, m) => { const a = $('ctitle'), b = $('cmsg'); if (!a) return; a.textContent = t; b.textContent = m || ''; anim(a, 'cpop2', 500); if (m) anim(b, 'cpop2', 500); };
   live('¡Lo has conseguido! Has llegado al final del juego.');
@@ -3154,12 +3158,13 @@ function showResults(done) {
   <div class="stats"><div><span>Aciertos</span><b>${S.correct}/${S.answered}</b></div><div><span>Precisión</span><b>${acc}%</b></div><div><span>Mejor racha</span><b>${S.best}</b></div><div><span>Vidas</span><b>${S.lives}/${S.maxLives}</b></div><div><span>Puntos de combate</span><b>${(S.score - S.bonus.enc - S.bonus.boss).toLocaleString('es-ES')}</b></div><div><span>Criaturas y jefes</span><b>+${S.bonus.enc + S.bonus.boss}</b></div>${done ? `${cont ? '' : `<div><span>Corazones</span><b>+${livesB}</b></div>`}<div><span>Misión</span><b>+${compB}</b></div>` : ''}${cont ? `<div class="pen"><span>Continuaciones (${cont})</span><b>−${pen.toLocaleString('es-ES')}</b></div>` : ''}<div class="tot"><span>TOTAL ${isBest ? '<span class="newb">¡RÉCORD!</span>' : ''}</span><b>${total.toLocaleString('es-ES')}</b></div></div>
   ${S.tamed.length ? `<div class="minipets">${S.tamed.map((t, i) => `<div title="${t.cr.name}">${C.svg(t.cr, { mood: 'happy', uid: 'r' + i })}</div>`).join('')}</div>` : ''}
   <div class="feelbox"><span class="chip">¿Cómo te has sentido con los retos?</span><div class="row">${[['Con confianza', 1, '#b6ff3b', 'M26 34q10 10 20 0'], ['Más o menos', 2, '#ffd23f', 'M26 38h20'], ['Con dudas', 3, '#ff9f43', 'M26 40q10-9 20 0']].map(f => `<button class="face" data-nav data-act="feel" data-v="${f[1]}" aria-label="${f[0]}"><svg viewBox="0 0 72 72"><circle cx="36" cy="36" r="30" fill="${f[2]}" stroke="#1b1140" stroke-width="4"/><circle cx="26" cy="29" r="4" fill="#1b1140"/><circle cx="46" cy="29" r="4" fill="#1b1140"/><path d="${f[3]}" fill="none" stroke="#1b1140" stroke-width="4" stroke-linecap="round"/></svg><span>${f[0]}</span></button>`).join('')}</div><p class="s" id="feelmsg" aria-live="polite"></p></div>
-  <div class="row"><button class="btn sm" data-nav data-first data-act="again">Jugar otra vez</button><button class="btn pink sm" data-nav data-act="powers">¡Descubre tus superpoderes!</button><button class="btn violet sm" data-nav data-act="report">Informe del alumnado</button><button class="btn cyan sm" data-nav data-act="menu">Cambiar modo</button><button class="btn ghost sm" data-nav data-act="home">Inicio</button></div>`, { noFocus: false });
+  <div class="row"><button class="btn sm" data-nav data-act="againask">Jugar otra vez</button><button class="btn pink sm" data-nav data-act="powers">¡Descubre tus superpoderes!</button><button class="btn violet sm" data-nav data-first data-act="report">Informe del alumnado</button><button class="btn cyan sm" data-nav data-act="menu">Cambiar modo</button><button class="btn ghost sm" data-nav data-act="home">Inicio</button></div>`, { noFocus: false });
   live(`Calificación ${letter}. ${title}. ${S.correct} aciertos de ${S.answered}. Total ${total} puntos`);
   S.final = { letter, total, title, done, cont, pen, base: rt.base[0] };
   window.__last = { letter, total, acc, done, stats: S.stats };
   setTimeout(() => { UI.audioOn && AU.startMusic('menu', P.world); curTrack = 'menu' + P.world; }, 2600);
-  S.ended = true;
+  S.ended = true; UI.resT = performance.now();
+  if (done) { const my = tok; setTimeout(() => { if (my === tok && S && S.ended && UI.screen === 'results' && !modalOpen()) { reportModal(); const cb = document.querySelector('#modal [data-act="closemodal"]'); if (cb) cb.focus(); } }, 1200); }
 }
 
 /* ---------- arranque ---------- */
